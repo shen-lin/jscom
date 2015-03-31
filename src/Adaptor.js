@@ -86,13 +86,27 @@ JSCOM.Adaptor.prototype.applyAdaptorAfter = function(adaptorFn, targetFnItem)
 	var thisAdaptor = this;
 	var originalFn = classObj.prototype[fnName];
 	var newFn = function() {
-		var output = originalFn.apply(this, arguments);
-		var adaptorArguments = {
-			inputs: arguments,
-			output: output
-		};
-		var adaptorOutput = adaptorFn.apply(thisAdaptor, adaptorArguments);
-		return adaptorOutput;
+		var returnVal, exception;
+		try {
+			returnVal = originalFn.apply(this, arguments);
+		} catch(error) {
+			exception = error;
+		}
+		
+		var adaptorArguments = [{
+			args: arguments,
+			returnVal: returnVal
+		}];
+
+		if (returnVal) {
+			return adaptorFn.apply(this, adaptorArguments);
+		} else if (exception) {
+			adaptorFn.apply(this, adaptorArguments);
+			throw exception;
+		} else {
+			adaptorFn.apply(this, adaptorArguments);
+			return;
+		}
 	}
 	classObj.prototype[fnName] = newFn;
 };
@@ -109,10 +123,10 @@ JSCOM.Adaptor.prototype.applyAdaptorAfterReturn = function(adaptorFn, targetFnIt
 	var thisAdaptor = this;
 	var originalFn = classObj.prototype[fnName];
 	var newFn = function() {
-		var output = originalFn.apply(this, arguments);
+		var returnVal = originalFn.apply(this, arguments);
 		var adaptorArguments = {
-			inputs: arguments,
-			output: output
+			args: arguments,
+			returnVal: returnVal
 		};
 		var adaptorOutput = adaptorFn.apply(thisAdaptor, adaptorArguments);
 		return adaptorOutput;
@@ -120,17 +134,67 @@ JSCOM.Adaptor.prototype.applyAdaptorAfterReturn = function(adaptorFn, targetFnIt
 	classObj.prototype[fnName] = newFn;	
 };
 
+/**
+ * Only executed when an exception is thrown. The adaptor functions acts as exception handling process.
+ */
 JSCOM.Adaptor.prototype.applyAdaptorAfterThrow = function(adaptorFn, targetFnItem) 
 {
-	
+	var classObj = targetFnItem.classObj;
+	var className = targetFnItem.className;
+	var fnName = targetFnItem.fnName;
+	var thisAdaptor = this;
+	var originalFn = classObj.prototype[fnName];
+	var newFn = function() {
+		var returnVal, exception;
+		try {
+			returnVal = originalFn.apply(this, arguments);
+		} catch(error) {
+			exception = error;
+		}
+		
+		var adaptorArguments = [{
+			args: arguments,
+			returnVal: returnVal
+		}];
+
+		if (exception) {
+			return adaptorFn.apply(this, adaptorArguments);
+		} else {
+			return returnVal;
+		}
+	}
+	classObj.prototype[fnName] = newFn;
 };
 
 JSCOM.Adaptor.prototype.applyAdaptorAround = function(adaptorFn, targetFnItem) 
 {
-	
+	var classObj = targetFnItem.classObj;
+	var className = targetFnItem.className;
+	var fnName = targetFnItem.fnName;
+	var thisAdaptor = this;
+	var originalFn = classObj.prototype[fnName];
+	var newFn = function() {
+		var adaptorArguments = {
+			args: arguments,
+			originFn: originalFn
+		};
+		return adaptorFn.apply(thisAdaptor, adaptorArguments);
+	}
+	classObj.prototype[fnName] = newFn;	
 };
 
 JSCOM.Adaptor.prototype.applyAdaptorIntroduce = function(adaptorFn, targetFnItem) 
 {
-	
+	var classObj = targetFnItem.classObj;
+	var className = targetFnItem.className;
+	var fnName = targetFnItem.fnName;
+	var thisAdaptor = this;
+	var originalFn = classObj.prototype[fnName];
+	var newFn = function() {
+		var adaptorArguments = {
+			args: arguments
+		};
+		return adaptorFn.apply(thisAdaptor, adaptorArguments);
+	}
+	classObj.prototype[fnName] = newFn;		
 };
