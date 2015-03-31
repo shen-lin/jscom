@@ -8,6 +8,9 @@ Install nodejs modules:
 		npm install log4js
 		
 
+Create Folders
+	%JSCOM_ROOT_DIR%/logs
+		
 Build Project
 	Requires python, Java, and NodeJS installed and setup the environment variables
 	cd %JSCOM_ROOT_DIR%/build
