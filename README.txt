@@ -10,6 +10,7 @@ Install nodejs modules:
 
 Create Folders
 	%JSCOM_ROOT_DIR%/logs
+	%JSCOM_ROOT_DIR%/dist
 		
 Build Project
 	Requires python, Java, and NodeJS installed and setup the environment variables
