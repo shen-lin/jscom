@@ -1,0 +1,6 @@
+{
+    "dispatch" : {
+        "inputs": [],
+        "output": null
+    }
+}
