@@ -1,6 +1,11 @@
-import os, sys
+import os, sys, argparse
 from subprocess import call
 from subprocess import check_call
+
+# Args parsing
+parser = argparse.ArgumentParser()
+parser.add_argument('-debug', action='store_true', help='Optional argument to activate NodeJS debug mode')
+args = parser.parse_args()
 
 print('Start building JSCOM...')
 # Change current working dir to jscompiler
@@ -14,4 +19,9 @@ call(["python", "build.py", "--include", "includes", "--warningoff", "--output",
 os.chdir(jscomDir)
 # Run mocha test
 os.environ['PATH'] = os.environ['PATH'] + ";" + jscomDir + "/node_modules/.bin"
-call("mocha", shell=True)
+
+
+if args.debug:
+	call(["mocha", "debug"], shell=True)
+else:
+	call(["mocha"], shell=True)

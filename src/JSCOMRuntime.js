@@ -108,10 +108,7 @@ JSCOM.JSCOMRuntime.prototype._findMatchingFunctions = function(scope, compClassN
 JSCOM.JSCOMRuntime.prototype._findMatchingFunctionsForClass = function(scope, className)
 {
 	var fnList = [];
-	
-	console.log("before");
 	eval("var classObj = " + className);
-	console.log("after");
 	var classPrototype = classObj.prototype;
 	for (var attrName in classPrototype) {
 		var attr = classPrototype[attrName];
@@ -119,7 +116,7 @@ JSCOM.JSCOMRuntime.prototype._findMatchingFunctionsForClass = function(scope, cl
 		
 		var fn = attr;
 		var fnName = attrName;
-		var fnExpr = className + "@" +  fnName;
+		var fnExpr = className + JSCOM.FN_SEPARATOR +  fnName;
 		
 		var isMatchingFn = this._findMatchingFunction(scope, fnExpr);
 		if (isMatchingFn) {
@@ -157,6 +154,9 @@ JSCOM.JSCOMRuntime.prototype._findMatchingFunction = function(scope, fnExpr)
 	}
 	return false;
 }
+
+
+
 
 JSCOM.JSCOMRuntime.prototype.changeAdaptorScope = function(scope)
 {

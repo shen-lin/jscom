@@ -15,7 +15,7 @@ JSCOM.Adaptor.Type.AFTER = "After";
 JSCOM.Adaptor.Type.AFTER_RETURN = "AfterReturn";
 JSCOM.Adaptor.Type.AFTER_THROW = "AfterThrow";
 JSCOM.Adaptor.Type.AROUND = "Around";
-JSCOM.Adaptor.Type.Introduce = "Introduce"; 
+JSCOM.Adaptor.Type.INTRODUCE = "Introduce"; 
 
 	
 JSCOM.Adaptor.prototype.applyAdaptor = function(sAdaptorFn, oAdaptorType, targetFnItem) 
@@ -44,7 +44,7 @@ JSCOM.Adaptor.prototype.applyAdaptor = function(sAdaptorFn, oAdaptorType, target
 	{
 		return this.applyAdaptorAround(adaptorFn, targetFnItem);
 	}
-	else if (oAdaptorType === JSCOM.Adaptor.Type.Introduce) 
+	else if (oAdaptorType === JSCOM.Adaptor.Type.INTRODUCE) 
 	{
 		return this.applyAdaptorIntroduce(adaptorFn, targetFnItem);
 	}
