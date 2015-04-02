@@ -142,9 +142,7 @@ JSCOM.Composite.prototype._loadRawInterface = function(interfaceName)
 	var componentRepo = this.jscomRt.getComponentRepo();
 	var interfaceRawContent = JSCOM.Loader.loadRawContent(componentRepo, interfaceName);
 	var interfaceDef = JSON.parse(interfaceRawContent);
-	for(var functionName in interfaceDef) {
-		JSCOM.LOGGER.debug("TODO");
-	}
+	this.jscomRt._interfaceDefSet[interfaceName] = interfaceDef;
 };
 
 

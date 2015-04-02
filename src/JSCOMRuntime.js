@@ -4,7 +4,7 @@ JSCOM.JSCOMRuntime = function () {
 	this._componentSet = {};     // loaded component instances
 	this._connectivity = {};          // runtime composite and component hierarchical graph 
 	this._componentClassNameSet = [];   // loaded component class types
-	this._interfaceDefSet = {};       // loaded interface definitions
+	this._interfaceDefSet = {};       // loaded interface definitions, accessed in Composite.js
 
 	this._adaptorSet = {}; // loaded adaptors
 	this._adaptorClassNameSet = []; // loaded adaptor class types
@@ -82,8 +82,7 @@ JSCOM.JSCOMRuntime.prototype.createAdaptor = function(className, id)
 JSCOM.JSCOMRuntime.prototype.injectAdaptor = function(sId, sAdaptorId, sAdaptorFn, oAdaptorType, oScope)
 {
 	var adaptorInstance = this._adaptorSet[sAdaptorId];
-	
-	var functions = this._findMatchingFunctions(oScope, this._componentClassNameSet);
+	var functions = this._findMatchingFunctions(oScope);
 	
 	for (var i in functions) {
 		var targetFnItem = functions[i];
@@ -92,54 +91,55 @@ JSCOM.JSCOMRuntime.prototype.injectAdaptor = function(sId, sAdaptorId, sAdaptorF
 };
 
 
-JSCOM.JSCOMRuntime.prototype._findMatchingFunctions = function(scope, compClassNameSet)
+JSCOM.JSCOMRuntime.prototype._findMatchingFunctions = function(scope)
 {
 	var targetFnList = [];
-	
-	for (var i in compClassNameSet) {
-		var className = compClassNameSet[i];
-		var fnList = this._findMatchingFunctionsForClass(scope, className);
-		targetFnList = targetFnList.concat(fnList);
+	for (var i in this._componentClassNameSet) {
+		var className = this._componentClassNameSet[i];
+		var matchFnList = this._findMatchingFunctionsForClass(scope, className);
+		targetFnList = targetFnList.concat(matchFnList);
 	}
-	
 	return targetFnList;
 };
+
+
 
 JSCOM.JSCOMRuntime.prototype._findMatchingFunctionsForClass = function(scope, className)
 {
 	var fnList = [];
-	eval("var classObj = " + className);
-	var classPrototype = classObj.prototype;
-	for (var attrName in classPrototype) {
-		var attr = classPrototype[attrName];
-		if (typeof(attr) !== "function") continue;
-		
-		var fn = attr;
-		var fnName = attrName;
-		var fnExpr = className + JSCOM.FN_SEPARATOR +  fnName;
-		
-		var isMatchingFn = this._findMatchingFunction(scope, fnExpr);
-		if (isMatchingFn) {
-			var fnItem = {
-				classObj: classObj,
-				className: className,
-				fnName: fnName
-			};
-			fnList.push(fnItem);
+	// load interfaces exposed by this component
+	var oComponentClass = eval(className);
+	var interfaceSet = oComponentClass.interfaces;
+	
+	for (var i in interfaceSet) {
+		var interfaceName = interfaceSet[i];
+		var interfaceDef = this._interfaceDefSet[interfaceName];
+		JSCOM.LOGGER.debug(interfaceName);
+		for (var fnName in interfaceDef) {
+			var classFnPath = className + "@" + fnName;
+			var isMatchingFn = this._isMatchingFunction(scope, classFnPath);
+			if (isMatchingFn) {
+				var fnItem = {
+					className: className,
+					classObj: oComponentClass,
+					fnName: fnName
+				};
+				fnList.push(fnItem);
+			}
 		}
 	}
+	
 	return fnList;
 };
 
 
-JSCOM.JSCOMRuntime.prototype._findMatchingFunction = function(scope, fnExpr)
-{
+JSCOM.JSCOMRuntime.prototype._isMatchingFunction = function(scope, classFnPath) {
 	var includeList = scope.include;
 	var excludeList = scope.exclude;
 	
 	for (var i in excludeList) {
 		var excludePattern = excludeList[i];
-		var isExcluded = JSCOM.String.matchRegExpr(fnExpr, excludePattern);
+		var isExcluded = JSCOM.String.matchRegExpr(classFnPath, excludePattern);
 		if (isExcluded) {
 			return false;
 		}
@@ -147,14 +147,13 @@ JSCOM.JSCOMRuntime.prototype._findMatchingFunction = function(scope, fnExpr)
 	
 	for (var i in includeList) {
 		var includePattern = includeList[i];
-		var isIncluded = JSCOM.String.matchRegExpr(fnExpr, includePattern);
+		var isIncluded = JSCOM.String.matchRegExpr(classFnPath, includePattern);
 		if (isIncluded) {
 			return true;
 		}
 	}
 	return false;
-}
-
+};
 
 
 

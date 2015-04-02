@@ -42,7 +42,6 @@ JSCOM.String.matchRegExpr = function(s, regexpr) {
 	regexpr = regexpr.replace(/\*/g, "[a-zA-Z]*");
 	regexpr = regexpr.replace(/~~/g, "([a-zA-Z]|\.)*");
 	regexpr = regexpr.replace(/\?/g, "[a-zA-Z]");
-	
 	var result = s.match(regexpr);
 	if (result) {
 		return result[0] === s;
