@@ -31,7 +31,7 @@ JSCOM.ADAPTOR   = "ADAPTOR";
 
 // JSCOM Templates
 JSCOM.FN_SEPARATOR = "@";
-JSCOM.FN_BAK = "jscom_bak_{0}";
+JSCOM.FN_BAK = "_jscom_bak_{0}";
 
 
 
