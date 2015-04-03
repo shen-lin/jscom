@@ -62,34 +62,54 @@ JSCOM.JSCOMRuntime.prototype.createAdaptor = function(className, id)
 
 /**
  * @param sId {string} Id of the injection
- * @param sAdaptorId {string} Id of the adaptor instance
- * @param sAdaptorFn {function} Cross-cutting function in Adaptor instance to be injected into components
- * @param oAdaptorType {JSCOM.Adaptor.Type} 
+ * @param oAdvices {array} Indicating the location of this adaptor function in the ordered list of applied adaptor functions. E.g.
+	[
+		{id: adaptorId, fn: adaptorFn_1, type: JSCOM.Adaptor.Type.BEFORE}, 
+		{id: adaptorId, fn: adaptorFn_2, type: JSCOM.Adaptor.Type.AFTER}, 
+		{id: adaptorId, fn: adaptorFn_3, type: JSCOM.Adaptor.Type.BEFORE} 
+	]
+	
  * @param oScope {object} A JSON object with data structure:  
- {
-	include: [{string}...],
-	exclude: [{string}...],
- }
- 
- Each string in the array is a regular expression that describe the component classes that should be 
- included / excluded for this adaptor injection. The regular expression contains the following characters for 
- pattern matching:
- 
- '*' Match zero or more characters 
- '**' Match zero or more directories 
- '?' Match a single character 
+	{
+		include: [{string}...],
+		exclude: [{string}...],
+	}
+	 
+	Each string in the array is a regular expression that describe the component classes that should be 
+	included / excluded for this adaptor injection. The regular expression contains the following characters for 
+	pattern matching:
+	 
+	'*' Match zero or more characters 
+	'**' Match zero or more directories 
+	'?' Match a single character
  */
-JSCOM.JSCOMRuntime.prototype.injectAdaptor = function(sId, sAdaptorId, sAdaptorFn, oAdaptorType, oScope)
+JSCOM.JSCOMRuntime.prototype.applyAdaptor = function(sId, oAdvices, oScope)
 {
-	var adaptorInstance = this._adaptorSet[sAdaptorId];
 	var functions = this._findMatchingFunctions(oScope);
 	
 	for (var i in functions) {
 		var targetFnItem = functions[i];
-		adaptorInstance.applyAdaptor(sAdaptorFn, oAdaptorType, targetFnItem);
+		// restore backup function
+		this._restoreBackupFunction(targetFnItem);
+		// apply cross-cutting functions in sequence
+		for (var i in oAdvices) {
+			var oAdvice = oAdvices[i];
+			var sAdaptorId = oAdvice.id;
+			var sAdaptorFn = oAdvice.fn;
+			var oAdaptorType = oAdvice.type;
+			var adaptorInstance = this._adaptorSet[sAdaptorId];
+			adaptorInstance.applyAdaptor(sAdaptorFn, oAdaptorType, targetFnItem);
+		}
 	}
 };
 
+JSCOM.JSCOMRuntime.prototype._restoreBackupFunction = function(fnItem)
+{
+	var classObj = fnItem.classObj;
+	var fnName = fnItem.fnName;
+	var backupFnName = JSCOM.String.format(JSCOM.FN_BAK, fnName);
+	classObj.prototype[fnName] = classObj.prototype[backupFnName];
+};
 
 JSCOM.JSCOMRuntime.prototype._findMatchingFunctions = function(scope)
 {
@@ -114,7 +134,6 @@ JSCOM.JSCOMRuntime.prototype._findMatchingFunctionsForClass = function(scope, cl
 	for (var i in interfaceSet) {
 		var interfaceName = interfaceSet[i];
 		var interfaceDef = this._interfaceDefSet[interfaceName];
-		JSCOM.LOGGER.debug(interfaceName);
 		for (var fnName in interfaceDef) {
 			var classFnPath = className + "@" + fnName;
 			var isMatchingFn = this._isMatchingFunction(scope, classFnPath);
@@ -153,19 +172,6 @@ JSCOM.JSCOMRuntime.prototype._isMatchingFunction = function(scope, classFnPath) 
 		}
 	}
 	return false;
-};
-
-
-
-JSCOM.JSCOMRuntime.prototype.changeAdaptorScope = function(scope)
-{
-	
-};
-
-
-JSCOM.JSCOMRuntime.prototype.ejectAdaptor = function(id, adaptorFn, adaptorType, scope)
-{
-	
 };
 
 

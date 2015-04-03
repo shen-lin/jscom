@@ -69,8 +69,12 @@ JSCOM.Composite.prototype.createComponent = function(className, id)
 	var compInstance = this._initComponentInstance(className, id);
 	// load the interface definition exposed by this component type
 	this._initComponentInterfaceSet(className);
+	// backup interface methods to recover from AoP modification
+	this._backupInterfaceMethods(compInstance);
+	
 	return compInstance;
 };
+
 
 JSCOM.Composite.prototype._initComponentInstance = function(className, id)
 {
@@ -80,8 +84,9 @@ JSCOM.Composite.prototype._initComponentInstance = function(className, id)
 	compInstance.id = id;
 	compInstance.className = className;
 	compInstance.jscomRt = this.jscomRt;
-	this.jscomRt._componentSet[id] = compInstance;
-
+	
+	// setup runtime reflection data
+	this.jscomRt._componentSet[id] = compInstance;	
 	var childItem = {
 		id: id, 
 		type: JSCOM.COMPONENT
@@ -92,7 +97,19 @@ JSCOM.Composite.prototype._initComponentInstance = function(className, id)
 	return compInstance;
 };
 
-
+JSCOM.Composite.prototype._backupInterfaceMethods = function(compInstance)
+{	
+	var interfaceSet = compInstance.getInterfaceSet();
+	for (var i in interfaceSet)
+	{
+		var interfaceName = interfaceSet[i];
+		var interfaceDef = this.jscomRt._interfaceDefSet[interfaceName];
+		for (var fnName in interfaceDef) {
+			var backupFnName = JSCOM.String.format(JSCOM.FN_BAK, fnName);
+			compInstance.constructor.prototype[backupFnName] = compInstance.constructor.prototype[fnName];
+		}
+	}
+};
 
 JSCOM.Composite.prototype._isNewComponentClassType = function(className)
 {
@@ -154,7 +171,7 @@ JSCOM.Composite.prototype._loadRawInterface = function(interfaceName)
 JSCOM.Composite.prototype.exposeInterface = function(interfaceName)
 {
 	var component = this._exposeLoop(interfaceName, this._hasInterface);
-	return component
+	return component;
 };
 
 

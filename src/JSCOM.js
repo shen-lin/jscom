@@ -29,8 +29,11 @@ JSCOM.COMPONENT = "COMPONENT";
 JSCOM.COMPOSITE = "COMPOSITE";
 JSCOM.ADAPTOR   = "ADAPTOR";
 
-// JSCOM
+// JSCOM Templates
 JSCOM.FN_SEPARATOR = "@";
+JSCOM.FN_BAK = "jscom_bak_{0}";
+
+
 
 // JSCOM Logger
 JSCOM.log4js = JSCOM.log4js || require('log4js');

@@ -52,4 +52,15 @@ JSCOM.String.matchRegExpr = function(s, regexpr) {
 } 
 
 
+// Test Color expr: accepts rgb(0-255, 0-255, 0-255) or rgba(0-255, 0-255, 0-255, 0-255)
+var colorValueRange = "([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])";
+var colorValueExpr = "[\\s]*" + colorValueRange + "[\\s]*";
+var rgbColorValueExpr = colorValueExpr + "," + colorValueExpr + "," + colorValueExpr;
+var rgbaColorValueExpr = colorValueExpr + "," + colorValueExpr + "," + colorValueExpr + "," + colorValueExpr;
+var rgbRegExpr = "[\\s]*rgb\\(" + rgbColorValueExpr + "\\)[\\s]*";
+var rgbaRegExpr = "[\\s]*rgba\\(" + rgbaColorValueExpr + "\\)[\\s]*";
 
+var input = "  rgb(10, 5, 10) ";
+var result = input.match(rgbRegExpr);
+var input = "  rgba( 10,  100,   200 ,258  )  ";
+var result = input.match(rgbaRegExpr);

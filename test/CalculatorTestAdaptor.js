@@ -12,18 +12,15 @@ jscomRt.addComponentRepo(JSCOM.URI_FILE, 'example/BasicCalculator');
 // Get component repository...
 var componentRepo = jscomRt.getComponentRepo();
 
-// Creating a composite of example calculator components...
-var calcComposite = jscomRt.createComposite("MyComposite");
+/*******************************************************
+ * Creating component architecture
+ *******************************************************/
 
-// Loading example component instances...
-var adder = calcComposite.createComponent("Calc.Adder", "MyAdder");
-var subtractor = calcComposite.createComponent("Calc.Subtractor", "MySubtractor");
-var calculator = calcComposite.createComponent("Calc.Calculator", "MyCalculator");
 
-var addOutput = adder.add(5, 5);
-console.log(addOutput);
-addOutput = adder.add(5, "abc");
-console.log(addOutput);
+
+/*******************************************************
+ * Test creating adaptor API
+ *******************************************************/
 
 var calcAdaptor = jscomRt.createAdaptor("Calc.CalcAdaptor", "MyAdaptor");
 
@@ -32,14 +29,6 @@ describe("Create Adaptor", function() {
 		should(calcAdaptor.id).equal("MyAdaptor");
 	}); 
 });
-
-
-// Binding example components to form the example system...
-calcComposite.bind(calculator, adder, "Calc.IAdd");
-calcComposite.bind(calculator, subtractor, "Calc.ISubtract");
-
-// Exposing example system interface...
-var iCalcIEP = calcComposite.exposeInterface("Calc.ICalculator");
 
 
 var invalidCreateAdaptorWithDuplicateID = function() {
@@ -53,35 +42,109 @@ describe("Invalid adaptor creation with duplicate ID", function() {
 });
 
 
-
-var scope = {
-	include: ["Calc.**@add"],
-	exclude: ["**@sub*"],
-};
-
-jscomRt.injectAdaptor("MyInjection", "MyAdaptor", "isInteger", JSCOM.Adaptor.Type.BEFORE, scope);
-
-var addTwoInt = iCalcIEP.add(5,3);
-
-var caughtErrorInInterceptedAddFn = function() {
-	iCalcIEP.add(5,'abc');
-};
-
-describe("Inject Adaptor", function() { 
-	it("No error with adding two integers", function() { 
-		should(addTwoInt).equal(8);
-	}); 
+/*******************************************************
+ * Test applying adaptor functions to components
+ *******************************************************/
+var iCalcIEP;
+describe("Test Adaptors", function() { 
 	
-	it("Non-integer input caught by adaptor function", function() { 
-		(caughtErrorInInterceptedAddFn).should.throw(/is not an integer/);
-	}); 
+	before(function(){
+		// Creating a composite of example calculator components...
+		var calcComposite = jscomRt.createComposite("MyComposite");
+
+		// Loading example component instances...
+		var adder = calcComposite.createComponent("Calc.Adder", "MyAdder");
+		var subtractor = calcComposite.createComponent("Calc.Subtractor", "MySubtractor");
+		var calculator = calcComposite.createComponent("Calc.Calculator", "MyCalculator");
+
+		// Binding example components to form the example system...
+		calcComposite.bind(calculator, adder, "Calc.IAdd");
+		calcComposite.bind(calculator, subtractor, "Calc.ISubtract");
+		
+		// Exposing example system interface...
+		iCalcIEP = calcComposite.exposeInterface("Calc.ICalculator");
+	});
+
+	describe("Initialize Adaptors", function() { 
+		before(function () { 
+			JSCOM.LOGGER.debug(iCalcIEP.add.toString());
+			var scope = {
+				include: ["Calc.C*@add"],
+				exclude: ["**@sub*"],
+			};
+
+			var oAdvices = [
+				{id: "MyAdaptor", fn: "isInteger", type: JSCOM.Adaptor.Type.BEFORE},
+				{id: "MyAdaptor", fn: "isWithinRange", type: JSCOM.Adaptor.Type.AFTER},
+			];
+			jscomRt.applyAdaptor("MyInjection", oAdvices, scope);
+		});
+
+		
+		it("No error with adding two integers", function() { 
+			var addTwoInt = iCalcIEP.add(5,3);
+			should(addTwoInt).equal(8);
+		}); 
+
+		it("Non-integer input caught by adaptor function: CalcAdaptor.isInteger", function() {
+			var caughtInvalidInputErrorInInterceptedAddFn = function() {
+				var output = iCalcIEP.add(5,'abc');
+			};
+			(caughtInvalidInputErrorInInterceptedAddFn).should.throw(/is not an integer/);
+		}); 
+		
+		it("Output > 100 caught by adaptor function: CalcAdaptor.isWithinRange", function() { 
+			var caughtOutOfRangeErrorInInterceptedAddFn = function() {
+				var output = iCalcIEP.add(5, 100);
+			};
+			(caughtOutOfRangeErrorInInterceptedAddFn).should.throw(/Result is greater than 100:/);
+		}); 
+		
+		after(function (){
+			JSCOM.LOGGER.debug(iCalcIEP.add.toString());
+		});
+	});
+	
+	
+	describe("Modified Adaptor", function() { 
+		before(function () { 
+			JSCOM.LOGGER.debug(iCalcIEP.add.toString());
+			var scope = {
+				include: ["Calc.C*@add"],
+				exclude: ["**@sub*"],
+			};
+			var oAdvices = [
+				{id: "MyAdaptor", fn: "isInteger", type: JSCOM.Adaptor.Type.BEFORE},
+				{id: "MyAdaptor", fn: "isWithinRange", type: JSCOM.Adaptor.Type.AFTER},
+				{id: "MyAdaptor", fn: "returnDefaultValue", type: JSCOM.Adaptor.Type.AFTER_THROW},
+			];
+			jscomRt.applyAdaptor("MyInjection2", oAdvices, scope);
+		});
+		
+
+		it("No error with adding two integers: 5+3=8", function() { 
+			var addTwoInt = iCalcIEP.add(5,3);
+			should(addTwoInt).equal(8);
+		}); 
+		
+		it("Invalid input handled: Return default value 50 for 5+'abc'", function() { 
+			var addTwoInt = iCalcIEP.add(5,'abc');
+			should(addTwoInt).equal(50);
+		}); 
+		
+		it("Out of range output handled: Return default value 50 for 5+100", function() { 
+			var addTwoInt = iCalcIEP.add(5, 100);
+			should(addTwoInt).equal(50);
+		}); 
+		after(function (){
+			JSCOM.LOGGER.debug(iCalcIEP.add.toString());
+		});
+	});
 });
 
 
-var changedScope = {
-	include: [],
-	exclude: [],
-};
-jscomRt.changeAdaptorScope("MyInjection", changedScope);
 
-jscomRt.ejectAdaptor("MyInjection");
+
+
+
+ 
