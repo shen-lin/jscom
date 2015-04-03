@@ -46,6 +46,9 @@ describe("Invalid adaptor creation with duplicate ID", function() {
  * Test applying adaptor functions to components
  *******************************************************/
 var iCalcIEP;
+var sOriginalAddFn;
+var sCurrentAddFn;
+
 describe("Test Adaptors", function() { 
 	
 	before(function(){
@@ -63,11 +66,20 @@ describe("Test Adaptors", function() {
 		
 		// Exposing example system interface...
 		iCalcIEP = calcComposite.exposeInterface("Calc.ICalculator");
+		
+		sCurrentAddFn = iCalcIEP.add.toString();
+		var bakAddFnName = JSCOM.String.format(JSCOM.FN_BAK, "add");
+		sOriginalAddFn = Calc.Calculator.prototype[bakAddFnName].toString();
 	});
 
+	
+	it("Initial add function without adaptor interception", function() { 
+		should(sCurrentAddFn).equal(sOriginalAddFn);
+	}); 
+	
 	describe("Initialize Adaptors", function() { 
+		
 		before(function () { 
-			JSCOM.LOGGER.debug(iCalcIEP.add.toString());
 			var scope = {
 				include: ["Calc.C*@add"],
 				exclude: ["**@sub*"],
@@ -78,8 +90,15 @@ describe("Test Adaptors", function() {
 				{id: "MyAdaptor", fn: "isWithinRange", type: JSCOM.Adaptor.Type.AFTER},
 			];
 			jscomRt.applyAdaptor("MyInjection", oAdvices, scope);
+			
+			sCurrentAddFn = iCalcIEP.add.toString();
 		});
 
+		
+		it("Test add function after adaptor interceptions", function() { 
+			var index = sCurrentAddFn.indexOf("thisAdaptorAfter");
+			should(index).be.above(0);
+		}); 
 		
 		it("No error with adding two integers", function() { 
 			var addTwoInt = iCalcIEP.add(5,3);
@@ -99,16 +118,13 @@ describe("Test Adaptors", function() {
 			};
 			(caughtOutOfRangeErrorInInterceptedAddFn).should.throw(/Result is greater than 100:/);
 		}); 
-		
-		after(function (){
-			JSCOM.LOGGER.debug(iCalcIEP.add.toString());
-		});
 	});
 	
 	
 	describe("Modified Adaptor", function() { 
+		var sUpdatedAddFn;
+	
 		before(function () { 
-			JSCOM.LOGGER.debug(iCalcIEP.add.toString());
 			var scope = {
 				include: ["Calc.C*@add"],
 				exclude: ["**@sub*"],
@@ -119,9 +135,21 @@ describe("Test Adaptors", function() {
 				{id: "MyAdaptor", fn: "returnDefaultValue", type: JSCOM.Adaptor.Type.AFTER_THROW},
 			];
 			jscomRt.applyAdaptor("MyInjection2", oAdvices, scope);
+			
+			sCurrentAddFn = iCalcIEP.add.toString();
+			sUpdatedAddFn = JSCOM.Adaptor.prototype.applyAdaptorAfterThrow.toString();
 		});
 		
-
+		it("Test add function after modifying adaptors", function() { 
+			var index = sCurrentAddFn.indexOf("thisAdaptorAfterThrow");
+			should(index).be.above(0);
+		}); 
+		
+		it("No error with adding two integers: 5+3=8", function() { 
+			var addTwoInt = iCalcIEP.add(5,3);
+			should(addTwoInt).equal(8);
+		}); 
+		
 		it("No error with adding two integers: 5+3=8", function() { 
 			var addTwoInt = iCalcIEP.add(5,3);
 			should(addTwoInt).equal(8);
@@ -136,9 +164,7 @@ describe("Test Adaptors", function() {
 			var addTwoInt = iCalcIEP.add(5, 100);
 			should(addTwoInt).equal(50);
 		}); 
-		after(function (){
-			JSCOM.LOGGER.debug(iCalcIEP.add.toString());
-		});
+
 	});
 });
 
