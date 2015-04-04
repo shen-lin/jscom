@@ -46,4 +46,5 @@ Temporary Items
 /node_modules
 /logs
 /dist
+/coverage
 *.log

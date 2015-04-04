@@ -17,11 +17,12 @@ call(["python", "build.py", "--include", "includes", "--warningoff", "--minify",
 call(["python", "build.py", "--include", "includes", "--warningoff", "--output", "../dist/jscom.js"]);
 # Change current working dir to jscom
 os.chdir(jscomDir)
+
+
 # Run mocha test
 os.environ['PATH'] = os.environ['PATH'] + ";" + jscomDir + "/node_modules/.bin"
-
 
 if args.debug:
 	call(["mocha", "debug"], shell=True)
 else:
-	call(["mocha"], shell=True)
+	call(["istanbul", "cover", "node_modules/mocha/bin/_mocha"], shell=True)

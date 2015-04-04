@@ -101,6 +101,10 @@ JSCOM.JSCOMRuntime.prototype.applyAdaptor = function(sId, oAdvices, oScope)
 			adaptorInstance.applyAdaptor(sAdaptorFn, oAdaptorType, targetFnItem);
 		}
 	}
+	
+	// TODO: build two metadata structures: 
+	// 1) component class -> injection id
+	// 2) injection id -> advices
 };
 
 JSCOM.JSCOMRuntime.prototype._restoreBackupFunction = function(fnItem)

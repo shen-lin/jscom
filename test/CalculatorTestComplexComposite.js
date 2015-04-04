@@ -2,7 +2,7 @@
 var should = require('should');
 
 // Loading JSCOM runtime...
-var jscom = require('../dist/JSCOM.js');
+var jscom = require('../dist/jscom.js');
 var jscomRt = jscom.getJSCOMRuntime();
 var JSCOM = jscom.getJSCOMGlobal();
 
