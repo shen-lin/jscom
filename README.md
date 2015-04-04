@@ -1,36 +1,45 @@
 JSCOM
 ======================
+A light-weight component framework that supports NodeJS development. 
+By using JSCOM, a software system is constructed as components bindings. 
+It facilitates introspection of a constructed system and its 
+meta-level properties at runtime, and allows this system to be reconfigured on the fly.
 
-Requires Python, Java, and NodeJS installed and setup the environment variables
+license : BSD
 
-Required nodejs modules:
-	cd %JSCOM_ROOT_DIR%/
-	mocha: 
-		npm install mocha
-	istanbul:
-		npm install istanbul
-	should:
-		npm install should 
-	log4js:
-		npm install log4js
-	smartdoc	
-		npm install smartdoc
+Development Setup
+--------------------
+	* Environment requirements: 
+
+		Install Python, Java, and NodeJS.
+	
+		Setup the Path environment variables.
+
+	* Required nodejs modules:
+	
+		cd jscom
+		mocha:    npm install mocha
+		istanbul: npm install istanbul
+		should:   npm install should 
+		log4js:   npm install log4js
+		smartdoc: npm install smartdoc
 		
-Create Folders
-	%JSCOM_ROOT_DIR%/logs
-	%JSCOM_ROOT_DIR%/dist
+	* Create folders
+	
+		jscom/logs
+		jscom/dist
 		
-Build Project
-	cd %JSCOM_ROOT_DIR%/
-	Build and test: build.py
-	Build and debug: build.py -debug
-	Build, test, and generate API document: build.py -docgen
+	* Build project
+	
+		cd jscom
+		Build and test:  build.py
+		Build and debug: build.py -debug
+		Build, test, and generate API document: build.py -docgen
 
-Build outputs:
-	Disted code: %JSCOM_ROOT_DIR%/dist
-	Logs: %JSCOM_ROOT_DIR%/logs
-	Test coverage reports: %JSCOM_ROOT_DIR%/coverage/lcov-report/index.html
+	* Build outputs:
+		Disted code:   jscom/dist
+		Logs:          jscom/logs
+		Test coverage: jscom/coverage/lcov-report/index.html
 	
 
-API document generation
 	
