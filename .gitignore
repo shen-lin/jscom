@@ -47,4 +47,5 @@ Temporary Items
 /logs
 /dist
 /coverage
+/doc
 *.log
