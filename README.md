@@ -5,7 +5,7 @@ By using JSCOM, a software system is constructed as components bindings.
 It facilitates introspection of a constructed system and its 
 meta-level properties at runtime, and allows this system to be reconfigured on the fly.
 
-license: BSD
+License: BSD
 
 	
 Development Setup

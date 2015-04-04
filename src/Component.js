@@ -39,11 +39,34 @@ JSCOM.Component.prototype.getInterfaceSet = function()
 };
 
 /***********************
+ * MetaInterface: Adaptor Information
+ ***********************/
+
+ /**
+  * @function getCustomMetadata
+  */
+JSCOM.Component.prototype.getAdaptorAdvices = function(interfaceName)
+{
+	var oInterfaceAdvices = {};
+	var interfaceDef = this.jscomRt._interfaceDefSet[interfaceName];
+	for (var fnName in interfaceDef) {
+		var classFnName = JSCOM.String.format("{0}{1}{2}", this.className, JSCOM.FN_SEPARATOR, fnName);
+		var sInjectionId = this.jscomRt._componentInjectionMetadata[classFnName];
+		var oAdvices = this.jscomRt._injectionInfo[sInjectionId];
+		oInterfaceAdvices[fnName] = oAdvices;
+	}
+	return oInterfaceAdvices;
+};
+
+
+/***********************
  * MetaInterface: Metadata
  ***********************/
 
-JSCOM.Component.prototype.getMetadata = function()
+/**
+ * @function getCustomMetadata
+ */
+JSCOM.Component.prototype.getCustomMetadata = function()
 {
 	return this._metadataSet;
 };
-

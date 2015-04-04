@@ -14,6 +14,9 @@ JSCOM.JSCOMRuntime = function () {
 
 	this._adaptorSet = {}; // loaded adaptors
 	this._adaptorClassNameSet = []; // loaded adaptor class types
+	this._componentInjectionMetadata = {}; // access in Component.js
+	this._injectionInfo = {}; // access in Component.js
+	
 	this._startTrans = false;
 	this._uncommittedBindings = [];
 };
@@ -67,6 +70,8 @@ JSCOM.JSCOMRuntime.prototype.createAdaptor = function(className, id)
 
 
 /**
+ *
+ * @function applyAdaptor
  * @param sId {string} Id of the injection
  * @param oAdvices {array} Indicating the location of this adaptor function in the ordered list of applied adaptor functions. E.g.
 	[
@@ -92,7 +97,27 @@ JSCOM.JSCOMRuntime.prototype.createAdaptor = function(className, id)
 JSCOM.JSCOMRuntime.prototype.applyAdaptor = function(sId, oAdvices, oScope)
 {
 	var functions = this._findMatchingFunctions(oScope);
-	
+	this._applyAdaptorToComponents(functions, oAdvices);
+	this._storeAdaptorMetadata(sId, functions, oAdvices);
+};
+
+
+JSCOM.JSCOMRuntime.prototype._storeAdaptorMetadata = function(sId, functions, oAdvices) 
+{
+	for (var i in functions) {
+		var targetFnItem = functions[i];
+		var className = targetFnItem.className;
+		var fnName = targetFnItem.fnName;
+		// 1) componentClassName@fnName -> injection id
+		var classFnName = JSCOM.String.format("{0}{1}{2}", className, JSCOM.FN_SEPARATOR, fnName);
+		this._componentInjectionMetadata[classFnName] = sId; 
+		// 2) injection id -> advices
+		this._injectionInfo[sId] = oAdvices;
+	}	
+};
+
+JSCOM.JSCOMRuntime.prototype._applyAdaptorToComponents = function(functions, oAdvices) 
+{
 	for (var i in functions) {
 		var targetFnItem = functions[i];
 		// restore backup function
@@ -107,11 +132,8 @@ JSCOM.JSCOMRuntime.prototype.applyAdaptor = function(sId, oAdvices, oScope)
 			adaptorInstance.applyAdaptor(sAdaptorFn, oAdaptorType, targetFnItem);
 		}
 	}
-	
-	// TODO: build two metadata structures: 
-	// 1) component class -> injection id
-	// 2) injection id -> advices
 };
+
 
 JSCOM.JSCOMRuntime.prototype._restoreBackupFunction = function(fnItem)
 {
