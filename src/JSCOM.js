@@ -1,3 +1,9 @@
+/**
+ * Entry point for JSCOM. It defines JSCOM global variables and declares NodeJS module exports for JSCOM.
+ * @module core
+ * @class JSCOM
+ */
+
 var JSCOM = {};
 
 exports.getJSCOMRuntime = function() {

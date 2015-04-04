@@ -1,7 +1,25 @@
+/**
+ * Loader for JSCOM entities
+ * 
+ * @module util
+ * @class Loader
+ * @static
+ */
+
 JSCOM.fs = JSCOM.fs || require("fs")
 
 JSCOM.Loader = {};
 
+
+/**
+ * Load component or adaptor. 
+ * @method loadComponent
+ * @param  {string} componentRepo       description
+ * @param  {string} packageName       description
+ * @return {string}            Formatted string result.
+ * @throw 
+ * @static
+ */ 
 JSCOM.Loader.loadComponent = function(componentRepo, packageName)
 {
 	JSCOM.Loader.buildPackagePath(packageName);
@@ -17,7 +35,15 @@ JSCOM.Loader.loadComponent = function(componentRepo, packageName)
 	}
 };
 
-
+/**
+ * Convert package name to URI path. 
+ * @method buildPackagePath
+ * @param  {string} componentRepo       description
+ * @param  {string} packageName       description
+ * @return {string}            Formatted string result.
+ * @throw 
+ * @static
+ */ 
 JSCOM.Loader.buildPackagePath = function(packageName)
 {
 	var pathTokens = packageName.split(".");

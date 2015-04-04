@@ -1,8 +1,22 @@
+/**
+ * String utilities
+ * 
+ * @module util
+ * @class String
+ * @static
+ */
+
 JSCOM.String = {};
 
+
 /**
- * JSCOM.string.format("{0} + {1} = {2}", 5, 5, 10);
- */
+ * JSCOM.string.format("{0} + {1} = {2}", 5, 5, 10); 
+ * @method format
+ * @param  {string} tmpl       description
+ * @param  {[type]} data       description
+ * @return {string}            Formatted string result.
+ * @static
+ */ 
 JSCOM.String.format = function()
 {
 	if( arguments.length == 0 ) return null;
@@ -17,25 +31,14 @@ JSCOM.String.format = function()
 };
 
 
-JSCOM.String.isEmpty = function(str)
-{
-	var exists = jade.utils.JSObj.exists(str);
-	if (!exists) return true;
-	return str.length == 0;
-};
-
-
-JSCOM.String.toObject = function(str)
-{
-	return JSON.parse(str);
-};
-
-JSCOM.String.toString = function(obj)
-{
-	return JSON.stringify(obj);
-};
-
-
+/**
+ *  
+ * @method matchRegExpr
+ * @param  {string} s Input string      	
+ * @param  {string} regexpr Regular expression for JSCOM adaptor scope 
+ * @return {boolean} 
+ * @static
+ */ 
 JSCOM.String.matchRegExpr = function(s, regexpr) {
 	regexpr = regexpr.replace(/\./g, "\\\.");
 	regexpr = regexpr.replace(/\*\*/g, "~~");

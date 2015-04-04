@@ -1,7 +1,10 @@
-/***********************
- * @class JSCOM.Adaptor
- * @author Shen Lin
- ***********************/
+/**
+ * Adaptor can be used to modify the behaviour of existing interface methods.
+ * 
+ * @module core
+ * @class Adaptor
+ *
+ */
 
  
 JSCOM.Adaptor = function()

@@ -1,3 +1,10 @@
+/**
+ * 
+ * @module core
+ * @class Acquisitor
+ *
+ */
+
 JSCOM.Acquisitor = function(componentRef, interfaceName, type)
 {
 	this.componentRef = componentRef;

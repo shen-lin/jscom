@@ -1,3 +1,13 @@
+/**
+ * Composite serves as the container for a set of components. 
+ * It allows this set of enclosed components to be hidden from a higher-level
+ * of abstraction.
+ *
+ * @module core
+ * @class Composite
+ */
+
+
 JSCOM.Composite = function (id, jscomRt) {
 	this.id = id;
 	this.jscomRt = jscomRt;

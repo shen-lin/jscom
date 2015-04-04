@@ -1,3 +1,9 @@
+/**
+ * 
+ * @module core
+ * @class JSCOMRuntime
+ */
+
 JSCOM.JSCOMRuntime = function () {
 	this._componentRepo = null;  // component repository
 	this._compositeSet = {};     // root-level composites
