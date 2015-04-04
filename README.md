@@ -5,18 +5,20 @@ By using JSCOM, a software system is constructed as components bindings.
 It facilitates introspection of a constructed system and its 
 meta-level properties at runtime, and allows this system to be reconfigured on the fly.
 
-license : BSD
+license: BSD
 
+
+API Documentation
+--------------------
+	[生成示例地址](http://zhh77.github.io/smartDoc/)
+	
 Development Setup
 --------------------
-	* Environment requirements: 
-
+	* Environment prerequisite: 
 		Install Python, Java, and NodeJS.
-	
 		Setup the Path environment variables.
 
 	* Required nodejs modules:
-	
 		cd jscom
 		mocha:    npm install mocha
 		istanbul: npm install istanbul
@@ -25,12 +27,10 @@ Development Setup
 		smartdoc: npm install smartdoc
 		
 	* Create folders
-	
 		jscom/logs
 		jscom/dist
 		
 	* Build project
-	
 		cd jscom
 		Build and test:  build.py
 		Build and debug: build.py -debug
