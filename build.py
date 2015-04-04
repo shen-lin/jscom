@@ -5,6 +5,7 @@ from subprocess import check_call
 # Args parsing
 parser = argparse.ArgumentParser()
 parser.add_argument('-debug', action='store_true', help='Optional argument to activate NodeJS debug mode')
+parser.add_argument('-docgen', action='store_true', help='Optional argument to activate NodeJS debug mode')
 args = parser.parse_args()
 
 print('Start building JSCOM...')
@@ -26,3 +27,5 @@ if args.debug:
 	call(["mocha", "debug"], shell=True)
 else:
 	call(["istanbul", "cover", "node_modules/mocha/bin/_mocha"], shell=True)
+	if args.docgen:
+		call(["smartDoc"], shell=True)

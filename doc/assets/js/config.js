@@ -1,0 +1,1 @@
+window['__docConfig'] = {"filterItems":[{"type":"class","name":"JSCOM.Adaptor"}]}
