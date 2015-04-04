@@ -7,10 +7,6 @@ meta-level properties at runtime, and allows this system to be reconfigured on t
 
 license: BSD
 
-
-API Documentation
---------------------
-	[生成示例地址](http://zhh77.github.io/smartDoc/)
 	
 Development Setup
 --------------------
