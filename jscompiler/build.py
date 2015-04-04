@@ -12,7 +12,6 @@ def main(argv=None):
 
 	parser = argparse.ArgumentParser()
 	parser.add_argument('--include', action='append', required=True)
-	parser.add_argument('--externs', action='append', default=['externs/examples.js'])
 	parser.add_argument('--warningoff', action='store_true', default=False)
 	parser.add_argument('--minify', action='store_true', default=False)
 	parser.add_argument('--output', default='../build/jscom.js')
@@ -57,11 +56,8 @@ def main(argv=None):
 		os.chmod(output, 0o664); # temp files would usually get 0600
 
 	else:
-
-		externs = ' --externs '.join(args.externs)
-
 		source = ' '.join(sources)
-		cmd = 'java -jar compiler/compiler.jar --jscomp_off=globalThis %s --externs %s --jscomp_off=checkTypes --language_in=ECMASCRIPT5_STRICT --js %s --js_output_file %s %s' % (warningOff, externs, source, output, sourcemapargs)
+		cmd = 'java -jar compiler/compiler.jar --jscomp_off=globalThis %s --jscomp_off=checkTypes --language_in=ECMASCRIPT5_STRICT --js %s --js_output_file %s %s' % (warningOff, source, output, sourcemapargs)
 		os.system(cmd)
 
 		# header
