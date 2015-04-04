@@ -166,11 +166,37 @@ describe("Test Adaptors", function() {
 		}); 
 
 	});
+	
+	
+	
+	/*******************************************************
+	 * Test applying adaptor functions to components
+	 *******************************************************/
+	var calculatorCompInstance;
+	var oInterfaceAdaptorAdvices;
+
+	describe("Test component's adaptor metadata interface", function() { 
+
+		before(function () { 
+			// Access JSCOM runtime metadata API to retrieve component.
+			calculatorCompInstance = jscomRt.getComponent("MyCalculator");
+			oInterfaceAdaptorAdvices = calculatorCompInstance.getAdaptorAdvices("Calc.ICalculator");
+		});
+		
+		it("Has advices on the add() method", function() {
+			var oAdvice = oInterfaceAdaptorAdvices["add"];
+			JSCOM.LOGGER.debug(oAdvice);
+			should(oAdvice.length).equal(3);
+			should(oAdvice[0].fn).equal("isInteger");
+			should(oAdvice[1].fn).equal("isWithinRange");
+			should(oAdvice[2].fn).equal("returnDefaultValue");
+		}); 
+		
+		it("Has no advices on the subtract() method", function() { 
+			var oAdvice = oInterfaceAdaptorAdvices["subtract"];
+			should(oAdvice).equal(undefined);
+		}); 
+	});	
 });
 
 
-
-
-
-
- 
