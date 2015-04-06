@@ -110,7 +110,7 @@ JSCOM.Loader.loadRawContentFromFile = function(uri)
 	}
 	catch (err)
 	{
-		JSCOM.LOGGER.error("Error loading " + "file" + " " + uri);
+		JSCOM.LOGGER.error("Error loading file: " + uri);
 	}
 	
 	return rawComp;
