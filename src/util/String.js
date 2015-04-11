@@ -55,16 +55,33 @@ JSCOM.String.matchRegExpr = function(s, regexpr) {
 } 
 
 
+JSCOM.String.startWith = function(s, expr)
+{
+	return s.indexOf(expr) === 0;
+};
+
+JSCOM.String.endWith = function(s, expr)
+{
+	var index = s.indexOf(expr);
+	return s.substring(index, s.length) === expr;
+};
+
 // Test Color expr: accepts rgb(0-255, 0-255, 0-255) or rgba(0-255, 0-255, 0-255, 0-255)
+
 var colorValueRange = "([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])";
 var colorValueExpr = "[\\s]*" + colorValueRange + "[\\s]*";
+var alphaValueRange = "([0]|[1]|0\\.[0-9]+)";
+var alphaValueExpr = "[\\s]*" + alphaValueRange + "[\\s]*";
 var rgbColorValueExpr = colorValueExpr + "," + colorValueExpr + "," + colorValueExpr;
-var rgbaColorValueExpr = colorValueExpr + "," + colorValueExpr + "," + colorValueExpr + "," + colorValueExpr;
+var rgbaColorValueExpr = colorValueExpr + "," + colorValueExpr + "," + colorValueExpr + "," + alphaValueExpr;
 var rgbRegExpr = "[\\s]*rgb\\(" + rgbColorValueExpr + "\\)[\\s]*";
 var rgbaRegExpr = "[\\s]*rgba\\(" + rgbaColorValueExpr + "\\)[\\s]*";
 
 var input = "  rgb(10, 5, 10) ";
 var result = input.match(rgbRegExpr);
-var input = "  rgba( 10,  100,   200 ,258  )  ";
+var input = "  rgba( 10,  100,   200 ,0.00  )  ";
 var result = input.match(rgbaRegExpr);
+
+
+
 

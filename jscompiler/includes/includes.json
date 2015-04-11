@@ -7,5 +7,5 @@
     "../src/Component.js",
     "../src/Acquisitor.js",
     "../src/Adaptor.js",
-    "../src/components/RESTRuntime.js"
+	"../src/components/rest/RestServer.js"
 ]

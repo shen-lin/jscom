@@ -13,38 +13,43 @@ JSCOM.Loader = {};
 
 /**
  * Load component or adaptor. 
- * @method loadComponent
+ * @method loadEntity
  * @param  {string} componentRepo       description
- * @param  {string} packageName       description
+ * @param  {string} className       description
  * @return {string}            Formatted string result.
  * @throw 
  * @static
  */ 
-JSCOM.Loader.loadComponent = function(componentRepo, packageName)
+JSCOM.Loader.loadEntity = function(componentRepo, className)
 {
-	JSCOM.Loader.buildPackagePath(packageName);
+	JSCOM.Loader.declare(className);
+	
+	// preloaded buildin entities
+	var isBuildin = JSCOM.Loader.isBuildInType(className);
+	if (isBuildin) return;
+	
 	try
 	{	
-		var rawContent = JSCOM.Loader.loadRawContent(componentRepo, packageName);
+		var rawContent = JSCOM.Loader.loadRawContent(componentRepo, className);
 		eval(rawContent);
 	}
 	catch (error)
 	{
-		var errorMsg = JSCOM.String.format("Error loading component/adaptor from {0}:\n{1}", packageName, error);
+		var errorMsg = JSCOM.String.format("Error loading component/adaptor from {0}:\n{1}", className, error);
 		JSCOM.LOGGER.error(errorMsg);
 	}
 };
 
 /**
  * Convert package name to URI path. 
- * @method buildPackagePath
+ * @method declare
  * @param  {string} componentRepo       description
  * @param  {string} packageName       description
  * @return {string}            Formatted string result.
  * @throw 
  * @static
  */ 
-JSCOM.Loader.buildPackagePath = function(packageName)
+JSCOM.Loader.declare = function(packageName)
 {
 	var pathTokens = packageName.split(".");
 	var incrementPath = "";
@@ -120,4 +125,10 @@ JSCOM.Loader.loadRawContentFromFile = function(uri)
 JSCOM.Loader.loadRawContentFromHttp = function(uri)
 {
 	throw new Error("Not Implemented");
+};
+
+
+JSCOM.Loader.isBuildInType = function(className)
+{
+	return JSCOM.String.startWith(className, "JSCOM");	
 };

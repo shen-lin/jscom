@@ -7,7 +7,7 @@ var jscomRt = jscom.getJSCOMRuntime();
 var JSCOM = jscom.getJSCOMGlobal();
 
 // Configure component repository to be working dir
-jscomRt.addComponentRepo(JSCOM.URI_FILE, 'example/RestCompPoC');
+// jscomRt.addComponentRepo(JSCOM.URI_FILE, 'example/RestCompPoC');
 
 // Get component repository...
 var componentRepo = jscomRt.getComponentRepo();
@@ -16,8 +16,14 @@ var componentRepo = jscomRt.getComponentRepo();
 var restComposite = jscomRt.createComposite("RestComposite");
 
 // Loading example component instances...
-var restService = restComposite.createComponent("rest.RestService", "MyRestService");
+var restService = restComposite.createComponent("JSCOM.components.rest.RestServer", "MyRestServer");
 
 // Invoking add method on the loaded Adder component instance
-restService.start(3000);
+//restService.start(3000);
 
+
+var unirest = require('unirest');
+unirest.post('http://localhost:3000/component')
+.end(function (response) {
+	console.log(response.body);
+});

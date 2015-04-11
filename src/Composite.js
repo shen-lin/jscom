@@ -71,7 +71,7 @@ JSCOM.Composite.prototype.createComponent = function(className, id)
 	// load component into runtime
 	if (isNewComponent) {
 		var componentRepo = this.jscomRt.getComponentRepo();
-		JSCOM.Loader.loadComponent(componentRepo, className);
+		JSCOM.Loader.loadEntity(componentRepo, className);
 	}
 	// store loaded component paths
 	this.jscomRt._componentClassNameSet.push(className);
@@ -137,6 +137,7 @@ JSCOM.Composite.prototype._isNewComponentClassType = function(className)
 
 	return isNewComponentClassType;
 };
+
 
 JSCOM.Composite.prototype._isNewComponentInstance = function(id)
 {

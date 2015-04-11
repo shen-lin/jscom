@@ -58,3 +58,7 @@ JSCOM.log4js.configure({
 
 JSCOM.LOGGER = JSCOM.log4js.getLogger('normal');
 JSCOM.LOGGER.setLevel('DEBUG');
+
+// 3rd party libraries
+JSCOM.fs = null;
+JSCOM.express = null;

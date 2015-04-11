@@ -21,6 +21,7 @@ Development Setup
 		should:   npm install should 
 		log4js:   npm install log4js
 		smartdoc: npm install smartdoc
+		unirest:  npm install unirest
 		
 	* Create folders
 		jscom/logs

@@ -59,7 +59,7 @@ JSCOM.JSCOMRuntime.prototype.createAdaptor = function(className, id)
 	// load adaptor into runtime
 	if (isNewAdaptor) {
 		var componentRepo = this.getComponentRepo();
-		JSCOM.Loader.loadComponent(componentRepo, className);		
+		JSCOM.Loader.loadEntity(componentRepo, className);		
 	}
 	// store loaded adaptor paths
 	this._adaptorClassNameSet.push(className);
@@ -67,6 +67,8 @@ JSCOM.JSCOMRuntime.prototype.createAdaptor = function(className, id)
 	var adaptorInstance = this._initAdaptorInstance(className, id);
 	return adaptorInstance;
 };
+
+
 
 
 /**
