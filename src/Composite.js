@@ -2,12 +2,20 @@
  * Composite serves as the container for a set of components. 
  * It allows this set of enclosed components to be hidden from a higher-level
  * of abstraction.
- *
+ * 
  * @module core
  * @class Composite
+ *
  */
 
-
+ 
+/**
+ * Creates a new composite instance. This constructor should
+ * not be called outside JSCOM.
+ * 
+ * @param  {string} id Composite ID
+ * @param  {JSCOM.JSCOMRuntime} jscomRt JSCOM runtime instance
+ */ 
 JSCOM.Composite = function (id, jscomRt) {
 	this.id = id;
 	this.jscomRt = jscomRt;
@@ -17,6 +25,11 @@ JSCOM.Composite = function (id, jscomRt) {
  * Child Composite API
  ***********************/
 
+/**
+ * Creates a child composite instance of this composite instance.
+ * @method createComposite
+ * @param  {string} id Composite ID
+ */ 
 JSCOM.Composite.prototype.createComposite = function(id)
 {
 	// Check duplicate ID
@@ -34,6 +47,10 @@ JSCOM.Composite.prototype.createComposite = function(id)
 	return composite;
 };
 
+/**
+ * Checks if the input composite ID already exists in JSCOM runtime.
+ * @param  {string} id Composite ID
+ */ 
 JSCOM.Composite.prototype._isNewComposite = function(id)
 {
 	var isNewComposite = false;
@@ -61,7 +78,12 @@ JSCOM.Composite.prototype._isNewComposite = function(id)
  * Component API
  ***********************/
 
-
+/**
+ * Creates a component instance inside this composite instance.
+ * @method createComponent
+ * @param  {string} className Component class name
+ * @param {string} id Component ID
+ */ 
 JSCOM.Composite.prototype.createComponent = function(className, id)
 {
 	// Check duplicate ID
@@ -85,7 +107,11 @@ JSCOM.Composite.prototype.createComponent = function(className, id)
 	return compInstance;
 };
 
-
+/**
+ * Initializes a component instance.
+ * @param  {string} className Component class name
+ * @param {string} id Component ID
+ */ 
 JSCOM.Composite.prototype._initComponentInstance = function(className, id)
 {
 	// initialize component instance
@@ -179,8 +205,17 @@ JSCOM.Composite.prototype._loadRawInterface = function(interfaceName)
  * Expose API
  ***********************/
 
+/**
+ * Explicitly expose an interface of this composite instance's internal component instance 
+ * to external entities.
+ * 
+ * @method exposeInterface
+ * @param  {string} interfaceName Interface name
+ */ 
 JSCOM.Composite.prototype.exposeInterface = function(interfaceName)
 {
+	// TODO: Check if validate existence of the interface. 
+	// Only need to record metadata and setup event handling, no need to return component instance.
 	var component = this._exposeLoop(interfaceName, this._hasInterface);
 	return component;
 };
@@ -206,7 +241,13 @@ JSCOM.Composite.prototype._hasInterface = function(component, interfaceName)
 	return false;
 };
 
-
+/**
+ * Explicitly expose an acquisitor of this composite instance's internal component instance 
+ * to external entities.
+ * 
+ * @method exposeInterface
+ * @param  {string} interfaceName Interface name
+ */ 
 JSCOM.Composite.prototype.exposeAcquisitor = function(interfaceName)
 {
 	var component = this._exposeLoop(interfaceName, this._hasAcquisitor);
@@ -233,7 +274,12 @@ JSCOM.Composite.prototype._hasAcquisitor = function(component, interfaceName)
 	return false;
 };
 
-
+/**
+ * A common looping function for both exposeInterface and exposeAcquisitor.
+ * 
+ * @param  {string} interfaceName Interface name
+ * @param  {function} exposeFunction
+ */ 
 JSCOM.Composite.prototype._exposeLoop = function(interfaceName, exposeFunction)
 {
 	var compositeChildrenList = this.jscomRt.getChildrenList(this.id);
@@ -266,8 +312,17 @@ JSCOM.Composite.prototype._exposeLoop = function(interfaceName, exposeFunction)
  * Binding API 
  ***********************/
 
+/**
+ * Bind the source component's acquisitor to the target component's interface.
+ * 
+ * @method bind
+ * @param  {string} interfaceName Interface name
+ * @exception Undefined Acquisitor Exception
+ */ 
 JSCOM.Composite.prototype.bind = function(sourceComp, targetComp, interfaceName)
 {
+	// TODO: Create event binding
+	
 	// Check if the acquisitor of the soureceComp has matching interfaceName
 	this._checkMatchingAcquisitor(sourceComp, interfaceName);
 

@@ -5,14 +5,16 @@
  */
 
 var express = require('express');
-JSCOM.express = JSCOM.express || express();
+var http = require('http')
 
+JSCOM.express = JSCOM.express || express();
 JSCOM.Loader.declare("JSCOM.components.rest.RestServer");
 
 JSCOM.components.rest.RestServer = function () 
 {
 	JSCOM.Component.call(this);
-	this.restservice = JSCOM.express;
+	this.restapp = JSCOM.express;
+	this.server = http.createServer(this.restapp);
 	this.port = null;
 	this.init();
 };
@@ -25,19 +27,31 @@ JSCOM.components.rest.RestServer.interfaces = [];
 
 JSCOM.components.rest.RestServer.prototype.init = function()
 {
-	this.restservice.get('/components', function(req, res) {
-		
+	var _this = this;
+	
+	this.restapp.get('/components', function(req, res) {
 		res.send('components');
 	});
 	
-	this.restservice.get('/composites', function(req, res) {
-		
+	this.restapp.get('/composites', function(req, res) {
 		res.send('composites');
+	});
+	
+	this.restapp.get('/close', function(req, res) {
+		_this.stop();
+		res.send('Closing Connection');
 	});
 };
 
 
 JSCOM.components.rest.RestServer.prototype.start = function()
 {
-	this.restservice.listen(this.port);
+	this.server.listen(this.port);
+};
+
+JSCOM.components.rest.RestServer.prototype.stop = function()
+{
+	this.server.close(function(){
+		console.log("Close");
+	});
 };

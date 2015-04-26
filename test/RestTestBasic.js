@@ -17,20 +17,39 @@ var restComposite = jscomRt.createComposite("RestComposite");
 
 // Loading example component instances...
 var restService = restComposite.createComponent("JSCOM.components.rest.RestServer", "MyRestServer");
-
-// Invoking add method on the loaded Adder component instance
-restService.start(3000);
-
+restService.port = 3000;
+restService.start();
 
 var unirest = require('unirest');
 
+var initResponse;
+var closeConfirm;
+var afterCloseResponse;
 
+unirest.get('http://localhost:3000/components')
+.end(function (response, error) {
+	initResponse = response.body;
+});	
+
+unirest.post('http://localhost:3000/close')
+.end(function (response) {
+	var closeConfirm = response.body;
+});
+
+unirest.post('http://localhost:3000/component')
+.end(function (response) {
+	var afterCloseResponse = response.body;
+});	
+	
 describe("REST API", function() { 
 	it("Create component", function() { 
-		unirest.post('http://localhost:3000/component')
-		.end(function (response) {
-			var res = response.body;
-			should(res).equal("Component");
-		});	
-	}); 
+		should(initResponse).equal("components");
+	});
+
+	it("Close connection", function() { 
+		should(closeConfirm).equal("Connection Closed");
+		should(afterCloseResponse).equal("components");
+	});	
 });
+
+
