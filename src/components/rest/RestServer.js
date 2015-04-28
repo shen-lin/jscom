@@ -3,18 +3,17 @@
  * @module components.rest
  * @class RestServer
  */
-
-var express = require('express');
-var http = require('http')
-
-JSCOM.express = JSCOM.express || express();
 JSCOM.Loader.declare("JSCOM.components.rest.RestServer");
+
+JSCOM.require('express');
+JSCOM.require('http');
+
 
 JSCOM.components.rest.RestServer = function () 
 {
 	JSCOM.Component.call(this);
-	this.restapp = JSCOM.express;
-	this.server = http.createServer(this.restapp);
+	this.restapp = JSCOM.express();
+	this.server = JSCOM.http.createServer(this.restapp);
 	this.port = null;
 	this.init();
 };

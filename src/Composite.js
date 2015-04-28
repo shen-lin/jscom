@@ -8,6 +8,8 @@
  *
  */
 
+JSCOM.require("fs"); 
+ 
  
 /**
  * Creates a new composite instance. This constructor should

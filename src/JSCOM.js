@@ -38,7 +38,7 @@ JSCOM.ADAPTOR   = "ADAPTOR";
 // JSCOM Templates
 JSCOM.FN_SEPARATOR = "@";
 JSCOM.FN_BAK = "_jscom_bak_{0}";
-
+JSCOM.GLOBAL_EVENTID_SEPARATOR = "_";
 
 
 // JSCOM Logger
@@ -59,6 +59,8 @@ JSCOM.log4js.configure({
 JSCOM.LOGGER = JSCOM.log4js.getLogger('normal');
 JSCOM.LOGGER.setLevel('DEBUG');
 
-// 3rd party libraries
-JSCOM.fs = null;
-JSCOM.express = null;
+// require 3rd party libraries
+JSCOM.require = function(libName) {
+	JSCOM.LOGGER.info("Load third party library: " + libName);
+	JSCOM[libName] = JSCOM[libName] || require(libName);
+};

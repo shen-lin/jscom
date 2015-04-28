@@ -5,11 +5,7 @@
  * @class Loader
  * @static
  */
-
-JSCOM.fs = JSCOM.fs || require("fs")
-
-JSCOM.Loader = {};
-
+JSCOM.Loader = JSCOM.Loader || {};
 
 /**
  * Load component or adaptor. 
