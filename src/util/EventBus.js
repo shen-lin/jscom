@@ -43,6 +43,34 @@ JSCOM.EventBus.subscribeLocal = function(sChannelId, sEventId, fnHandler)
 };
 
 
+
+JSCOM.EventBus._subscribeComponentInterfaceEvents = function(compInstance)
+{
+	var oInterfaceSet = compInstance.getInterfaceSet();
+	for (var sInterfaceName in oInterfaceSet) {
+		var oInterface = oInterfaceSet[sInterfaceName];
+		var sChannelId = JSCOM.eventUri.ComponentInterface;
+		var oInterfaceDef = oInterface.oInterfaceDef;
+		for (var sFnName in oInterfaceDef) {
+			var sEventId = JSCOM.String.format(JSCOM.eventUri.EventIDFormat, 
+				compInstance.className, 
+				compInstance.id, 
+				sInterfaceName,
+				sFnName);
+			
+			if (!compInstance[sFnName]) {
+				throw "Function " + sFnName + " of Interface " + sInterfaceName + " is not implemented in Component " + compInstance.id;
+			}
+			var fnInterfaceFunction = compInstance[sFnName].bind(compInstance);
+			JSCOM.EventBus.subscribeLocal(sChannelId, sEventId, fnInterfaceFunction);
+			
+			// TODO: subscribe remote
+		}
+	}
+};
+
+
+
 /**
  * Publish a remote JSCOM event, by using an external message/event broker. This function
  * needs to be overwritten with custom implementation. <div> @throws "Not Implemented"</div> 
@@ -83,6 +111,6 @@ JSCOM.EventBus.subscribeRemote = function(sChannelId, sEventId, fnHandler)
  */ 
 JSCOM.EventBus.getCombinedEventId = function(sChannelId, sEventId) 
 {
-	var sCombinedEventId = sChannelId + JSCOM.GLOBAL_EVENTID_SEPARATOR + sEventId;
+	var sCombinedEventId = sEventId + JSCOM.eventUri.SEPARATOR + sChannelId;
 	return sCombinedEventId;
 };

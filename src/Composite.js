@@ -1,7 +1,10 @@
 /**
  * Composite serves as the container for a set of components. 
  * It allows this set of enclosed components to be hidden from a higher-level
- * of abstraction.
+ * of abstraction. Do not call the Composite constructor to create new composite
+ * instances outside JSCOM. Instead, call JSCOMRuntime.createRootComposite() to
+ * create root level composite instances; and call Composite.createComposite() 
+ * to create a child composite of this composite instance.
  * 
  * @module core
  * @class Composite
@@ -13,14 +16,18 @@ JSCOM.require("fs");
  
 /**
  * Creates a new composite instance. This constructor should
- * not be called outside JSCOM.
- * 
+ * not be called outside JSCOM library classes. 
+ *
+ * @constructor
+ * @private
  * @param  {string} id Composite ID
  * @param  {JSCOM.JSCOMRuntime} jscomRt JSCOM runtime instance
  */ 
 JSCOM.Composite = function (id, jscomRt) {
 	this.id = id;
 	this.jscomRt = jscomRt;
+	this._exposedInterfaces = {};
+	this._exposedReceptacles = {};
 };
 
 /***********************
@@ -38,12 +45,15 @@ JSCOM.Composite.prototype.createComposite = function(id)
 	this._isNewComposite(id);
 	
 	// Create composite within this parent composite
-	var composite =  new JSCOM.Composite(id, this.jscomRt);
+	var composite = new JSCOM.Composite(id, this.jscomRt);
 	var childItem = {
 		id: id,
 		type: JSCOM.COMPOSITE
 	};
+	
+	// Attach newly create composite to its parent
 	this.jscomRt._connectivity[this.id].push(childItem);
+	// This composite doesn't have any children by default.
 	this.jscomRt._connectivity[id] = [];
 
 	return composite;
@@ -82,6 +92,7 @@ JSCOM.Composite.prototype._isNewComposite = function(id)
 
 /**
  * Creates a component instance inside this composite instance.
+ * <p>@throws FunctionNotImplemented</p>
  * @method createComponent
  * @param  {string} className Component class name
  * @param {string} id Component ID
@@ -103,10 +114,27 @@ JSCOM.Composite.prototype.createComponent = function(className, id)
 	var compInstance = this._initComponentInstance(className, id);
 	// load the interface definition exposed by this component type
 	this._initComponentInterfaceSet(className);
+	// check the interface methods are implemented in the component
+	this._checkInterfaceMethods(compInstance);
 	// backup interface methods to recover from AoP modification
 	this._backupInterfaceMethods(compInstance);
 	
 	return compInstance;
+};
+
+
+JSCOM.Composite.prototype._checkInterfaceMethods = function(compInstance)
+{
+	var oInterfaceSet = compInstance.getInterfaceSet();
+	for (var sInterfaceName in oInterfaceSet) {
+		var oInterface = oInterfaceSet[sInterfaceName];
+		var oInterfaceDef = oInterface.oInterfaceDef;
+		for (var sFnName in oInterfaceDef) {
+			if (!compInstance[sFnName]) {
+				throw "Function " + sFnName + " of Interface " + sInterfaceName + " is not implemented in Component " + compInstance.id;
+			}
+		}
+	}
 };
 
 /**
@@ -193,12 +221,16 @@ JSCOM.Composite.prototype._initComponentInterfaceSet = function(className)
 
 
 
-JSCOM.Composite.prototype._loadRawInterface = function(interfaceName)
+JSCOM.Composite.prototype._loadRawInterface = function(sInterfaceName)
 {
+	// Skip interfaces that already added
+	if (this.jscomRt._interfaceDefSet[sInterfaceName]) return;
+	
 	var componentRepo = this.jscomRt.getComponentRepo();
-	var interfaceRawContent = JSCOM.Loader.loadRawContent(componentRepo, interfaceName);
-	var interfaceDef = JSON.parse(interfaceRawContent);
-	this.jscomRt._interfaceDefSet[interfaceName] = interfaceDef;
+	var interfaceRawContent = JSCOM.Loader.loadRawContent(componentRepo, sInterfaceName);
+	var oInterfaceDef = JSON.parse(interfaceRawContent);
+	var oInterface = new JSCOM.Interface(sInterfaceName, oInterfaceDef);
+	this.jscomRt._interfaceDefSet[sInterfaceName] = oInterface;
 };
 
 
@@ -209,17 +241,21 @@ JSCOM.Composite.prototype._loadRawInterface = function(interfaceName)
 
 /**
  * Explicitly expose an interface of this composite instance's internal component instance 
- * to external entities.
+ * to external entities. Interfaces of internal composites cannot be exposed. 
  * 
  * @method exposeInterface
- * @param  {string} interfaceName Interface name
+ * @param  {string} sInterfaceName Interface name
+ * @return {boolean} Found component for valid interface expose
  */ 
-JSCOM.Composite.prototype.exposeInterface = function(interfaceName)
+JSCOM.Composite.prototype.exposeInterface = function(sInterfaceName)
 {
-	// TODO: Check if validate existence of the interface. 
-	// Only need to record metadata and setup event handling, no need to return component instance.
-	var component = this._exposeLoop(interfaceName, this._hasInterface);
-	return component;
+	// Only need to record metadata and setup event handling.
+	var component = this._exposeLoop(sInterfaceName, this._hasInterface);
+	if (!component) return false;
+	
+	// Creates functions of the exposed interface for the composite
+	
+	return true;
 };
 
 
@@ -245,15 +281,20 @@ JSCOM.Composite.prototype._hasInterface = function(component, interfaceName)
 
 /**
  * Explicitly expose an acquisitor of this composite instance's internal component instance 
- * to external entities.
+ * to external entities. Acquisitors of internal composites cannot be exposed. 
  * 
- * @method exposeInterface
+ * @method exposeAcquisitor
  * @param  {string} interfaceName Interface name
+ * @return {boolean} Found component for valid acquisitor expose
  */ 
 JSCOM.Composite.prototype.exposeAcquisitor = function(interfaceName)
 {
 	var component = this._exposeLoop(interfaceName, this._hasAcquisitor);
-	return component;
+	if (!component) return false;
+	
+	
+	
+	return true;
 };
 
 JSCOM.Composite.prototype._hasAcquisitor = function(component, interfaceName)
@@ -278,34 +319,44 @@ JSCOM.Composite.prototype._hasAcquisitor = function(component, interfaceName)
 
 /**
  * A common looping function for both exposeInterface and exposeAcquisitor.
- * 
- * @param  {string} interfaceName Interface name
- * @param  {function} exposeFunction
+ * <p>@throws "Multiple components found with the same interface"</p>
+ * @param  {string} sInterfaceName Interface name
+ * @param  {function} fnExposeFunction
+ * @return {oComponent} Found component with the given interface/acquisitor.
  */ 
-JSCOM.Composite.prototype._exposeLoop = function(interfaceName, exposeFunction)
+JSCOM.Composite.prototype._exposeLoop = function(sInterfaceName, fnExposeFunction)
 {
 	var compositeChildrenList = this.jscomRt.getChildrenList(this.id);
-	
+	var aComponents = []; // count the number of components found with the matching interface 
 	for(var i in compositeChildrenList) {
 		var childEntity = compositeChildrenList[i];
 		var childEntityId = childEntity.id;
-		var childEntityType = childEntity.type;
 
+		// Skip internal composites
+		var childEntityType = childEntity.type;
 		if (childEntityType === JSCOM.COMPOSITE)
 		{
 			continue;
 		}
-
+		
 		var nextComp = this.jscomRt._componentSet[childEntityId];
-		var exists = exposeFunction(nextComp, interfaceName);
+		var exists = fnExposeFunction(nextComp, sInterfaceName);
 
 		if (exists)
 		{
-			return nextComp;
+			aComponents.push(nextComp);
 		}
 	}
 
-	return null;	
+	if (aComponents.length === 0) {
+		return null;
+	}
+	else if (aComponents.length === 1) {
+		return aComponents[0];
+	} 
+	else {
+		throw "Multiple components found with the same interface";
+	}
 };
 
 
@@ -323,7 +374,12 @@ JSCOM.Composite.prototype._exposeLoop = function(interfaceName, exposeFunction)
  */ 
 JSCOM.Composite.prototype.bind = function(sourceComp, targetComp, interfaceName)
 {
-	// TODO: Create event binding
+	// Create event binding
+	// register event handlers for the newly loaded component instance
+	JSCOM.EventBus._subscribeComponentInterfaceEvents.(compInstance);
+	
+	
+	
 	
 	// Check if the acquisitor of the soureceComp has matching interfaceName
 	this._checkMatchingAcquisitor(sourceComp, interfaceName);
@@ -352,7 +408,6 @@ JSCOM.Composite.prototype.bind = function(sourceComp, targetComp, interfaceName)
 		var errorMsg = JSCOM.String.format("Undefined Acquisitor Type: {0}", acquisitor.type);
 		throw new Error(errorMsg);
 	}
-	
 };
 
 

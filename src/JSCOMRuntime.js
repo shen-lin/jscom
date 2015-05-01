@@ -6,7 +6,8 @@
 
 JSCOM.JSCOMRuntime = function () {
 	this._componentRepo = null;  // component repository
-	this._compositeSet = {};     // root-level composites
+	this._rootCompositeSet = {};     // root level composites
+	this._compositeSet = {};     // non-root level composites
 	this._componentSet = {};     // loaded component instances
 	this._connectivity = {};          // runtime composite and component hierarchical graph 
 	this._componentClassNameSet = [];   // loaded component class types
@@ -23,31 +24,53 @@ JSCOM.JSCOMRuntime = function () {
 
 
 /***********************
- * Composite Access API
+ * Root Composite Access API
  ***********************/
-JSCOM.JSCOMRuntime.prototype.createComposite = function(id)
+ 
+/**
+ * Creates a root composite instance within JSCOM runtime.
+ * @method createRootComposite
+ * @param  {string} sId Id of the composite instance to be created
+ */ 
+JSCOM.JSCOMRuntime.prototype.createRootComposite = function(sId)
 {
-	var composite =  new JSCOM.Composite(id, this);
-	this._compositeSet[id] = composite;
-	this._connectivity[id] = [];
+	var composite =  new JSCOM.Composite(sId, this);
+	this._rootCompositeSet[sId] = composite;
+	this._connectivity[sId] = [];
 	return composite;
 };
 
-JSCOM.JSCOMRuntime.prototype.getComposite = function(id)
+
+/**
+ * Gets a root composite instance by Id.
+ * @method getRootComposite
+ * @param  {string} sId Composite Id used to query
+ * @return {JSCOM.Composite} Composite instance
+ */ 
+JSCOM.JSCOMRuntime.prototype.getRootComposite = function(sId)
 {
-	return this._compositeSet[id];
+	return this._rootCompositeSet[sId];
 };
 
-JSCOM.JSCOMRuntime.prototype.getCompositeSet = function()
+/**
+ * Gets all the root composites with JSCOM runtime.
+ * @method getRootCompositeSet
+ * @return {map} The set of root composites as a map. Key is composite id.
+ */ 
+JSCOM.JSCOMRuntime.prototype.getRootCompositeSet = function()
 {
-	return this._compositeSet;
+	return this._rootCompositeSet;
 };
+
+
+
 
 /***********************
  * Adaptor API 
  ***********************/
  
 /**
+ * @method createAdaptor
  * @param 
  */  
 JSCOM.JSCOMRuntime.prototype.createAdaptor = function(className, id) 
@@ -73,9 +96,9 @@ JSCOM.JSCOMRuntime.prototype.createAdaptor = function(className, id)
 
 /**
  *
- * @function applyAdaptor
+ * @method applyAdaptor
  * @param sId {string} Id of the injection
- * @param oAdvices {array} Indicating the location of this adaptor function in the ordered list of applied adaptor functions. E.g.
+ * @param oAdvices {array} Indicating the location of this adaptor method in the ordered list of applied adaptor methods. E.g.
 	[
 		{id: adaptorId, fn: adaptorFn_1, type: JSCOM.Adaptor.Type.BEFORE}, 
 		{id: adaptorId, fn: adaptorFn_2, type: JSCOM.Adaptor.Type.AFTER}, 
@@ -276,6 +299,8 @@ JSCOM.JSCOMRuntime.prototype.getComponent = function(id)
  ***********************/
 JSCOM.JSCOMRuntime.prototype.addComponentRepo = function(protocol, baseUri)
 {
+	// JSCOM.LOGGER.debug(arguments.callee.name);
+	
 	this._componentRepo = {
 		protocol: protocol,
 		baseUri: baseUri

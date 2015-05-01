@@ -2,7 +2,7 @@
  * 
  * @module core
  * @class Acquisitor
- *
+ * @constructor
  */
 
 JSCOM.Acquisitor = function(componentRef, interfaceName, type)

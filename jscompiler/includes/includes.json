@@ -4,9 +4,10 @@
 	"../src/util/Loader.js",
 	"../src/util/EventBus.js",
     "../src/JSCOMRuntime.js",
-    "../src/Composite.js",
-    "../src/Component.js",
     "../src/Acquisitor.js",
+	"../src/Interface.js",
+	"../src/Composite.js",
+    "../src/Component.js",
     "../src/Adaptor.js",
 	"../src/components/rest/RestServer.js"
 ]

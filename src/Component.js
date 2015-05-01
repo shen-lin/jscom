@@ -5,6 +5,9 @@
  * acquisitors and interfaces. An interface defines the services this component
  * provides to other components / composites. An acquisitor defines the
  * the services this component requires from others.
+ * A component always resides within a composite instance. A component should not
+ * be created by calling the constructor. Use JSCOM.Composite.createComponent() method
+ * to create a new component instance.
  * 
  * @module core
  * @class Component
@@ -17,6 +20,13 @@ JSCOM.Component = function () {
 	this._metadataSet = {};
 	this._acquisitorSet = {};
 };
+
+
+/***********************
+ * @example Calc.Calculator.interfaces = ["Calc.ICalculator"];
+ * @property interfaces
+ * @static
+ ***********************/
 
 
 /***********************

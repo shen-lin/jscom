@@ -20,7 +20,7 @@ describe("Componnet Repository Configuration", function() {
 });
 
 // Creating a composite of example calculator components...
-var calcComposite = jscomRt.createComposite("MyComposite");
+var calcComposite = jscomRt.createRootComposite("MyComposite");
 
 // Loading example component instances...
 var adder = calcComposite.createComponent("Calc.Adder", "MyAdder");
@@ -41,11 +41,11 @@ calcComposite.bind(calculator, adder, "Calc.IAdd");
 calcComposite.bind(calculator, subtractor, "Calc.ISubtract");
 
 // Exposing example system interface...
-var iCalcIEP = calcComposite.exposeInterface("Calc.ICalculator");
+calcComposite.exposeInterface("Calc.ICalculator");
 
 // Invoking example system and printing output...
-addOutput = iCalcIEP.add(5,5);
-subOutput = iCalcIEP.subtract(5,3);
+addOutput = calcComposite.add(5,5);
+subOutput = calcComposite.subtract(5,3);
 
 
 describe("Invoke Composed Calculator Component Instance", function() { 
