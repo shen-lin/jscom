@@ -3,6 +3,7 @@
     "../src/util/String.js",
 	"../src/util/Loader.js",
 	"../src/util/EventBus.js",
+	"../src/util/Error.js",
     "../src/JSCOMRuntime.js",
     "../src/Acquisitor.js",
 	"../src/Interface.js",

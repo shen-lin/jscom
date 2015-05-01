@@ -22,6 +22,20 @@ JSCOM.JSCOMRuntime = function () {
 	this._uncommittedBindings = [];
 };
 
+/***********************
+ * Get Entity API
+ ***********************/
+
+JSCOM.JSCOMRuntime.prototype.getEntity = function(sId, sType)
+{
+	if (sType === JSCOM.COMPONENT) {
+		return this.getComponent(sId);
+	} 
+	else if (sType === JSCOM.COMPOSITE) {
+		return this.getComposite(sId);
+	}
+	return null;
+};
 
 /***********************
  * Root Composite Access API
@@ -34,7 +48,7 @@ JSCOM.JSCOMRuntime = function () {
  */ 
 JSCOM.JSCOMRuntime.prototype.createRootComposite = function(sId)
 {
-	var composite =  new JSCOM.Composite(sId, this);
+	var composite = new JSCOM.Composite(sId, this);
 	this._rootCompositeSet[sId] = composite;
 	this._connectivity[sId] = [];
 	return composite;
@@ -62,6 +76,27 @@ JSCOM.JSCOMRuntime.prototype.getRootCompositeSet = function()
 	return this._rootCompositeSet;
 };
 
+/***********************
+ * Composite Access API
+ ***********************/
+ 
+
+/**
+ * Gets a composite instance by Id, including root-level composites.
+ * @method getComposite
+ * @param  {string} sId Composite Id used to query
+ * @return {JSCOM.Composite} Composite instance
+ */ 
+JSCOM.JSCOMRuntime.prototype.getComposite = function(sId)
+{
+	var rootComposite = this.getRootComposite(sId);
+	if (rootComposite) {
+		return rootComposite;
+	} 
+	else {
+		return this._compositeSet[sId];
+	}
+};
 
 
 
@@ -275,10 +310,14 @@ JSCOM.JSCOMRuntime.prototype._initAdaptorInstance = function(className, id)
 
 /**
  * Return the components and composites in the given composite.
+ * @method getChildrenList
+ * @param {string} Id of the composite
+ * @return {array} Child components and composites stored in an array. Each array element is a JSON
+ * 				   object with data structure {id: sEntityId, type: [JSCOM.COMPONENT|JSCOM.COMPOSITE]}.
  */
-JSCOM.JSCOMRuntime.prototype.getChildrenList = function(id)
+JSCOM.JSCOMRuntime.prototype.getChildrenList = function(sId)
 {
-	return this._connectivity[id];
+	return this._connectivity[sId];
 };
 
 

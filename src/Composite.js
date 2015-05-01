@@ -22,6 +22,7 @@ JSCOM.require("fs");
  * @private
  * @param  {string} id Composite ID
  * @param  {JSCOM.JSCOMRuntime} jscomRt JSCOM runtime instance
+ * @pram   {boolean} Indicate the composite is root level or not
  */ 
 JSCOM.Composite = function (id, jscomRt) {
 	this.id = id;
@@ -38,6 +39,7 @@ JSCOM.Composite = function (id, jscomRt) {
  * Creates a child composite instance of this composite instance.
  * @method createComposite
  * @param  {string} id Composite ID
+ * @return {JSCOM.Composite} Created composite instance
  */ 
 JSCOM.Composite.prototype.createComposite = function(id)
 {
@@ -80,8 +82,7 @@ JSCOM.Composite.prototype._isNewComposite = function(id)
 
 	if (isNewComposite)
 	{
-		var errorMsg = JSCOM.String.format("Composite {0} already exists", id);
-		throw new Error(errorMsg);
+		JSCOM.Error.throwError(JSCOM.Error.CompositeAlreadyExist, [id]);
 	}
 }
 
@@ -131,7 +132,7 @@ JSCOM.Composite.prototype._checkInterfaceMethods = function(compInstance)
 		var oInterfaceDef = oInterface.oInterfaceDef;
 		for (var sFnName in oInterfaceDef) {
 			if (!compInstance[sFnName]) {
-				throw "Function " + sFnName + " of Interface " + sInterfaceName + " is not implemented in Component " + compInstance.id;
+				JSCOM.Error.throwError(JSCOM.Error.FunctionNotImplemented, [sInterfaceName, sFnName, compInstance.id]);
 			}
 		}
 	}
@@ -200,8 +201,7 @@ JSCOM.Composite.prototype._isNewComponentInstance = function(id)
 	var componentInstance = this.jscomRt._componentSet[id];
 	if (componentInstance)
 	{
-		var errorMsg = JSCOM.String.format("Component instance already exists: ID={0}", id);
-		throw new Error(errorMsg);
+		JSCOM.Error.throwError(JSCOM.Error.ComponentAlreadyExist, [id]);
 	}
 };
 
@@ -250,12 +250,41 @@ JSCOM.Composite.prototype._loadRawInterface = function(sInterfaceName)
 JSCOM.Composite.prototype.exposeInterface = function(sInterfaceName)
 {
 	// Only need to record metadata and setup event handling.
-	var component = this._exposeLoop(sInterfaceName, this._hasInterface);
-	if (!component) return false;
+	var oComponent = this._exposeLoop(sInterfaceName, this._hasInterface);
+	if (!oComponent) return false;
 	
 	// Creates functions of the exposed interface for the composite
-	
+	this._createInterfaceFunctions(sInterfaceName, oComponent);
 	return true;
+};
+
+
+JSCOM.Composite.prototype._createInterfaceFunctions = function(sInterfaceName, oComponent)
+{
+	var oInterface = this.jscomRt._interfaceDefSet[sInterfaceName];
+	var oInterfaceDef = oInterface.oInterfaceDef;
+
+	var sChannelId = JSCOM.eventUri.ComponentInterfaceChannel;
+	
+	for (var sFnName in oInterfaceDef) {
+		this[sFnName] = function() {
+			// Publish events
+		}
+		/*
+		var sEventId = JSCOM.String.format(
+			JSCOM.eventUri.EventIDFormat, 
+			oComponent.className, 
+			oComponent.id, 
+			sInterfaceName,
+			sFnName);
+		
+		if (!oComponent[sFnName]) {
+			throw "Function " + sFnName + " of Interface " + sInterfaceName + " is not implemented in Component " + oComponent.id;
+		}
+		var fnInterfaceFunction = oComponent[sFnName].bind(oComponent);
+		JSCOM.EventBus.subscribeLocal(sChannelId, sEventId, fnInterfaceFunction);
+		*/
+	}
 };
 
 
@@ -319,7 +348,7 @@ JSCOM.Composite.prototype._hasAcquisitor = function(component, interfaceName)
 
 /**
  * A common looping function for both exposeInterface and exposeAcquisitor.
- * <p>@throws "Multiple components found with the same interface"</p>
+ * <p>@throws JSCOM.Error.DuplicateInterfacesWithinComposite</p>
  * @param  {string} sInterfaceName Interface name
  * @param  {function} fnExposeFunction
  * @return {oComponent} Found component with the given interface/acquisitor.
@@ -355,7 +384,7 @@ JSCOM.Composite.prototype._exposeLoop = function(sInterfaceName, fnExposeFunctio
 		return aComponents[0];
 	} 
 	else {
-		throw "Multiple components found with the same interface";
+		JSCOM.Error.throwError(JSCOM.Error.DuplicateInterfacesWithinComposite, [this.id]);
 	}
 };
 
@@ -366,76 +395,81 @@ JSCOM.Composite.prototype._exposeLoop = function(sInterfaceName, fnExposeFunctio
  ***********************/
 
 /**
- * Bind the source component's acquisitor to the target component's interface.
- * 
+ * Bind the source entity's acquisitor to the target entity's interface.
+ * <p>@throws JSCOM.Error.UndefinedAcquisitorType</p>
+ *
  * @method bind
- * @param  {string} interfaceName Interface name
- * @exception Undefined Acquisitor Exception
+ * @param  {string} sSourceId Id of the source entity
+ * @param  {string} sTargetId Id of the target entity
+ * @param  {string} sInterfaceName Interface name
+ * 
  */ 
-JSCOM.Composite.prototype.bind = function(sourceComp, targetComp, interfaceName)
+JSCOM.Composite.prototype.bind = function(sSourceId, sTargetId, sInterfaceName)
 {
 	// Create event binding
 	// register event handlers for the newly loaded component instance
-	JSCOM.EventBus._subscribeComponentInterfaceEvents.(compInstance);
+	// JSCOM.EventBus._subscribeComponentInterfaceEvents.(compInstance);
 	
+	// validation
+	var oEntities = this._validateBindingInputs(sSourceId, sTargetId, sInterfaceName);
+	var oSource = oEntities.source;
+	var oTarget = oEntities.target;
 	
-	
-	
-	// Check if the acquisitor of the soureceComp has matching interfaceName
-	this._checkMatchingAcquisitor(sourceComp, interfaceName);
-
-	// Check if the targetComp exposes the interface
-	this._checkMatchingInterface(targetComp, interfaceName);
-
-	// Component binding
-	var acquisitor = sourceComp._acquisitorSet[interfaceName];
+	// entity binding
+	var acquisitor = oSource._acquisitorSet[sInterfaceName];
 	if (acquisitor.type === JSCOM.ACQUISITOR_SINGLE)
 	{
-		this.jscomRt._recordUncommittedBindings(JSCOM.COMMIT_BINDING, JSCOM.ACQUISITOR_SINGLE, sourceComp.id, targetComp.id, interfaceName);
-		acquisitor.ref = targetComp;
+		this.jscomRt._recordUncommittedBindings(JSCOM.COMMIT_BINDING, JSCOM.ACQUISITOR_SINGLE, sSourceId, sTargetId, sInterfaceName);
+		acquisitor.ref = oTarget;
 	}
 	else if (acquisitor.type === JSCOM.ACQUISITOR_MULTIPLE)
 	{
-		this.jscomRt._recordUncommittedBindings(JSCOM.COMMIT_BINDING, JSCOM.ACQUISITOR_MULTIPLE, sourceComp.id, targetComp.id, interfaceName);
+		this.jscomRt._recordUncommittedBindings(JSCOM.COMMIT_BINDING, JSCOM.ACQUISITOR_MULTIPLE, sSourceId, sTargetId, sInterfaceName);
 
 		if (!acquisitor.ref)
 		{
 			acquisitor.ref = [];
 		}
-		acquisitor.ref.push(targetComp);
+		acquisitor.ref.push(oTarget);
 	}
 	else {
-		var errorMsg = JSCOM.String.format("Undefined Acquisitor Type: {0}", acquisitor.type);
-		throw new Error(errorMsg);
+		JSCOM.Error.throwError(JSCOM.Error.UndefinedAcquisitorType, [acquisitor.type]);
 	}
 };
 
 
-
-JSCOM.Composite.prototype.unbind = function(sourceComp, targetComp, interfaceName)
+/**
+ * Unind the source entity's acquisitor from the target entity's interface.
+ * <p>@throws JSCOM.Error.UndefinedAcquisitorType</p>
+ *
+ * @method unbind
+ * @param  {string} sSourceId Id of the source entity
+ * @param  {string} sTargetId Id of the target entity
+ * @param  {string} sInterfaceName Interface name
+ * 
+ */ 
+JSCOM.Composite.prototype.unbind = function(sSourceId, sTargetId, sInterfaceName)
 {
+	// validation
+	var oEntities = this._validateBindingInputs(sSourceId, sTargetId, sInterfaceName);
+	var oSource = oEntities.source;
+	var oTarget = oEntities.target;
 	
-	// Check if the acquisitor of the soureceComp has matching interfaceName
-	this._checkMatchingAcquisitor(sourceComp, interfaceName);
-
-	// Check if the targetComp exposes the interface
-	this._checkMatchingInterface(targetComp, interfaceName);
-
 	// Component unbinding
-	var acquisitor = sourceComp._acquisitorSet[interfaceName];
+	var acquisitor = oSource._acquisitorSet[sInterfaceName];
 	if (acquisitor.type === JSCOM.ACQUISITOR_SINGLE)
 	{
-		this.jscomRt._recordUncommittedBindings(JSCOM.COMMIT_UNBINDING, JSCOM.ACQUISITOR_SINGLE, sourceComp.id, targetComp.id, interfaceName);
+		this.jscomRt._recordUncommittedBindings(JSCOM.COMMIT_UNBINDING, JSCOM.ACQUISITOR_SINGLE, sSourceId, sTargetId, sInterfaceName);
 		acquisitor.ref = null;
 	}
 	else if (acquisitor.type === JSCOM.ACQUISITOR_MULTIPLE)
 	{
-		this.jscomRt._recordUncommittedBindings(JSCOM.COMMIT_UNBINDING, JSCOM.ACQUISITOR_MULTIPLE, sourceComp.id, targetComp.id, interfaceName);
+		this.jscomRt._recordUncommittedBindings(JSCOM.COMMIT_UNBINDING, JSCOM.ACQUISITOR_MULTIPLE, sSourceId, sTargetId, sInterfaceName);
 
 		if (!acquisitor.ref) return;
 		for (var i in acquisitor.ref)
 		{
-			if (targetComp.id === acquisitor.ref[i].id)
+			if (oTarget.id === acquisitor.ref[i].id)
 			{
 				acquisitor.ref.slice(i, 1);
 			}
@@ -447,30 +481,80 @@ JSCOM.Composite.prototype.unbind = function(sourceComp, targetComp, interfaceNam
 		}
 	}
 	else {
-		var errorMsg = JSCOM.String.format("Undefined Acquisitor Type: {0}", acquisitor.type);
-		throw new Error(errorMsg);
+		JSCOM.Error.throwError(JSCOM.Error.UndefinedAcquisitorType, [acquisitor.type]);
 	}
 };
 
-JSCOM.Composite.prototype._checkMatchingAcquisitor = function(sourceComp, interfaceName)
+// Check if the source entity is within this composite
+// Check if the acquisitor of the sourece has matching interfaceName
+// Check if the target entity is within this composite 
+// Check if the target entity exposes the interface
+JSCOM.Composite.prototype._validateBindingInputs = function(sSourceId, sTargetId, sInterfaceName)
 {
-	var acquisitor = sourceComp._acquisitorSet[interfaceName];
+	var oEntities = this._checkInputAreChildren(sSourceId, sTargetId);
+	var oSource = oEntities.source;
+	var oTarget = oEntities.target;
+	this._checkMatchingAcquisitor(oSource, sInterfaceName);
+	this._checkMatchingInterface(oTarget, sInterfaceName);
+	return oEntities;
+};
+
+
+
+
+JSCOM.Composite.prototype._checkInputAreChildren = function(sSourceId, sTargetId)
+{
+	var aChildIds = this.jscomRt.getChildrenList(this.id);
+	var oSourceChild, oTargetChild;
+	for (var i in aChildIds) {
+		var oChild = aChildIds[i];
+		var sChildId = oChild.id;
+		var sChildType = oChild.type;
+		
+		if (sChildId === sSourceId) {
+			oSourceChild = this.jscomRt.getEntity(sChildId, sChildType);
+		}
+		if (sChildId === sTargetId) {
+			oTargetChild = this.jscomRt.getEntity(sChildId, sChildType);
+		}
+		
+		if (oSourceChild && oTargetChild) {
+			break;
+		}
+	}
+	
+	if (!oSourceChild) {
+		JSCOM.Error.throwError(JSCOM.Error.ChildNotExist, [sSourceId, this.id]);
+	}
+	
+	if (!oTargetChild) {
+		JSCOM.Error.throwError(JSCOM.Error.ChildNotExist, [sTargetId, this.id]);
+	}
+	
+	return {
+		source: oSourceChild,
+		target: oTargetChild
+	}
+};
+
+JSCOM.Composite.prototype._checkMatchingAcquisitor = function(oSource, sInterfaceName)
+{
+	var acquisitor = oSource._acquisitorSet[sInterfaceName];
 	
 	if (!acquisitor)
 	{
-		var errorMsg = JSCOM.String.format("Binding Failure: Component {0} does not have acquisitor {1}", sourceComp.id, interfaceName);
-		throw new Error(errorMsg);
+		JSCOM.Error.throwError(JSCOM.Error.BindingFailureAcquisitor, [oSource.id, sInterfaceName]);
 	}
 };
 
-JSCOM.Composite.prototype._checkMatchingInterface = function(targetComp, interfaceName)
+JSCOM.Composite.prototype._checkMatchingInterface = function(oTarget, sInterfaceName)
 {
 	var hasInterface = false;
-	var targetCompInterfaces = targetComp.getInterfaceSet();
-	for (var i in targetCompInterfaces)
+	var aTargetInterfaces = oTarget.getInterfaceSet();
+	for (var i in aTargetInterfaces)
 	{
-		var nextInterface = targetCompInterfaces[i];
-		if (nextInterface === interfaceName)
+		var sNextInterface = aTargetInterfaces[i];
+		if (sNextInterface === sInterfaceName)
 		{
 			hasInterface = true;
 			break;
@@ -479,7 +563,6 @@ JSCOM.Composite.prototype._checkMatchingInterface = function(targetComp, interfa
 
 	if (!hasInterface)
 	{
-		var errorMsg = JSCOM.String.format("Binding Failure: Component {0} does not have interface {1}", targetComp.id, interfaceName);
-		throw new Error(errorMsg);
+		JSCOM.Error.throwError(JSCOM.Error.BindingFailureInterface, [oTarget.id, sInterfaceName]);
 	}
 };

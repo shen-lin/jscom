@@ -11,9 +11,9 @@ License: BSD
 Development Setup
 --------------------
 	* Environment prerequisite: 
-		Install Python, Java, and NodeJS.
+		Install Python, Java, and NodeJS. Require NodeJS 0.11 and above.
 		Setup the Path environment variables.
-
+		
 	* Required nodejs modules:
 		cd jscom
 		mocha:    npm install mocha

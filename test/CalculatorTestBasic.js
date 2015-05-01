@@ -37,8 +37,8 @@ describe("Invoke Loaded Adder Component Instance", function() {
 });
 
 // Binding example components to form the example system...
-calcComposite.bind(calculator, adder, "Calc.IAdd");
-calcComposite.bind(calculator, subtractor, "Calc.ISubtract");
+calcComposite.bind("MyCalculator", "MyAdder", "Calc.IAdd");
+calcComposite.bind("MyCalculator", "MySubtractor", "Calc.ISubtract");
 
 // Exposing example system interface...
 calcComposite.exposeInterface("Calc.ICalculator");
@@ -60,7 +60,7 @@ describe("Invoke Composed Calculator Component Instance", function() {
 
 
 // Listing composites in the runtime environment...
-var compositeSet = jscomRt.getCompositeSet();
+var compositeSet = jscomRt.getRootCompositeSet();
 
 describe("[Meta Interface] Composite Set", function() { 
 	it("Exist MyComposite", function() { 
@@ -134,11 +134,11 @@ describe("[Meta Interface] Get Interfaces", function() {
 // Test multiple Logger components to MyCalculator...
 var consoleLogger = calcComposite.createComponent("Calc.ConsoleLogger", "MyConsoleLogger");
 var fileLogger = calcComposite.createComponent("Calc.FileLogger", "MyFileLogger");
-calcComposite.bind(calculator, consoleLogger, "Calc.ILog");
-calcComposite.bind(calculator, fileLogger, "Calc.ILog");
-var iCalcIEP = calcComposite.exposeInterface("Calc.ICalculator");
-iCalcIEP.add(10,5);
-iCalcIEP.subtract(20,3);
+calcComposite.bind("MyCalculator", "MyConsoleLogger", "Calc.ILog");
+calcComposite.bind("MyCalculator", "MyFileLogger", "Calc.ILog");
+calcComposite.exposeInterface("Calc.ICalculator");
+calcComposite.add(10,5);
+calcComposite.subtract(20,3);
 
 
 // Test binding failure...

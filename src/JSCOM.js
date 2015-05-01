@@ -43,8 +43,9 @@ JSCOM.FN_BAK = "_jscom_bak_{0}";
 // Build-in events and channels
 JSCOM.eventUri = JSCOM.eventUri || {};
 JSCOM.eventUri.SEPARATOR = "@";
-JSCOM.eventUri.ComponentInterface = "JSCOM.channel.ComponentInterface";
+JSCOM.eventUri.ComponentInterfaceChannel = "JSCOM.channel.ComponentInterface";
 JSCOM.eventUri.EventIDFormat = "{0}.{1}.{2}.{3}"; // ComponentName.InstanceId.InterfaceName.FnName
+
 
 // JSCOM Logger
 JSCOM.log4js = JSCOM.log4js || require('log4js');

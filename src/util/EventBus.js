@@ -49,10 +49,11 @@ JSCOM.EventBus._subscribeComponentInterfaceEvents = function(compInstance)
 	var oInterfaceSet = compInstance.getInterfaceSet();
 	for (var sInterfaceName in oInterfaceSet) {
 		var oInterface = oInterfaceSet[sInterfaceName];
-		var sChannelId = JSCOM.eventUri.ComponentInterface;
+		var sChannelId = JSCOM.eventUri.ComponentInterfaceChannel;
 		var oInterfaceDef = oInterface.oInterfaceDef;
 		for (var sFnName in oInterfaceDef) {
-			var sEventId = JSCOM.String.format(JSCOM.eventUri.EventIDFormat, 
+			var sEventId = JSCOM.String.format(
+				JSCOM.eventUri.EventIDFormat, 
 				compInstance.className, 
 				compInstance.id, 
 				sInterfaceName,
