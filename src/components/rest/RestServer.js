@@ -3,12 +3,15 @@
  * @module components.rest
  * @class RestServer
  */
-JSCOM.Loader.declare("JSCOM.components.rest.RestServer");
+JSCOM.Loader.declare({
+	component: "JSCOM.components.rest.RestServer",
+	extend: "JSCOM.Component"
+});
 
-JSCOM.require('express');
-JSCOM.require('http');
+JSCOM.Loader.require('express');
+JSCOM.Loader.require('http');
 
-
+/*
 JSCOM.components.rest.RestServer = function () 
 {
 	JSCOM.Component.call(this);
@@ -20,9 +23,9 @@ JSCOM.components.rest.RestServer = function ()
 
 JSCOM.components.rest.RestServer.prototype = new JSCOM.Component();
 JSCOM.components.rest.RestServer.prototype.constructor = JSCOM.components.rest.RestServer;
+*/
 
-
-JSCOM.components.rest.RestServer.interfaces = [];
+JSCOM.components.rest.RestServer.interfaces = []; // TODO: require ILifeCycle
 
 JSCOM.components.rest.RestServer.prototype.init = function()
 {

@@ -8,7 +8,7 @@
  */
 JSCOM.EventBus = JSCOM.EventBus || {};
 
-JSCOM.require("events");
+JSCOM.Loader.require("events");
 
 JSCOM.EventBus.local = new JSCOM.events.EventEmitter();
 JSCOM.EventBus.remote = null;
@@ -29,7 +29,7 @@ JSCOM.EventBus.publishLocal = function(sChannelId, sEventId, oData)
 
 
 /**
- * Subscribe to a local JSCOM event, based on NodeJS events mechanism. 
+ * Subscribe to a local JSCOM event publisher, based on NodeJS events mechanism. 
  * @method subscribeLocal
  * @param  {string} sChannelId   Message channel Id 
  * @param  {string} sEventId     Event Id
@@ -43,6 +43,18 @@ JSCOM.EventBus.subscribeLocal = function(sChannelId, sEventId, fnHandler)
 };
 
 
+/**
+ * Unsubscribe from a local JSCOM event listener, based on NodeJS events mechanism. 
+ * @method unsubscribeLocal
+ * @param  {string} sChannelId   Message channel Id 
+ * @param  {string} sEventId     Event Id
+ * @static
+ */ 
+JSCOM.EventBus.unsubscribeLocal = function(sChannelId, sEventId) 
+{
+	var sCombinedEventId = JSCOM.EventBus._getCombinedEventId(sChannelId, sEventId);
+	JSCOM.EventBus.local.removeAllListeners(sCombinedEventId);
+};
 
 JSCOM.EventBus._subscribeComponentInterfaceEvents = function(compInstance)
 {
@@ -84,7 +96,7 @@ JSCOM.EventBus._subscribeComponentInterfaceEvents = function(compInstance)
  */
 JSCOM.EventBus.publishRemote = function(sChannelId, sEventId, oData) 
 {
-	throw "Not Implemented";
+	JSCOM.Error.throwError(JSCOM.Error.NotImplemented);
 };
 
 
@@ -95,12 +107,28 @@ JSCOM.EventBus.publishRemote = function(sChannelId, sEventId, oData)
  * @method subscribeRemote
  * @param  {string} sChannelId Message channel Id 
  * @param  {string} sEventId   Event Id
- * @param  {object} oData      Message carried by the event
+ * @param  {function} fnHandler Event handler function
  * @static
  */
 JSCOM.EventBus.subscribeRemote = function(sChannelId, sEventId, fnHandler) 
 {
-	throw "Not Implemented";	
+	JSCOM.Error.throwError(JSCOM.Error.NotImplemented);	
+};
+
+
+/**
+ * Unsubscribe from a remote JSCOM event publisher, by using an external message/event broker. This function
+ * needs to be overwritten with custom implementation. 
+ * <p>@throws "Not Implemented"</p> 
+ * 
+ * @method unsubscribeRemote
+ * @param  {string} sChannelId Message channel Id 
+ * @param  {string} sEventId   Event Id
+ * @static
+ */
+JSCOM.EventBus.unsubscribeRemote = function(sChannelId, sEventId) 
+{
+	JSCOM.Error.throwError(JSCOM.Error.NotImplemented);	
 };
 
 /**

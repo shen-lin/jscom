@@ -3,8 +3,8 @@ var should = require('should');
 
 // Loading JSCOM runtime...
 var jscom = require('../dist/jscom.js');
-var JSCOM = jscom.getJSCOM();
-var jscomRt = JSCOM.getJSCOMRuntime();
+var jscomRt = jscom.getJSCOMRuntime();
+var JSCOM = jscom.getJSCOMGlobal();
 
 // Configure component repository to be working dir
 jscomRt.addComponentRepo(JSCOM.URI_FILE, 'example/BasicCalculator');
@@ -101,7 +101,7 @@ describe("[Meta Interface] Children Entity List in MyComposite", function() {
 
 // Listing acquisitor of component MyCalculator...
 var calculator = jscomRt.getComponent("MyCalculator");
-var calculatorAcquisitors = calculator.getAcquisitors();
+var calculatorAcquisitors = calculator.getAcquisitorSet();
 
 describe("[Meta Interface] Runtime Component Graph", function() { 
 	it("MyCalculator's IAdd Acquisitor", function() { 
@@ -123,7 +123,7 @@ describe("[Meta Interface] Runtime Component Graph", function() {
 
 // Listing interfaces of component MyCalculator...
 var calculator = jscomRt.getComponent("MyCalculator");
-var calculatorInterfaces = calculator.getInterfaces();
+var calculatorInterfaces = calculator.getInterfaceSet();
 
 describe("[Meta Interface] Get Interfaces", function() { 
 	it("MyCalculator: Calc.ICalculator", function() { 

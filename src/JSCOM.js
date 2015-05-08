@@ -6,13 +6,18 @@
 
 var JSCOM = {};
 
-exports.getJSCOMRuntime = function() {
-	var jscomRt =  new JSCOM.JSCOMRuntime();
-	return jscomRt;
+exports.getJSCOM = function() {
+	return JSCOM;
 };
 
-exports.getJSCOMGlobal = function() {
-	return JSCOM;
+JSCOM._jscomRt = null;
+
+JSCOM.getJSCOMRuntime = function() {
+	if (JSCOM._jscomRt) {
+		return JSCOM._jscomRt;
+	}
+	JSCOM._jscomRt = new JSCOM.JSCOMRuntime();
+	return JSCOM._jscomRt;
 };
 
 
@@ -64,9 +69,3 @@ JSCOM.log4js.configure({
 
 JSCOM.LOGGER = JSCOM.log4js.getLogger('normal');
 JSCOM.LOGGER.setLevel('DEBUG');
-
-// require 3rd party libraries
-JSCOM.require = function(libName) {
-	JSCOM.LOGGER.info("Load third party library: " + libName);
-	JSCOM[libName] = JSCOM[libName] || require(libName);
-};

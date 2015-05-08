@@ -1,10 +1,7 @@
-Calc.ConsoleLogger = function() 
-{
-	JSCOM.Component.call(this);
-};
-
-Calc.ConsoleLogger.prototype = new JSCOM.Component();
-Calc.ConsoleLogger.prototype.constructor = Calc.ConsoleLogger;
+JSCOM.Loader.declare({
+	component: "Calc.ConsoleLogger",
+	extend: "JSCOM.Component"
+});
 
 // Expose interface ICalculator
 Calc.ConsoleLogger.interfaces = ["Calc.ILog"];

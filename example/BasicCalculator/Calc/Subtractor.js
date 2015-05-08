@@ -1,10 +1,7 @@
-Calc.Subtractor = function () 
-{
-	JSCOM.Component.call(this);
-};
-
-Calc.Subtractor.prototype = new JSCOM.Component();
-Calc.Subtractor.prototype.constructor = Calc.Subtractor;
+JSCOM.Loader.declare({
+	component: "Calc.Subtractor",
+	extend: "JSCOM.Component"
+});
 
 // Expose interface ICalculator
 Calc.Subtractor.interfaces = ["Calc.ISubtract"];

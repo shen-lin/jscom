@@ -7,47 +7,66 @@
  */
 JSCOM.Loader = JSCOM.Loader || {};
 
+/****************************************
+ * API methods
+ ****************************************/
+JSCOM.Loader.declare = function(oDeclaration)
+{	
+	var sComponentClassName = oDeclaration.component;
+	var sSuperComponentClassName = oDeclaration.extend;
+	
+	JSCOM.Loader._declare(sComponentClassName);
+	
+	// Load ancestors
+	var bIsBuildInParent = JSCOM.Loader.isBuildInType(sSuperComponentClassName);
+	if (!bIsBuildInParent) {
+		var sComponentRepo = JSCOM._jscomRt.getComponentRepo();
+		JSCOM.Loader.loadEntity(sComponentRepo, sSuperComponentClassName);
+	}
+	
+	// Initialize constructor and inheritance
+	var sStmt_1 = JSCOM.String.format("{0} = function() {{1}.call(this);};", 
+		sComponentClassName, sSuperComponentClassName);
+	var sStmt_2 = JSCOM.String.format("{0}.prototype = new {1}();", 
+		sComponentClassName, sSuperComponentClassName);
+	var sStmt_3 = JSCOM.String.format("{0}.prototype.constructor = {0};", 
+		sComponentClassName);
+	var sStmt_4 = JSCOM.String.format("{0}.parent = '{1}';", 
+		sComponentClassName, sSuperComponentClassName);
+		
+	eval(sStmt_1);
+	eval(sStmt_2);
+	eval(sStmt_3);
+	eval(sStmt_4);
+}; 
+
+
+
+
 /**
- * Load component or adaptor. 
- * @method loadEntity
- * @param  {string} componentRepo       description
- * @param  {string} className       description
- * @return {string}            Formatted string result.
- * @throw 
+ * Require 3rd party libraries
+ * @method require
  * @static
- */ 
-JSCOM.Loader.loadEntity = function(componentRepo, className)
-{
-	JSCOM.Loader.declare(className);
-	
-	// preloaded buildin entities
-	var isBuildin = JSCOM.Loader.isBuildInType(className);
-	if (isBuildin) return;
-	
-	try
-	{	
-		var rawContent = JSCOM.Loader.loadRawContent(componentRepo, className);
-		eval(rawContent);
-	}
-	catch (error)
-	{
-		var errorMsg = JSCOM.String.format("Error loading component/adaptor from {0}:\n{1}", className, error);
-		JSCOM.LOGGER.error(errorMsg);
-	}
+ */
+JSCOM.Loader.require = function(libName) {
+	JSCOM.LOGGER.info("Load third party library: " + libName);
+	JSCOM[libName] = JSCOM[libName] || require(libName);
 };
+
+/****************************************
+ * Private methods
+ ****************************************/
 
 /**
  * Convert package name to URI path. 
+ * <p>@throws</p>
  * @method declare
- * @param  {string} componentRepo       description
- * @param  {string} packageName       description
- * @return {string}            Formatted string result.
- * @throw 
+ * @param  {string} sClassName Component class name
  * @static
  */ 
-JSCOM.Loader.declare = function(packageName)
+JSCOM.Loader._declare = function(sClassName)
 {
-	var pathTokens = packageName.split(".");
+	var pathTokens = sClassName.split(".");
 	var incrementPath = "";
 	for (var i = 0; i < pathTokens.length - 1; i++)
 	{
@@ -66,7 +85,43 @@ JSCOM.Loader.declare = function(packageName)
 	}
 };
 
+ 
+/**
+ * Load component or adaptor. 
+ * <p>@throws JSCOM.EntityLoadingError</p>
+ * @private
+ * @param  {string} componentRepo description
+ * @param  {string} className description
+ * @static
+ */ 
+JSCOM.Loader.loadEntity = function(componentRepo, className)
+{
+	// skip preloaded build-in entities
+	var isBuildin = JSCOM.Loader.isBuildInType(className);
+	if (isBuildin) return;
+	
+	try
+	{	
+		var rawContent = JSCOM.Loader.loadRawContent(componentRepo, className);
+		eval(rawContent);
+	}
+	catch (error)
+	{
+		JSCOM.Error.throwError(JSCOM.Error.EntityLoadingError, [className]);
+	}
+};
 
+
+
+/**
+ * Load raw source code content of the component JS file. 
+ * <p>@throws</p>
+ * @private
+ * @param  {string} componentRepo description
+ * @param  {string} packagePath description
+ * @return {string} Source code content of the loaded component.
+ * @static
+ */ 
 JSCOM.Loader.loadRawContent = function(componentRepo, packagePath)
 {
 	var protocol = componentRepo.protocol;

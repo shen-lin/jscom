@@ -5,6 +5,7 @@
  */
 
 JSCOM.JSCOMRuntime = function () {
+	/* Composite and Component metadata */
 	this._componentRepo = null;  // component repository
 	this._rootCompositeSet = {};     // root level composites
 	this._compositeSet = {};     // non-root level composites
@@ -12,14 +13,17 @@ JSCOM.JSCOMRuntime = function () {
 	this._connectivity = {};          // runtime composite and component hierarchical graph 
 	this._componentClassNameSet = [];   // loaded component class types
 	this._interfaceDefSet = {};       // loaded interface definitions, accessed in Composite.js
-
+	
+	/* Adaptor metadata */
 	this._adaptorSet = {}; // loaded adaptors
 	this._adaptorClassNameSet = []; // loaded adaptor class types
 	this._componentInjectionMetadata = {}; // access in Component.js
 	this._injectionInfo = {}; // access in Component.js
 	
+	/* Binding metadata */
 	this._startTrans = false;
 	this._uncommittedBindings = [];
+	this._committedBindings = [];
 };
 
 /***********************
@@ -119,7 +123,7 @@ JSCOM.JSCOMRuntime.prototype.createAdaptor = function(className, id)
 		var componentRepo = this.getComponentRepo();
 		JSCOM.Loader.loadEntity(componentRepo, className);		
 	}
-	// store loaded adaptor paths
+	// store loaded adaptors
 	this._adaptorClassNameSet.push(className);
 	// instantiate adaptor instance
 	var adaptorInstance = this._initAdaptorInstance(className, id);
@@ -364,19 +368,26 @@ JSCOM.JSCOMRuntime.prototype.getComponentRepo = function()
 /***********************
  * Transactional Configuration API 
  ***********************/
+ 
+/**
+ * Start transactional phase of bindings and unbindings.
+ * @method initTransaction
+ */ 
 JSCOM.JSCOMRuntime.prototype.initTransaction = function()
 {
 	if (this._startTrans)
 	{
-		var errorMsg = JSCOM.String.format("Transactional Configuration Already Started. No Nested Transaction Allowed.");
-		throw new Error(errorMsg);
+		JSCOM.Error.throwError(JSCOM.Error.TransactionAlreadyStarted);
 	}
 	else {
 		this._startTrans = true;
 	}
 };
 
-
+/**
+ * Commit the bindings and unbindings during the transactional phase.
+ * @method commit
+ */ 
 JSCOM.JSCOMRuntime.prototype.commit = function()
 {
 	if (this._startTrans)
@@ -385,8 +396,7 @@ JSCOM.JSCOMRuntime.prototype.commit = function()
 		this._removeUncommittedBindings();
 	}
 	else {
-		var errorMsg = JSCOM.String.format("No Transactional Configuration Started.");
-		throw new Error(errorMsg);
+		JSCOM.Error.throwError(JSCOM.Error.NotTransactionStarted);
 	}
 };
 
@@ -400,8 +410,7 @@ JSCOM.JSCOMRuntime.prototype.rollback = function()
 		this._startTrans = false;
 	} 
 	else {
-		var errorMsg = JSCOM.String.format("No Transactional Configuration Started.");
-		throw new Error(errorMsg);
+		JSCOM.Error.throwError(JSCOM.Error.NotTransactionStarted);
 	}
 };
 
@@ -421,8 +430,6 @@ JSCOM.JSCOMRuntime.prototype._revertUncommittedBinding = function(uncommittedBin
 		uncommittedBindingUnit.acquisitorType === JSCOM.ACQUISITOR_SINGLE)
 	{
 		var sourceComp = this._componentSet[uncommittedBindingUnit.sourceCompId];
-		var acquisitor = sourceComp._acquisitorSet[uncommittedBindingUnit.interfaceName];
-		acquisitor.ref = null;
 	}
 
 	else if (uncommittedBindingUnit.commitType === JSCOM.COMMIT_BINDING && 
@@ -430,45 +437,44 @@ JSCOM.JSCOMRuntime.prototype._revertUncommittedBinding = function(uncommittedBin
 	{
 		var sourceComp = this._componentSet[uncommittedBindingUnit.sourceCompId];
 		var targetComp = this._componentSet[uncommittedBindingUnit.targetCompId];
-		var acquisitor = sourceComp._acquisitorSet[uncommittedBindingUnit.interfaceName];
-		if (!acquisitor.ref) return;
-		for (var i in acquisitor.ref)
-		{
-			if (targetComp.id === acquisitor.ref[i].id)
-			{
-				acquisitor.ref.slice(i, 1);
-			}
-		}
-			
-		if (acquisitor.ref.length === 0)
-		{
-			acquisitor.ref = null;
-		}
 	}
 	else if (uncommittedBindingUnit.commitType === JSCOM.COMMIT_UNBINDING &&
 		uncommittedBindingUnit.acquisitorType === JSCOM.ACQUISITOR_SINGLE)
 	{
 		var sourceComp = this._componentSet[uncommittedBindingUnit.sourceCompId];
 		var targetComp = this._componentSet[uncommittedBindingUnit.targetCompId];
-		var acquisitor = sourceComp._acquisitorSet[interfaceName];
-		acquisitor.ref = targetComp;
 	}
 	else if (uncommittedBindingUnit.commitType === JSCOM.COMMIT_UNBINDING &&
 		uncommittedBindingUnit.acquisitorType === JSCOM.ACQUISITOR_MULTIPLE)
 	{
 		var sourceComp = this._componentSet[uncommittedBindingUnit.sourceCompId];
 		var targetComp = this._componentSet[uncommittedBindingUnit.targetCompId];
-		var acquisitor = sourceComp._acquisitorSet[interfaceName];
-		if (!acquisitor.ref)
-		{
-			acquisitor.ref = [];
-		}
-		acquisitor.ref.push(targetComp);
 	}
 };
 
-JSCOM.JSCOMRuntime.prototype._recordUncommittedBindings = function(commitType, acquisitorType, sourceCompId, targetCompId, interfaceName)
+JSCOM.JSCOMRuntime.prototype._recordBinding = function(commitType, acquisitorType, sourceCompId, targetCompId, interfaceName)
 {
+	if (this._startTrans) 
+	{
+		this._recordUncommittedBindings(commitType, acquisitorType, 
+			sourceCompId, targetCompId, interfaceName);
+	}
+	else 
+	{
+		this._recordCommittedBinding(commitType, acquisitorType, 
+			sourceCompId, targetCompId, interfaceName);
+	}
+};
+
+JSCOM.JSCOMRuntime.prototype._recordCommittedBinding = function(commitType, acquisitorType, sourceCompId, targetCompId, interfaceName)
+{
+	
+};
+
+JSCOM.JSCOMRuntime.prototype._recordUncommittedBinding = function(commitType, acquisitorType, sourceCompId, targetCompId, interfaceName)
+{
+	if(!this._startTrans) return;
+	
 	var uncommittedBindingUnit = {
 		commitType: commitType, 
 		acquisitorType: acquisitorType,
@@ -479,8 +485,6 @@ JSCOM.JSCOMRuntime.prototype._recordUncommittedBindings = function(commitType, a
 
 	this._uncommittedBindings.push(uncommittedBindingUnit);
 };
-
-
 
 
 JSCOM.JSCOMRuntime.prototype._removeUncommittedBindings = function()

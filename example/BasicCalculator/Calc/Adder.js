@@ -1,10 +1,7 @@
-Calc.Adder = function() 
-{
-	JSCOM.Component.call(this);
-};
-
-Calc.Adder.prototype = new JSCOM.Component();
-Calc.Adder.prototype.constructor = Calc.Adder;
+JSCOM.Loader.declare({
+	component: "Calc.Adder",
+	extend: "JSCOM.Component"
+});
 
 // Expose interface ICalculator
 Calc.Adder.interfaces = ["Calc.IAdd"];

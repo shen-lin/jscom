@@ -1,12 +1,11 @@
-Calc.CalculationDispatcher = function () 
-{
-	JSCOM.Component.call(this);
-	// Requires interface of ICalculate
-	this.calcAcquisitor = new JSCOM.Acquisitor(this, "Calc.ICalculator", JSCOM.ACQUISITOR_SINGLE);
-};
+JSCOM.Loader.declare({
+	component: "Calc.CalculationDispatcher",
+	extend: "JSCOM.Component"
+});
 
-Calc.CalculationDispatcher.prototype = new JSCOM.Component();
-Calc.CalculationDispatcher.prototype.constructor = Calc.CalculationDispatcher;
+Calc.CalculationDispatcher.acquisitors = [
+	{name: "Calc.ICalculator", type: JSCOM.ACQUISITOR_SINGLE}
+];
 
 // Expose interface ICalculator
 Calc.CalculationDispatcher.interfaces = ["Calc.IDispatch"];

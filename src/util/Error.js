@@ -38,7 +38,23 @@ JSCOM.Error = {
 	BindingFailureInterface: {
 		code: 107,
 		desc: "Binding Failure: Component {0} does not have interface {1}"
-	},	
+	},
+	EntityLoadingError: {
+		code: 108,
+		desc: "Error loading component/adaptor from {0}"
+	},
+	TransactionAlreadyStarted: {
+		code: 109,
+		desc: "A transactional phase already started. No nested transaction allowed."
+	},
+	NotTransactionStarted: {
+		code: 110,
+		desc: "No transactional phase need to be committed."
+	},
+	NotImplemented: {
+		code: 111,
+		desc: "Not Implemented"
+	},
 };
 
 
@@ -47,15 +63,17 @@ JSCOM.Error = {
  * Throw an JSCOM error. 
  * @method throwError
  * @param  {object} oError JSCOM.Error property
- * @param  {array} args Arguments to be formatted into the error description (0:n)
+ * @param  {array} args Optional arguments to be formatted into the error description (0:n).
  * @return {error} Error object
  * @static
  */ 
 JSCOM.Error.throwError = function(oError, args)
 {
 	var formatArgs = [oError.desc];
-	var formatArgs = formatArgs.concat(args);
-	var errorMsg = JSCOM.String.format.(formatArgs);
-	JSCOM.LOGGER.error(errorMsg);
-	throw new Error(oError.code, errorMsg);
+	if (args) {
+		var formatArgs = formatArgs.concat(args);
+	}
+	var sErrorMsg = JSCOM.String.format.apply(JSCOM.String.format, formatArgs);
+	
+	throw new Error(sErrorMsg);
 };
