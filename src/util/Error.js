@@ -8,51 +8,51 @@
 
 JSCOM.Error = {
 	CompositeAlreadyExist: {
-		code: 100,
+		code: "CompositeAlreadyExist",
 		desc: "Composite {0} already exists"
 	},
 	FunctionNotImplemented: {
-		code: 101,
+		code: "FunctionNotImplemented",
 		desc: "Interface {0}, Function {1} is not implemented in Component {2}"
 	},
 	ComponentAlreadyExist: {
-		code: 102,
+		code: "ComponentAlreadyExist",
 		desc: "Component {0} already exists"
 	},
 	DuplicateInterfacesWithinComposite: {
-		code: 103,
+		code: "DuplicateInterfacesWithinComposite",
 		desc: "Duplicate component interfaces are found within composite {1}"
 	},
 	UndefinedAcquisitorType: {
-		code: 104,
+		code: "UndefinedAcquisitorType",
 		desc: "Undefined Acquisitor Type: {0}"
 	},
-	ChildNotExist: {
-		code: 105,
+	ChildEntityNotExist: {
+		code: "ChildEntityNotExist",
 		desc: "Entity {0} does not exist in composite {1}"
 	},
 	BindingFailureAcquisitor: {
-		code: 106,
+		code: "BindingFailureAcquisitor",
 		desc: "Binding Failure: Component {0} does not have acquisitor {1}"
 	},
 	BindingFailureInterface: {
-		code: 107,
+		code: "BindingFailureInterface",
 		desc: "Binding Failure: Component {0} does not have interface {1}"
 	},
 	EntityLoadingError: {
-		code: 108,
+		code: "EntityLoadingError",
 		desc: "Error loading component/adaptor from {0}"
 	},
 	TransactionAlreadyStarted: {
-		code: 109,
+		code: "TransactionAlreadyStarted",
 		desc: "A transactional phase already started. No nested transaction allowed."
 	},
 	NotTransactionStarted: {
-		code: 110,
+		code: "NotTransactionStarted",
 		desc: "No transactional phase need to be committed."
 	},
 	NotImplemented: {
-		code: 111,
+		code: "NotImplemented",
 		desc: "Not Implemented"
 	},
 };
@@ -74,6 +74,6 @@ JSCOM.Error.throwError = function(oError, args)
 		var formatArgs = formatArgs.concat(args);
 	}
 	var sErrorMsg = JSCOM.String.format.apply(JSCOM.String.format, formatArgs);
-	
+	sErrorMsg = oError.code + ": " + sErrorMsg;
 	throw new Error(sErrorMsg);
 };
