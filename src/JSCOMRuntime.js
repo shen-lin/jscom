@@ -23,7 +23,7 @@ JSCOM.JSCOMRuntime = function () {
 	/* Binding metadata */
 	this._startTrans = false;
 	this._uncommittedBindings = [];
-	this._committedBindings = [];
+	this._committedBindings = []; 
 };
 
 /***********************
@@ -468,7 +468,27 @@ JSCOM.JSCOMRuntime.prototype._recordBinding = function(commitType, acquisitorTyp
 
 JSCOM.JSCOMRuntime.prototype._recordCommittedBinding = function(commitType, acquisitorType, sourceCompId, targetCompId, interfaceName)
 {
-	
+	if (commitType === JSCOM.COMMIT_BINDING) {
+		var record = {
+			source: sourceCompId,
+			target: targetCompId,
+			interface: interfaceName,
+			type: acquisitorType
+		};
+		this._committedBindings.push(record);
+	}
+	else if (commitType === JSCOM.COMMIT_UNBINDING) {
+		for (var i in this._committedBindings) {
+			var record = this._committedBindings[i];
+			if (record.source === sourceCompId && 
+				record.target === targetCompId &&
+				record.interface === interfaceName &&
+				record.type === acquisitorType) 
+			{
+				this._committedBindings.splice(i, 1);	
+			}
+		}
+	}
 };
 
 JSCOM.JSCOMRuntime.prototype._recordUncommittedBinding = function(commitType, acquisitorType, sourceCompId, targetCompId, interfaceName)
@@ -490,4 +510,45 @@ JSCOM.JSCOMRuntime.prototype._recordUncommittedBinding = function(commitType, ac
 JSCOM.JSCOMRuntime.prototype._removeUncommittedBindings = function()
 {
 	this._uncommittedBindings = [];
+};
+
+
+
+/**
+ * Get all the entities that have bound interfaces to an entity Id
+ * @param {string} sConsumerId
+ * @return {array}
+ */ 
+JSCOM.JSCOMRuntime.prototype._getServiceProviders = function(sConsumerId)
+{
+	var aServiceProviders = [];
+	var bindings = this._committedBindings;
+	for (var i in bindings) {
+		var record = bindings[i];
+		if (sConsumerId === record.source) {
+			aServiceProviders.push(record);
+		}
+	}
+	
+	return aServiceProviders;
+};
+
+
+/**
+ * Get all the entities that have bound interfaces to an entity Id
+ * @param {string} sProviderId
+ * @return {array}
+ */ 
+JSCOM.JSCOMRuntime.prototype._getServiceConsumers = function(sProviderId)
+{
+	var aServiceProviders = [];
+	var bindings = this._committedBindings;
+	for (var i in bindings) {
+		var record = bindings[i];
+		if (sProviderId === record.target) {
+			aServiceProviders.push(record);
+		}
+	}
+	
+	return aServiceProviders;
 };

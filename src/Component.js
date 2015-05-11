@@ -136,3 +136,29 @@ JSCOM.Component.prototype.getCustomMetadata = function()
 {
 	return this._metadataSet;
 };
+
+/***********************
+ * MetaInterface: Binding Info
+ ***********************/
+
+/**
+ * Get all the entities that have bound interfaces to this composite
+ * @method getServiceProviders
+ * @return 
+ */  
+JSCOM.Component.prototype.getServiceProviders = function()
+{
+	var sCompositeId = this.id;
+	return JSCOM._jscomRt._getServiceProviders(sCompositeId);
+}
+
+/**
+ * Get all the entities that have bound acquisitors to this composite
+ * @method getServiceConsumers
+ * @return 
+ */  
+JSCOM.Component.prototype.getServiceConsumers = function()
+{
+	var sProviderId = this.id;
+	return JSCOM._jscomRt._getServiceConsumers(sProviderId);
+}

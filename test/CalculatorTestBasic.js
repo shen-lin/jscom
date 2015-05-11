@@ -111,6 +111,7 @@ describe("[Meta Interface] Children Entity List in MyComposite", function() {
 // Listing acquisitor of component MyCalculator...
 var calculator = jscomRt.getComponent("MyCalculator");
 var calculatorAcquisitors = calculator.getAcquisitors();
+var oCalculatorProviders = calculator.getServiceProviders();
 
 describe("[Meta Interface] Runtime Component Graph", function() { 
 	it("MyCalculator's IAdd Acquisitor", function() { 
@@ -128,10 +129,22 @@ describe("[Meta Interface] Runtime Component Graph", function() {
 		should(calculatorAcquisitors).containEql(acquisitorISubtract);
 	}); 
 	it("Connects to MyAdder", function() { 
-		// should(calculatorAcquisitors['Calc.IAdd'].ref.id).equal('MyAdder');
+		var bindingTarget = {
+			source: "MyCalculator",
+			target: "MyAdder",
+			interface: "Calc.IAdd",
+			type: JSCOM.ACQUISITOR_SINGLE
+		};
+		should(oCalculatorProviders).containEql(bindingTarget);
 	}); 
 	it("Connects to MySubtractor", function() { 
-		// should(calculatorAcquisitors['Calc.ISubtract'].ref.id).equal('MySubtractor');
+		var bindingTarget = {
+			source: "MyCalculator",
+			target: "MySubtractor",
+			interface: "Calc.ISubtract",
+			type: JSCOM.ACQUISITOR_SINGLE
+		};
+		should(oCalculatorProviders).containEql(bindingTarget);		
 	}); 
 });
 

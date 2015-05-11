@@ -424,6 +424,29 @@ JSCOM.Composite.prototype._exposeLoop = function(sInterfaceName, fnExposeFunctio
 /***********************
  * Binding API 
  ***********************/
+ 
+/**
+ * Get all the entities that have bound interfaces to this composite
+ * @method getServiceProviders
+ * @return 
+ */  
+JSCOM.Composite.prototype.getServiceProviders = function()
+{
+	var sCompositeId = this.id;
+	return JSCOM._jscomRt._getServiceProviders(sCompositeId);
+}
+
+/**
+ * Get all the entities that have bound acquisitors to this composite
+ * @method getServiceConsumers
+ * @return 
+ */  
+JSCOM.Composite.prototype.getServiceConsumers = function()
+{
+	var sProviderId = this.id;
+	return JSCOM._jscomRt._getServiceConsumers(sProviderId);
+}
+
 
 /**
  * Bind the source entity's acquisitor to the target entity's interface.
