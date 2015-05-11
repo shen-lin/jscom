@@ -25,6 +25,8 @@ JSCOM.Loader.require("fs");
  */ 
 JSCOM.Composite = function (id) {
 	this.id = id;
+	this._acquisitorSet = [];
+	this._interfaceSet = [];
 };
 
 /***********************
@@ -233,6 +235,27 @@ JSCOM.Composite.prototype._loadRawInterface = function(sInterfaceName)
 /***********************
  * Expose API
  ***********************/
+/**
+ * Get interfaces exposed by this composite
+ * 
+ * @method getInterfaces
+ * @return {array} An array of interface names
+ */ 
+JSCOM.Composite.prototype.getInterfaces = function()
+{
+	return this._interfaceSet;
+};
+
+/**
+ * Get acquisitors exposed by this composite
+ * 
+ * @method getAcquisitors
+ * @return {array} An array of acquisitors
+ */ 
+JSCOM.Composite.prototype.getAcquisitors = function()
+{
+	return this._acquisitorSet;
+};
 
 /**
  * Explicitly expose an interface of this composite instance's internal component instance 
@@ -244,12 +267,16 @@ JSCOM.Composite.prototype._loadRawInterface = function(sInterfaceName)
  */ 
 JSCOM.Composite.prototype.exposeInterface = function(sInterfaceName)
 {
-	// Only need to record metadata and setup event handling.
+	// Find the component within this composite, and this component has 
+	// the interface to be exposed
 	var oComponent = this._exposeLoop(sInterfaceName, this._hasInterface);
 	if (!oComponent) return false;
 	
 	// Creates functions of the exposed interface for the composite
 	this._createInterfaceFunctions(sInterfaceName, oComponent);
+	
+	// Add interface to this composite's interface set
+	this._interfaceSet.push(sInterfaceName);
 	return true;
 };
 
@@ -263,7 +290,7 @@ JSCOM.Composite.prototype._createInterfaceFunctions = function(sInterfaceName, o
 	
 	for (var sFnName in oInterfaceDef) {
 		this[sFnName] = function() {
-			// Publish events
+			
 		}
 		/*
 		var sEventId = JSCOM.String.format(
@@ -283,18 +310,18 @@ JSCOM.Composite.prototype._createInterfaceFunctions = function(sInterfaceName, o
 };
 
 
-JSCOM.Composite.prototype._hasInterface = function(component, interfaceName)
+JSCOM.Composite.prototype._hasInterface = function(oComponent, sInterfaceName)
 {
-	var compInterfaces = component.constructor.interfaces;
-	if (!compInterfaces)
+	var aCompInterfaces = oComponent.getInterfaces();
+	if (!aCompInterfaces)
 	{
 		return false;
 	}
 
-	for (var i in compInterfaces)
+	for (var i in aCompInterfaces)
 	{
-		var compInterface = compInterfaces[i];
-		if (compInterface === interfaceName)
+		var sCompInterface = aCompInterfaces[i];
+		if (sCompInterface === sInterfaceName)
 		{
 			return true;
 		}
@@ -308,16 +335,21 @@ JSCOM.Composite.prototype._hasInterface = function(component, interfaceName)
  * to external entities. Acquisitors of internal composites cannot be exposed. 
  * 
  * @method exposeAcquisitor
- * @param  {string} interfaceName Interface name
+ * @param  {string} sInterfaceName Interface name
  * @return {boolean} Found component for valid acquisitor expose
  */ 
-JSCOM.Composite.prototype.exposeAcquisitor = function(interfaceName)
+JSCOM.Composite.prototype.exposeAcquisitor = function(sInterfaceName)
 {
-	var component = this._exposeLoop(interfaceName, this._hasAcquisitor);
+	var component = this._exposeLoop(sInterfaceName, this._hasAcquisitor);
 	if (!component) return false;
 	
 	// Creates functions of the exposed acuisitor for the composite
 	// this._createAcquisitorFunctions(sInterfaceName, oComponent);
+	
+	// Add interface to this composite's interface set
+	var oAcquisitorDef = component.getAcquisitor(sInterfaceName);
+	this._acquisitorSet.push(oAcquisitorDef);
+	
 	return true;
 };
 
@@ -502,11 +534,11 @@ JSCOM.Composite.prototype._checkInputAreChildren = function(sSourceId, sTargetId
 	}
 	
 	if (!oSourceChild) {
-		JSCOM.Error.throwError(JSCOM.Error.ChildNotExist, [sSourceId, this.id]);
+		JSCOM.Error.throwError(JSCOM.Error.ChildEntityNotExist, [sSourceId, this.id]);
 	}
 	
 	if (!oTargetChild) {
-		JSCOM.Error.throwError(JSCOM.Error.ChildNotExist, [sTargetId, this.id]);
+		JSCOM.Error.throwError(JSCOM.Error.ChildEntityNotExist, [sTargetId, this.id]);
 	}
 	
 	return {
