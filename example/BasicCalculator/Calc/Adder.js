@@ -6,8 +6,11 @@ JSCOM.Loader.declare({
 // Expose interface ICalculator
 Calc.Adder.interfaces = ["Calc.IAdd"];
 
-Calc.Adder.prototype.add = function(a, b)
+Calc.Adder.prototype.add = function(a, b, callback)
 {
+	console.log(a);
+	console.log(b);
+	console.log(callback);
 	var result = a + b;
-	return result;
+	setImmediate(callback, null, result);
 };

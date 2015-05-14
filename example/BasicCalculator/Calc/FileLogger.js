@@ -8,7 +8,7 @@ JSCOM.Loader.require('fs');
 // Expose interface ICalculator
 Calc.FileLogger.interfaces = ["Calc.ILog"];
 
-Calc.FileLogger.prototype.log = function(record)
+Calc.FileLogger.prototype.log = function(record, callback)
 {
 	var filepath = "test/Calculator.log";
 	var fileContent = JSCOM.fs.readFileSync(filepath);

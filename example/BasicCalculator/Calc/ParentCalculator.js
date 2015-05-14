@@ -8,18 +8,20 @@ Calc.ParentCalculator.acquisitors = [
 	{name: "Calc.IAdd", type: JSCOM.ACQUISITOR_SINGLE}
 ];
 
-Calc.ParentCalculator.prototype.add = function(a, b)
+Calc.ParentCalculator.prototype.add = function(a, b, callback)
 {
-	var output = this.acquisite("Calc.IAdd").add(a, b);
-	return output;
+	this.acquisite("Calc.IAdd").add(a, b, function(error, response){
+		var sum = response;
+		setImmediate(callback, null, sum);
+	});
 };
 
-Calc.ParentCalculator.prototype.subtract = function(a, b)
+Calc.ParentCalculator.prototype.subtract = function(a, b, callback)
 {
-	throw "NotImplemented";
+	JSCOM.Error.throwError(JSCOM.Error.NotImplemented);
 };
 
-Calc.ParentCalculator.prototype.log = function(operator, a, b, output)
+Calc.ParentCalculator.prototype.log = function(operator, a, b, output, callback)
 {
-	throw "NotImplemented";
+	JSCOM.Error.throwError(JSCOM.Error.NotImplemented);
 };

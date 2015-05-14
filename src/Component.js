@@ -35,6 +35,27 @@ JSCOM.Component.prototype.getParent = function()
 };
 
 
+
+/**
+ * 
+ * @method acquisite
+ * @param {string} sInterfaceName Interface type of the acquisitor
+ * @return 
+ */
+JSCOM.Component.prototype.acquisite = function(sInterfaceName)
+{
+	
+};
+
+/*
+When create a binding, create acquisitor object. 
+Create interface method in the acquisitor object
+Within the interface method, it publish event to the service provider component.
+It also listen on callback from service provider.
+
+
+*/
+
 /***********************
  * @example 
  * Calc.Calculator.acquisitors = [
@@ -108,9 +129,9 @@ JSCOM.Component.prototype.getInterfaces = function()
  * MetaInterface: Adaptor Information
  ***********************/
 
- /**
-  * @function getCustomMetadata
-  */
+/**
+ * @method getCustomMetadata
+ */
 JSCOM.Component.prototype.getAdaptorAdvices = function(interfaceName)
 {
 	var oInterfaceAdvices = {};
@@ -130,7 +151,7 @@ JSCOM.Component.prototype.getAdaptorAdvices = function(interfaceName)
  ***********************/
 
 /**
- * @function getCustomMetadata
+ * @method getCustomMetadata
  */
 JSCOM.Component.prototype.getCustomMetadata = function()
 {

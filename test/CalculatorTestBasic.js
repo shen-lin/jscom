@@ -28,26 +28,63 @@ var subtractor = calcComposite.createComponent("Calc.Subtractor", "MySubtractor"
 var calculator = calcComposite.createComponent("Calc.Calculator", "MyCalculator");
 
 // Invoking add method on the loaded Adder component instance
-var addOutput = adder.add(5, 5);
 
-describe("Invoke Loaded Adder Component Instance", function() { 
-	it("5 + 5", function() { 
-		should(addOutput).equal(10);
+describe("Directly Invoke Component Interfaces", function() { 
+	it("Adder: 5 + 5", function(done) { 
+		adder.add(5, 5, function(error, response){
+			should(response).equal(10);
+			done();
+		});
 	}); 
+	
+	it("Subtractor: 5 - 1", function(done) { 
+		subtractor.subtract(5, 1, function(error, response){
+			should(response).equal(4);
+			done();
+		});
+	}); 	
 });
+
+// Exposing example system interface...
+var exposeIAdderSucceed = calcComposite.exposeInterface("Calc.IAdd", "IAdd");
+var exposeISubtractSucceed = calcComposite.exposeInterface("Calc.ISubtract", "ISub");
+var exposeICalculatorSucceed = calcComposite.exposeInterface("Calc.ICalculator", "ICalc");
+
+describe("MyComposite Expose interfaces", function() { 
+	it("Expose IAdder interface succeed", function() { 
+		should(exposeIAdderSucceed).equal(true);
+	}); 
+	it("Expose ISubtract interface succeed", function() { 
+		should(exposeISubtractSucceed).equal(true);
+	}); 	
+	it("Expose ICalculator interface succeed", function() { 
+		should(exposeICalculatorSucceed).equal(true);
+	}); 
+	it("Invoke exposed IAdder: 5 + 5", function(done) { 
+		calcComposite.IAdd.add(5, 5, function(error, response){
+			should(response).equal(10);
+			done();
+		});
+	}); 
+	
+	it("Invoke exposed ISubtract: 5 - 1", function(done) { 
+		calcComposite.ISub.subtract(5, 1, function(error, response){
+			should(response).equal(4);
+			done();
+		});
+	}); 	
+});
+
+
+
+
 
 // Binding example components to form the example system...
 calcComposite.bind("MyCalculator", "MyAdder", "Calc.IAdd");
 calcComposite.bind("MyCalculator", "MySubtractor", "Calc.ISubtract");
 
-// Exposing example system interface...
-var succeed = calcComposite.exposeInterface("Calc.ICalculator");
-describe("MyComposite Compose ICalculator interface", function() { 
-	it("Expose ICalculator interface succeed", function() { 
-		should(succeed).equal(true);
-	}); 
-});
 
+/*
 // Invoking example system and printing output...
 var compositeAddOutput;
 var compositeSubOutput;
@@ -179,4 +216,4 @@ describe("Invalid Component Binding", function() {
 		(invalidBind).should.throw(regexp);
 	}); 
 });
-
+*/

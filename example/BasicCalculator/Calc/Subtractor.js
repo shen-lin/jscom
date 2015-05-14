@@ -6,7 +6,8 @@ JSCOM.Loader.declare({
 // Expose interface ICalculator
 Calc.Subtractor.interfaces = ["Calc.ISubtract"];
 
-Calc.Subtractor.prototype.subtract = function(a, b)
+Calc.Subtractor.prototype.subtract = function(a, b, callback)
 {
-	return a - b;
+	var result = a - b;
+	setImmediate(callback, null, result);
 };
