@@ -26,7 +26,7 @@ JSCOM.Loader.require("fs");
 JSCOM.Composite = function (id) {
 	this.id = id;
 	this._acquisitorSet = [];
-	this._interfaceSet = [];
+	this._interfaceMap = {};
 };
 
 /***********************
@@ -238,12 +238,14 @@ JSCOM.Composite.prototype._loadRawInterface = function(sInterfaceName)
 /**
  * Get interfaces exposed by this composite
  * 
- * @method getInterfaces
- * @return {array} An array of interface names
+ * @method getInterfaceMap
+ * @return {object} A map of interfaces exposed by the composite. 
+ * Key is the short name used for invoking the interface method.
+ * Value is interface name.
  */ 
-JSCOM.Composite.prototype.getInterfaces = function()
+JSCOM.Composite.prototype.getInterfaceMap = function()
 {
-	return this._interfaceSet;
+	return this._interfaceMap;
 };
 
 /**
@@ -262,37 +264,40 @@ JSCOM.Composite.prototype.getAcquisitors = function()
  * to external entities. Interfaces of internal composites cannot be exposed. 
  * 
  * @method exposeInterface
- * @param  {string} sInterfaceName Interface name
+ * @param {string} sInterfaceName Interface name
+ * @param {string} sShortName A short name for the interface. It serves as namespace for methods within this interface.
  * @return {boolean} Found component for valid interface expose
  */ 
-JSCOM.Composite.prototype.exposeInterface = function(sInterfaceName)
+JSCOM.Composite.prototype.exposeInterface = function(sInterfaceName, sShortName)
 {
+	if (this._interfaceMap[sShortName]) {
+		JSCOM.Error.throwError(JSCOM.Error.ExposeInterfaceFailure, sShortName, this.id);
+	}
+	
 	// Find the component within this composite, and this component has 
 	// the interface to be exposed
 	var oComponent = this._exposeLoop(sInterfaceName, this._hasInterface);
 	if (!oComponent) return false;
 	
 	// Creates functions of the exposed interface for the composite
-	this._createInterfaceFunctions(sInterfaceName, oComponent);
+	this._createInterfaceFunctions(sInterfaceName, oComponent, sShortName);
 	
 	// Add interface to this composite's interface set
-	this._interfaceSet.push(sInterfaceName);
+	this._interfaceMap[sShortName] = sInterfaceName;
 	return true;
 };
 
 
-JSCOM.Composite.prototype._createInterfaceFunctions = function(sInterfaceName, oComponent)
+JSCOM.Composite.prototype._createInterfaceFunctions = function(sInterfaceName, oComponent, sShortName)
 {
 	var oInterface = JSCOM._jscomRt._interfaceDefSet[sInterfaceName];
 	var oInterfaceDef = oInterface.oInterfaceDef;
 
-	var sChannelId = JSCOM.eventUri.ComponentInterfaceChannel;
-	
 	for (var sFnName in oInterfaceDef) {
-		this[sFnName] = function() {
-			
-		}
+		this._createInterfaceFunction(oComponent, sFnName, sInterfaceName, oInterfaceDef, sShortName);
+		 
 		/*
+		var sChannelId = JSCOM.eventUri.ComponentInterfaceChannel;
 		var sEventId = JSCOM.String.format(
 			JSCOM.eventUri.EventIDFormat, 
 			oComponent.className, 
@@ -309,6 +314,24 @@ JSCOM.Composite.prototype._createInterfaceFunctions = function(sInterfaceName, o
 	}
 };
 
+JSCOM.Composite.prototype._createInterfaceFunction = function(oComponent, sFnName, sInterfaceName, oInterfaceDef, sShortName)
+{
+	var sComponentId = oComponent.id;
+	
+	var fnProcedureTemplate = "var oComponent = JSCOM._jscomRt._componentSet['{0}'];\n";
+	fnProcedureTemplate += "oComponent.{1}.apply(oComponent, arguments)";
+	var fnProcedureStmt = JSCOM.String.format(fnProcedureTemplate, sComponentId, sFnName);
+	
+	var createExposeFnTemplate = "this['{0}']['{1}'] = function() {\n{2}\n}";
+	var createExposeFnStmt = JSCOM.String.format(createExposeFnTemplate, sShortName, sFnName, fnProcedureStmt);
+	
+	var createInterfaceScopeTemplate = "this['{0}'] = this['{1}'] || {};\n";
+	var createInterfaceScopeStmt = JSCOM.String.format(createInterfaceScopeTemplate, sShortName, sShortName);
+	
+	var stmt = createInterfaceScopeStmt + createExposeFnStmt;
+	JSCOM.LOGGER.debug(stmt);
+	eval(stmt);
+}
 
 JSCOM.Composite.prototype._hasInterface = function(oComponent, sInterfaceName)
 {
@@ -346,7 +369,6 @@ JSCOM.Composite.prototype.exposeAcquisitor = function(sInterfaceName)
 	// Creates functions of the exposed acuisitor for the composite
 	// this._createAcquisitorFunctions(sInterfaceName, oComponent);
 	
-	// Add interface to this composite's interface set
 	var oAcquisitorDef = component.getAcquisitor(sInterfaceName);
 	this._acquisitorSet.push(oAcquisitorDef);
 	

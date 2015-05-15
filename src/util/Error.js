@@ -55,6 +55,10 @@ JSCOM.Error = {
 		code: "NotImplemented",
 		desc: "Not Implemented"
 	},
+	ExposeInterfaceFailure: {
+		code: "ExposeInterfaceFailure",
+		desc: "Short name {0} has been used for an exposed interface of composite {1}"		
+	},
 };
 
 

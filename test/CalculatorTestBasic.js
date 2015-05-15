@@ -50,16 +50,28 @@ var exposeIAdderSucceed = calcComposite.exposeInterface("Calc.IAdd", "IAdd");
 var exposeISubtractSucceed = calcComposite.exposeInterface("Calc.ISubtract", "ISub");
 var exposeICalculatorSucceed = calcComposite.exposeInterface("Calc.ICalculator", "ICalc");
 
+var oExposedInterfaceMap = calcComposite.getInterfaceMap();
+
 describe("MyComposite Expose interfaces", function() { 
 	it("Expose IAdder interface succeed", function() { 
 		should(exposeIAdderSucceed).equal(true);
 	}); 
+	
 	it("Expose ISubtract interface succeed", function() { 
 		should(exposeISubtractSucceed).equal(true);
-	}); 	
+	});
+	
 	it("Expose ICalculator interface succeed", function() { 
 		should(exposeICalculatorSucceed).equal(true);
 	}); 
+	
+	it("[Meta Interface] Query exposed interfaces ", function() { 
+		should(oExposedInterfaceMap).have.property("IAdd");
+		should(oExposedInterfaceMap).have.property("ISub");
+		should(oExposedInterfaceMap).have.property("ICalc");
+	}); 
+	
+	
 	it("Invoke exposed IAdder: 5 + 5", function(done) { 
 		calcComposite.IAdd.add(5, 5, function(error, response){
 			should(response).equal(10);
@@ -72,38 +84,13 @@ describe("MyComposite Expose interfaces", function() {
 			should(response).equal(4);
 			done();
 		});
-	}); 	
+	});
 });
-
-
-
 
 
 // Binding example components to form the example system...
 calcComposite.bind("MyCalculator", "MyAdder", "Calc.IAdd");
 calcComposite.bind("MyCalculator", "MySubtractor", "Calc.ISubtract");
-
-
-/*
-// Invoking example system and printing output...
-var compositeAddOutput;
-var compositeSubOutput;
-
-if (succeed) {
-	compositeAddOutput = calcComposite.add(5,5);
-	compositeSubOutput = calcComposite.subtract(5,3);
-}
-
-describe("Invoke Composed Calculator Component Instance", function() { 
-	it("5 + 5", function() { 
-		should(compositeAddOutput).equal(10);
-	}); 
-
-	it("5 - 3", function() { 
-		should(compositeSubOutput).equal(2);
-	}); 
-});
-
 
 // Listing composites in the runtime environment...
 var compositeSet = jscomRt.getRootCompositeSet();
@@ -142,8 +129,6 @@ describe("[Meta Interface] Children Entity List in MyComposite", function() {
 		should(childrenList).containEql(obj);
 	}); 
 });
-
-
 
 // Listing acquisitor of component MyCalculator...
 var calculator = jscomRt.getComponent("MyCalculator");
@@ -195,6 +180,33 @@ describe("[Meta Interface] Get Interfaces", function() {
 	}); 
 });
 
+
+
+
+
+
+
+// Invoking example system and printing output...
+describe("Invoke MyComposite Exposed interfaces", function() { 
+	it("Invoke exposed IAdder: 5 + 5", function(done) { 
+		calcComposite.ICalc.add(5, 5, function(error, response){
+			should(response).equal(10);
+			done();
+		});
+	}); 
+	
+	it("Invoke exposed ISubtract: 5 - 1", function(done) { 
+		calcComposite.ICalc.subtract(5, 1, function(error, response){
+			should(response).equal(4);
+			done();
+		});
+	});
+});
+
+
+
+/*
+
 // Test multiple Logger components to MyCalculator...
 var consoleLogger = calcComposite.createComponent("Calc.ConsoleLogger", "MyConsoleLogger");
 var fileLogger = calcComposite.createComponent("Calc.FileLogger", "MyFileLogger");
@@ -203,6 +215,8 @@ calcComposite.bind("MyCalculator", "MyFileLogger", "Calc.ILog");
 calcComposite.exposeInterface("Calc.ICalculator");
 calcComposite.add(10,5);
 calcComposite.subtract(20,3);
+
+
 
 
 // Test binding failure...

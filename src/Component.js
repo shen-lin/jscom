@@ -38,11 +38,11 @@ JSCOM.Component.prototype.getParent = function()
 
 /**
  * 
- * @method acquisite
+ * @method use
  * @param {string} sInterfaceName Interface type of the acquisitor
  * @return 
  */
-JSCOM.Component.prototype.acquisite = function(sInterfaceName)
+JSCOM.Component.prototype.use = function(sInterfaceName)
 {
 	
 };

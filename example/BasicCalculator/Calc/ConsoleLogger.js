@@ -9,5 +9,6 @@ Calc.ConsoleLogger.interfaces = ["Calc.ILog"];
 Calc.ConsoleLogger.prototype.log = function(record, callback)
 {
 	JSCOM.LOGGER.info(record);
-	return "Log sent to console";
+	var returnMsg = "Log sent to console";
+	setImmediate(callback, null, returnMsg);
 };

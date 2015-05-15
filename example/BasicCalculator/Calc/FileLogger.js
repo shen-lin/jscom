@@ -14,5 +14,7 @@ Calc.FileLogger.prototype.log = function(record, callback)
 	var fileContent = JSCOM.fs.readFileSync(filepath);
 	fileContent = fileContent + record + "\n";
 	fs.writeFile(filepath, fileContent);
-	return "Log written to file";
+	
+	var returnMsg = "Log sent to file";
+	setImmediate(callback, null, returnMsg);
 };
