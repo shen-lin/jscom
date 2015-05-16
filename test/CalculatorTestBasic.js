@@ -205,18 +205,11 @@ describe("Invoke MyComposite Exposed interfaces", function() {
 
 
 
-/*
-
 // Test multiple Logger components to MyCalculator...
 var consoleLogger = calcComposite.createComponent("Calc.ConsoleLogger", "MyConsoleLogger");
 var fileLogger = calcComposite.createComponent("Calc.FileLogger", "MyFileLogger");
 calcComposite.bind("MyCalculator", "MyConsoleLogger", "Calc.ILog");
 calcComposite.bind("MyCalculator", "MyFileLogger", "Calc.ILog");
-calcComposite.exposeInterface("Calc.ICalculator");
-calcComposite.add(10,5);
-calcComposite.subtract(20,3);
-
-
 
 
 // Test binding failure...
@@ -230,4 +223,20 @@ describe("Invalid Component Binding", function() {
 		(invalidBind).should.throw(regexp);
 	}); 
 });
-*/
+
+
+describe("Invoke MyComposite Exposed ILog interfaces", function() { 
+	it("ILog test 1", function(done) { 
+		calcComposite.ICalc.log("+", "5", "5", "10", function(error, response){
+			should(response).equal("Log sent to console");
+			done();
+		});
+	}); 
+	
+	it("ILog test 2", function(done) { 
+		calcComposite.ICalc.log("-", "5", "1", "4", function(error, response){
+			should(response).equal("Log sent to console");
+			done();
+		});
+	}); 	
+});

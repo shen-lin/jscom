@@ -22,6 +22,7 @@ JSCOM.Component = function ()
 {
 	this.id = null;
 	this.className = null;
+	this.compositeId = null;
 	this._metadataSet = {};
 };
 
@@ -29,32 +30,64 @@ JSCOM.Component = function ()
  * @property parent {string} Parent component class
  * @static
  ***********************/
+ 
+ 
+/***********************
+ * Get the parent component class extends this component class
+ * @method getParent
+ * @return {string} Parent component class name
+ ***********************/ 
 JSCOM.Component.prototype.getParent = function()
 {
 	return this.constructor.parent;
 };
 
-
+/***********************
+ * Get the id of the composite that contains this component instance
+ * @method getCompositeId
+ * @param {string} The id of the composite that contains this component instance
+ ***********************/
+JSCOM.Component.prototype.getCompositeId = function()
+{
+	return this.compositeId;
+};
 
 /**
  * 
  * @method use
  * @param {string} sInterfaceName Interface type of the acquisitor
- * @return 
+ * @return {JSCOM}
  */
 JSCOM.Component.prototype.use = function(sInterfaceName)
 {
+	// Get the entity bound to this component
+	var aServiceProviders = this.getServiceProviders();
+	var aFilterBindings = JSCOM._jscomRt._getBoundEntities(aServiceProviders, "interface", sInterfaceName);
 	
+	// If not found, try to get the entity bound to the composite that holds this component
+	if (!aFilterBindings || aFilterBindings.length === 0) {
+		 aServiceProviders = JSCOM._jscomRt._getBoundEntities(JSCOM._jscomRt._committedBindings, "source", this.compositeId);
+		 aFilterBindings = JSCOM._jscomRt._getBoundEntities(aServiceProviders, "interface", sInterfaceName);
+	}
+	
+	// TODO: Throw exception if invalid bindings
+	
+	// Get service providers
+	var aServiceProviders = [];
+	for (var i in aFilterBindings) {
+		var oBinding = aFilterBindings[i];
+		var sServiceProviderId = oBinding.target;
+		var oEntity = JSCOM._jscomRt.getEntityById(sServiceProviderId);
+		aServiceProviders.push(oEntity);
+	}
+	
+	if (aServiceProviders.length === 1) {
+		return aServiceProviders[0];
+	} else {
+		return aServiceProviders;
+	}
 };
 
-/*
-When create a binding, create acquisitor object. 
-Create interface method in the acquisitor object
-Within the interface method, it publish event to the service provider component.
-It also listen on callback from service provider.
-
-
-*/
 
 /***********************
  * @example 
@@ -170,7 +203,7 @@ JSCOM.Component.prototype.getCustomMetadata = function()
 JSCOM.Component.prototype.getServiceProviders = function()
 {
 	var sCompositeId = this.id;
-	return JSCOM._jscomRt._getServiceProviders(sCompositeId);
+	return JSCOM._jscomRt._getBoundEntities(JSCOM._jscomRt._committedBindings, "source", sCompositeId);
 }
 
 /**
@@ -181,5 +214,5 @@ JSCOM.Component.prototype.getServiceProviders = function()
 JSCOM.Component.prototype.getServiceConsumers = function()
 {
 	var sProviderId = this.id;
-	return JSCOM._jscomRt._getServiceConsumers(sProviderId);
+	return JSCOM._jscomRt._getBoundEntities(JSCOM._jscomRt._committedBindings, "target", sProviderId);
 }

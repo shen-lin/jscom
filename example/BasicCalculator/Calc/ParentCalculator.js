@@ -10,7 +10,9 @@ Calc.ParentCalculator.acquisitors = [
 
 Calc.ParentCalculator.prototype.add = function(a, b, callback)
 {
-	this.use("Calc.IAdd").add(a, b, function(error, response){
+	var oServiceProvider = this.use("Calc.IAdd");
+	
+	oServiceProvider.add(a, b, function(error, response){
 		var sum = response;
 		setImmediate(callback, null, sum);
 	});

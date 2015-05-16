@@ -41,6 +41,19 @@ JSCOM.JSCOMRuntime.prototype.getEntity = function(sId, sType)
 	return null;
 };
 
+
+JSCOM.JSCOMRuntime.prototype.getEntityById = function(sId)
+{
+	var oEntity = this.getComponent(sId);
+	if (oEntity) {
+		return oEntity;
+	}
+	else {
+		oEntity = this.getComposite(sId);
+	}
+	return oEntity;
+};
+
 /***********************
  * Root Composite Access API
  ***********************/
@@ -515,40 +528,20 @@ JSCOM.JSCOMRuntime.prototype._removeUncommittedBindings = function()
 
 
 /**
- * Get all the entities that have bound interfaces to an entity Id
- * @param {string} sConsumerId
+ * Filter the input bindings that contain the matching property and value.
+ * @param {array} aBindings
+ * @param {string} sSearchProperty
+ * @param {string} sSearchValue
  * @return {array}
  */ 
-JSCOM.JSCOMRuntime.prototype._getServiceProviders = function(sConsumerId)
+JSCOM.JSCOMRuntime.prototype._getBoundEntities = function(aBindings, sSearchProperty, sSearchValue)
 {
-	var aServiceProviders = [];
-	var bindings = this._committedBindings;
-	for (var i in bindings) {
-		var record = bindings[i];
-		if (sConsumerId === record.source) {
-			aServiceProviders.push(record);
+	var aBoundEntities = [];
+	for (var i in aBindings) {
+		var record = aBindings[i];
+		if (sSearchValue === record[sSearchProperty]) {
+			aBoundEntities.push(record);
 		}
 	}
-	
-	return aServiceProviders;
-};
-
-
-/**
- * Get all the entities that have bound interfaces to an entity Id
- * @param {string} sProviderId
- * @return {array}
- */ 
-JSCOM.JSCOMRuntime.prototype._getServiceConsumers = function(sProviderId)
-{
-	var aServiceProviders = [];
-	var bindings = this._committedBindings;
-	for (var i in bindings) {
-		var record = bindings[i];
-		if (sProviderId === record.target) {
-			aServiceProviders.push(record);
-		}
-	}
-	
-	return aServiceProviders;
+	return aBoundEntities;
 };

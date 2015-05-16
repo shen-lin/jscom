@@ -148,6 +148,7 @@ JSCOM.Composite.prototype._initComponentInstance = function(className, id)
 	var newCompStmt = JSCOM.String.format("new {0}()", className);
 	var compInstance = eval(newCompStmt);
 	compInstance.id = id;
+	compInstance.compositeId = this.id;
 	compInstance.className = className;
 	
 	// setup runtime reflection data
@@ -455,7 +456,7 @@ JSCOM.Composite.prototype._exposeLoop = function(sInterfaceName, fnExposeFunctio
 JSCOM.Composite.prototype.getServiceProviders = function()
 {
 	var sCompositeId = this.id;
-	return JSCOM._jscomRt._getServiceProviders(sCompositeId);
+	return JSCOM._jscomRt._getBoundEntities(JSCOM._jscomRt._committedBindings, "source", sCompositeId);
 }
 
 /**
@@ -466,7 +467,7 @@ JSCOM.Composite.prototype.getServiceProviders = function()
 JSCOM.Composite.prototype.getServiceConsumers = function()
 {
 	var sProviderId = this.id;
-	return JSCOM._jscomRt._getServiceConsumers(sProviderId);
+	return JSCOM._jscomRt._getBoundEntities(JSCOM._jscomRt._committedBindings, "target", sProviderId);
 }
 
 
@@ -490,10 +491,7 @@ JSCOM.Composite.prototype.bind = function(sSourceId, sTargetId, sInterfaceName)
 	var oTarget = oEntities.target;
 
 	var acquisitor = oSource.getAcquisitor(sInterfaceName);	
-	// Create event binding
-	// register event handlers for the newly loaded component instance
-	// JSCOM.EventBus._subscribeComponentInterfaceEvents.(compInstance);	
-			
+
 	// record entity binding
 	if (acquisitor.type === JSCOM.ACQUISITOR_SINGLE)
 	{
