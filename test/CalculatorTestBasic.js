@@ -103,7 +103,7 @@ describe("[Meta Interface] Composite Set", function() {
 
 
 // Listing components in MyComposite...
-var childrenList = jscomRt.getChildrenList("MyComposite");
+var childrenList = jscomRt.getChildEntityList("MyComposite");
 describe("[Meta Interface] Children Entity List in MyComposite", function() { 
 	it("Exist MyAdder", function() { 
 		var obj = {

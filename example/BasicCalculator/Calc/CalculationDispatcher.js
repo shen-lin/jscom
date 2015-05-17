@@ -10,14 +10,17 @@ Calc.CalculationDispatcher.acquisitors = [
 // Expose interface ICalculator
 Calc.CalculationDispatcher.interfaces = ["Calc.IDispatch"];
 
-Calc.CalculationDispatcher.prototype.dispatch = function()
+Calc.CalculationDispatcher.prototype.dispatch = function(callback)
 {
 	for (var i = 0; i < 10; i++)
 	{
 		var a = Math.round(Math.random() * 100);
 		var b = Math.round(Math.random() * 100);
-		var result = this.calcAcquisitor.ref.add(a, b);
-		var logMsg = JSCOM.String.format("{0}+{1}={2}", a, b, result);
-		JSCOM.LOGGER.info(logMsg);
+		var aServiceProvider = this.use("Calc.ICalc");
+		aServiceProvider.add(a, b, function(error, response) {
+			var result = response;
+			var logMsg = JSCOM.String.format("{0}+{1}={2}", a, b, result);
+			JSCOM.LOGGER.info(logMsg);
+		});
 	}
 };

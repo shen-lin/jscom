@@ -327,12 +327,12 @@ JSCOM.JSCOMRuntime.prototype._initAdaptorInstance = function(className, id)
 
 /**
  * Return the components and composites in the given composite.
- * @method getChildrenList
+ * @method getChildEntityList
  * @param {string} Id of the composite
  * @return {array} Child components and composites stored in an array. Each array element is a JSON
  * 				   object with data structure {id: sEntityId, type: [JSCOM.COMPONENT|JSCOM.COMPOSITE]}.
  */
-JSCOM.JSCOMRuntime.prototype.getChildrenList = function(sId)
+JSCOM.JSCOMRuntime.prototype.getChildEntityList = function(sId)
 {
 	return this._connectivity[sId];
 };

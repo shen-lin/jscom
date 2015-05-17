@@ -67,7 +67,7 @@ JSCOM.Composite.prototype._isNewComposite = function(id)
 {
 	var isNewComposite = false;
 
-	var childList = JSCOM._jscomRt.getChildrenList(this.id);
+	var childList = JSCOM._jscomRt.getChildEntityList(this.id);
 	for (var i in childList)
 	{
 		var nextEntity = childList[i];
@@ -296,22 +296,6 @@ JSCOM.Composite.prototype._createInterfaceFunctions = function(sInterfaceName, o
 
 	for (var sFnName in oInterfaceDef) {
 		this._createInterfaceFunction(oComponent, sFnName, sInterfaceName, oInterfaceDef, sShortName);
-		 
-		/*
-		var sChannelId = JSCOM.eventUri.ComponentInterfaceChannel;
-		var sEventId = JSCOM.String.format(
-			JSCOM.eventUri.EventIDFormat, 
-			oComponent.className, 
-			oComponent.id, 
-			sInterfaceName,
-			sFnName);
-		
-		if (!oComponent[sFnName]) {
-			throw "Function " + sFnName + " of Interface " + sInterfaceName + " is not implemented in Component " + oComponent.id;
-		}
-		var fnInterfaceFunction = oComponent[sFnName].bind(oComponent);
-		JSCOM.EventBus.subscribeLocal(sChannelId, sEventId, fnInterfaceFunction);
-		*/
 	}
 };
 
@@ -330,7 +314,7 @@ JSCOM.Composite.prototype._createInterfaceFunction = function(oComponent, sFnNam
 	var createInterfaceScopeStmt = JSCOM.String.format(createInterfaceScopeTemplate, sShortName, sShortName);
 	
 	var stmt = createInterfaceScopeStmt + createExposeFnStmt;
-	JSCOM.LOGGER.debug(stmt);
+	// JSCOM.LOGGER.debug(stmt);
 	eval(stmt);
 }
 
@@ -409,7 +393,7 @@ JSCOM.Composite.prototype._hasAcquisitor = function(component, interfaceName)
  */ 
 JSCOM.Composite.prototype._exposeLoop = function(sInterfaceName, fnExposeFunction)
 {
-	var compositeChildrenList = JSCOM._jscomRt.getChildrenList(this.id);
+	var compositeChildrenList = JSCOM._jscomRt.getChildEntityList(this.id);
 	var aComponents = []; // count the number of components found with the matching interface 
 	for(var i in compositeChildrenList) {
 		var childEntity = compositeChildrenList[i];
@@ -557,7 +541,8 @@ JSCOM.Composite.prototype._validateBindingInputs = function(sSourceId, sTargetId
 
 JSCOM.Composite.prototype._checkInputAreChildren = function(sSourceId, sTargetId)
 {
-	var aChildIds = JSCOM._jscomRt.getChildrenList(this.id);
+	var aChildIds = JSCOM._jscomRt.getChildEntityList(this.id);
+	
 	var oSourceChild, oTargetChild;
 	for (var i in aChildIds) {
 		var oChild = aChildIds[i];
