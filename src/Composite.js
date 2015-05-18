@@ -51,6 +51,7 @@ JSCOM.Composite.prototype.createComposite = function(id)
 		type: JSCOM.COMPOSITE
 	};
 	
+	JSCOM._jscomRt._compositeSet[id] = composite;
 	// Attach newly create composite to its parent
 	JSCOM._jscomRt._connectivity[this.id].push(childItem);
 	// This composite doesn't have any children by default.
@@ -244,7 +245,7 @@ JSCOM.Composite.prototype._loadRawInterface = function(sInterfaceName)
  * Key is the short name used for invoking the interface method.
  * Value is interface name.
  */ 
-JSCOM.Composite.prototype.getInterfaceMap = function()
+JSCOM.Composite.prototype.getInterfaces = function()
 {
 	return this._interfaceMap;
 };
@@ -259,6 +260,25 @@ JSCOM.Composite.prototype.getAcquisitors = function()
 {
 	return this._acquisitorSet;
 };
+
+/**
+ * Get acquisitor exposed by this composite that match the given interface name.
+ * 
+ * @method getAcquisitor
+ * @param {string} sInterfaceName Interface name
+ * @return {JSCOM.Acquisitor}
+ */ 
+JSCOM.Composite.prototype.getAcquisitor = function(sInterfaceName)
+{
+	for(var i in this._acquisitorSet) {
+		var acquisitor = this._acquisitorSet[i];
+		if (acquisitor.name === sInterfaceName) {
+			return acquisitor;
+		}
+	} 
+	return null;
+};
+
 
 /**
  * Explicitly expose an interface of this composite instance's internal component instance 
@@ -339,22 +359,22 @@ JSCOM.Composite.prototype._hasInterface = function(oComponent, sInterfaceName)
 };
 
 /**
- * Explicitly expose an acquisitor of this composite instance's internal component instance 
+ * Explicitly expose an acquisitor of this composite instance's internal entity instance 
  * to external entities. Acquisitors of internal composites cannot be exposed. 
  * 
  * @method exposeAcquisitor
  * @param  {string} sInterfaceName Interface name
- * @return {boolean} Found component for valid acquisitor expose
+ * @return {boolean} Found component/composite for valid acquisitor expose
  */ 
 JSCOM.Composite.prototype.exposeAcquisitor = function(sInterfaceName)
 {
-	var component = this._exposeLoop(sInterfaceName, this._hasAcquisitor);
-	if (!component) return false;
+	var entity = this._exposeLoop(sInterfaceName, this._hasAcquisitor);
+	if (!entity) return false;
 	
 	// Creates functions of the exposed acuisitor for the composite
 	// this._createAcquisitorFunctions(sInterfaceName, oComponent);
 	
-	var oAcquisitorDef = component.getAcquisitor(sInterfaceName);
+	var oAcquisitorDef = entity.getAcquisitor(sInterfaceName);
 	this._acquisitorSet.push(oAcquisitorDef);
 	
 	return true;
@@ -363,10 +383,14 @@ JSCOM.Composite.prototype.exposeAcquisitor = function(sInterfaceName)
 
 
 
-
+/**
+ * @param {JSCOM.Entity} component It can be component or composite
+ * @param {string} interfaceName
+ */
 JSCOM.Composite.prototype._hasAcquisitor = function(component, interfaceName)
 {
-	var acquisitorSet = component.getAcquisitorSet();
+	var acquisitorSet = component.getAcquisitors();
+	
 	if (!acquisitorSet)
 	{
 		return false;
@@ -375,7 +399,7 @@ JSCOM.Composite.prototype._hasAcquisitor = function(component, interfaceName)
 	for (var i in acquisitorSet)
 	{
 		var acquisitor = acquisitorSet[i];
-		if (acquisitor.interfaceName === interfaceName)
+		if (acquisitor.name === interfaceName)
 		{
 			return true;
 		}
@@ -542,13 +566,13 @@ JSCOM.Composite.prototype._validateBindingInputs = function(sSourceId, sTargetId
 JSCOM.Composite.prototype._checkInputAreChildren = function(sSourceId, sTargetId)
 {
 	var aChildIds = JSCOM._jscomRt.getChildEntityList(this.id);
-	
+
 	var oSourceChild, oTargetChild;
 	for (var i in aChildIds) {
 		var oChild = aChildIds[i];
 		var sChildId = oChild.id;
 		var sChildType = oChild.type;
-		
+
 		if (sChildId === sSourceId) {
 			oSourceChild = JSCOM._jscomRt.getEntity(sChildId, sChildType);
 		}
@@ -579,6 +603,7 @@ JSCOM.Composite.prototype._checkMatchingAcquisitor = function(oSource, sInterfac
 {
 	var hasAcquisitor = false;
 	var aAcquisitors = oSource.getAcquisitors();
+
 	for (var i in aAcquisitors) {
 		var oNextAcquisitor = aAcquisitors[i];
 		var sNextAcquisitor = oNextAcquisitor.name;
@@ -597,16 +622,33 @@ JSCOM.Composite.prototype._checkMatchingAcquisitor = function(oSource, sInterfac
 JSCOM.Composite.prototype._checkMatchingInterface = function(oTarget, sInterfaceName)
 {
 	var hasInterface = false;
-	var aTargetInterfaces = oTarget.getInterfaces();
-	for (var i in aTargetInterfaces)
-	{
-		var sNextInterface = aTargetInterfaces[i];
-		if (sNextInterface === sInterfaceName)
+	
+	if (oTarget instanceof JSCOM.Component) {
+		var aTargetInterfaces = oTarget.getInterfaces();
+		for (var i in aTargetInterfaces)
 		{
-			hasInterface = true;
-			break;
-		}
+			var sNextInterface = aTargetInterfaces[i];
+			if (sNextInterface === sInterfaceName)
+			{
+				hasInterface = true;
+				break;
+			}
+		}		
 	}
+
+	if (oTarget instanceof JSCOM.Composite) {
+		var oTargetInterfaceMap = oTarget.getInterfaces();
+		for (var key in oTargetInterfaceMap)
+		{
+			var sNextInterface = oTargetInterfaceMap[key];
+			if (sNextInterface === sInterfaceName)
+			{
+				hasInterface = true;
+				break;
+			}
+		}		
+	}	
+	
 
 	if (!hasInterface)
 	{

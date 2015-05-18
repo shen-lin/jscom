@@ -50,7 +50,7 @@ var exposeIAdderSucceed = calcComposite.exposeInterface("Calc.IAdd", "IAdd");
 var exposeISubtractSucceed = calcComposite.exposeInterface("Calc.ISubtract", "ISub");
 var exposeICalculatorSucceed = calcComposite.exposeInterface("Calc.ICalculator", "ICalc");
 
-var oExposedInterfaceMap = calcComposite.getInterfaceMap();
+var oExposedInterfaceMap = calcComposite.getInterfaces();
 
 describe("MyComposite Expose interfaces", function() { 
 	it("Expose IAdder interface succeed", function() { 

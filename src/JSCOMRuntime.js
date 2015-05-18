@@ -107,6 +107,7 @@ JSCOM.JSCOMRuntime.prototype.getRootCompositeSet = function()
 JSCOM.JSCOMRuntime.prototype.getComposite = function(sId)
 {
 	var rootComposite = this.getRootComposite(sId);
+	
 	if (rootComposite) {
 		return rootComposite;
 	} 

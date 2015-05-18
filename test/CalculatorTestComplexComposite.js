@@ -130,34 +130,46 @@ describe("[Meta Interface] Component Children", function() {
 	});
 });
 
-/*
+
 // CalculatorComposite binding
-var iAdderIEP = adderComposite.exposeInterface("Calc.IAdd");
-var iSubtractorIEP = subtractorComposite.exposeInterface("Calc.ISubtract");
-calculatorComposite.bind(calculator, iAdderIEP, "Calc.IAdd");
-calculatorComposite.bind(calculator, iSubtractorIEP, "Calc.ISubtract");
-var iCalcIEP = calculatorComposite.exposeInterface("Calc.ICalculator");
-var addOutput = iCalcIEP.add(10, 50);
-var subOutput = iCalcIEP.subtract(10, 50);
+adderComposite.exposeInterface("Calc.IAdd", "IAdd");
+subtractorComposite.exposeInterface("Calc.ISubtract", "ISub");
+calculatorComposite.exposeInterface("Calc.ICalculator", "ICalc");
 
-describe("Calculation", function() { 
-	it("10 + 50", function() { 
-		should(addOutput).equal(60);	
-	});
+calculatorComposite.bind("MyCalculatorInCalculatorTestComplex", "MyAdderComposite", "Calc.IAdd");
+calculatorComposite.bind("MyCalculatorInCalculatorTestComplex", "MySubtractorComposite", "Calc.ISubtract");
 
-	it("10 - 50", function() { 
-		should(subOutput).equal(-40);	
-	});
+
+describe("Invoking ICalculator interfaces exposed by MyCalculatorComposite", function() { 
+	it("5 + 5", function(done) { 
+		calculatorComposite.ICalc.add(5, 5, function(error, response){
+			should(response).equal(10);
+			done();
+		});
+	}); 
+	
+	it("5 - 1", function(done) { 
+		calculatorComposite.ICalc.subtract(5, 1, function(error, response){
+			should(response).equal(4);
+			done();
+		});
+	}); 	
 });
 
 
-// MyComposite binding
-var iCalcAEP = dispatcherComposite.exposeAcquisitor("Calc.ICalculator");
-myComposite.bind(iCalcAEP, iCalcIEP, "Calc.ICalculator");
-var iDispatchIEP = dispatcherComposite.exposeInterface("Calc.IDispatch");
-iDispatchIEP.dispatch();
 
+// Binding in root composite
+dispatcherComposite1.exposeAcquisitor("Calc.ICalculator");
+dispatcherComposite1.exposeInterface("Calc.IDispatch", "IDispatch");
+myComposite.bind("MyDispatcherComposite1", "MyCalculatorComposite", "Calc.ICalculator");
+dispatcherComposite1.IDispatch.dispatch();
 
+dispatcherComposite2.exposeAcquisitor("Calc.ICalculator");
+dispatcherComposite2.exposeInterface("Calc.IDispatch", "IDispatch");
+myComposite.bind("MyDispatcherComposite2", "MyCalculatorComposite", "Calc.ICalculator");
+dispatcherComposite2.IDispatch.dispatch();
+
+/*
 // Disconnect bindings
 dispatcherComposite.unbind(iCalcAEP, iCalcIEP, "Calc.ICalculator");
 var iDispatchIEP = dispatcherComposite.exposeInterface("Calc.IDispatch");

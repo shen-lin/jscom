@@ -70,6 +70,7 @@ JSCOM.Component.prototype.use = function(sInterfaceName)
 		 aFilterBindings = JSCOM._jscomRt._getBoundEntities(aServiceProviders, "interface", sInterfaceName);
 	}
 	
+	
 	// TODO: Throw exception if invalid bindings
 	
 	// Get service providers
@@ -78,7 +79,27 @@ JSCOM.Component.prototype.use = function(sInterfaceName)
 		var oBinding = aFilterBindings[i];
 		var sServiceProviderId = oBinding.target;
 		var oEntity = JSCOM._jscomRt.getEntityById(sServiceProviderId);
-		aServiceProviders.push(oEntity);
+		
+		if (oEntity instanceof JSCOM.Component) {
+			aServiceProviders.push(oEntity);
+		}
+		else if (oEntity instanceof JSCOM.Composite) {
+			var oInterfaceMap = oEntity.getInterfaces();
+			var matchingShortName;
+			for (var sShortName in oInterfaceMap) {
+				var nextInterfaceName = oInterfaceMap[sShortName];
+				if (nextInterfaceName === sInterfaceName) {
+					matchingShortName = sShortName;
+					break;
+				}
+			}
+			
+			if (!matchingShortName) {
+				JSCOM.Error.throwError(JSCOM.Error.NoShortNameFound, sInterfaceName, oEntity.id);
+			}
+			
+			aServiceProviders.push(oEntity[matchingShortName]);
+		}
 	}
 	
 	if (aServiceProviders.length === 1) {
@@ -89,6 +110,8 @@ JSCOM.Component.prototype.use = function(sInterfaceName)
 };
 
 
+
+
 /***********************
  * @example 
  * Calc.Calculator.acquisitors = [
@@ -97,6 +120,14 @@ JSCOM.Component.prototype.use = function(sInterfaceName)
  * ];
  * @property acquisitors
  * @static
+ ***********************/
+ 
+ 
+/***********************
+ * Gets a list of acquisitors required by this component class.
+ * @method getAcquisitors
+ * @return {array} An array list of acquisitors required by this component class.
+ * Each element in the array is a JSON object {name : {string}, type: {JSCOM.ACQUISITOR_SINGLE | JSCOM.ACQUISITOR_MULTIPLE}}  
  ***********************/
 JSCOM.Component.prototype.getAcquisitors = function()
 {

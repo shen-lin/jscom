@@ -59,6 +59,10 @@ JSCOM.Error = {
 		code: "ExposeInterfaceFailure",
 		desc: "Short name {0} has been used for an exposed interface of composite {1}"		
 	},
+	NoShortNameFound: {
+		code: "NoShortNameFound",
+		desc: "No short name found for interface {0} in composite {1}"			
+	},
 };
 
 
