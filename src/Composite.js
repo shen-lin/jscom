@@ -532,6 +532,8 @@ JSCOM.Composite.prototype.unbind = function(sSourceId, sTargetId, sInterfaceName
 	var oSource = oEntities.source;
 	var oTarget = oEntities.target;
 	
+	var acquisitor = oSource.getAcquisitor(sInterfaceName);	
+	
 	// Component unbinding
 	if (acquisitor.type === JSCOM.ACQUISITOR_SINGLE)
 	{
