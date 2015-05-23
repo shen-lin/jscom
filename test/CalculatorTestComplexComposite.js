@@ -169,20 +169,18 @@ dispatcherComposite2.exposeInterface("Calc.IDispatch", "IDispatch");
 myComposite.bind("MyDispatcherComposite2", "MyCalculatorComposite", "Calc.ICalculator");
 dispatcherComposite2.IDispatch.dispatch();
 
-/*
+
 // Disconnect bindings
-dispatcherComposite.unbind(iCalcAEP, iCalcIEP, "Calc.ICalculator");
-var iDispatchIEP = dispatcherComposite.exposeInterface("Calc.IDispatch");
+myComposite.unbind("MyDispatcherComposite1", "MyCalculatorComposite", "Calc.ICalculator");
+
 
 var invalidInvokeAfterUnbinding = function() {
-	iDispatchIEP.dispatch();
+	dispatcherComposite1.IDispatch.dispatch();
 };
-
 
 describe("Invalid Invoke on unbound acquisitor", function() { 
 	it("Throw Error", function() { 
-		(invalidInvokeAfterUnbinding).should.throw(/^Cannot call method/);
+		var regexp = new RegExp(JSCOM.Error.NoBindingFound.code);
+		(invalidInvokeAfterUnbinding).should.throw(regexp);
 	}); 
 });
-
-*/

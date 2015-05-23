@@ -493,7 +493,7 @@ JSCOM.Composite.prototype.bind = function(sSourceId, sTargetId, sInterfaceName)
 {	
 	// validation
 	var oEntities = this._validateBindingInputs(sSourceId, sTargetId, sInterfaceName);
-	// TODO: check single acquisitor is not bound to any other entity
+	// TODO: check single acquisitor is bound to at most one entity
 	
 	var oSource = oEntities.source;
 	var oTarget = oEntities.target;

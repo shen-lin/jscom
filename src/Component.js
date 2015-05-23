@@ -71,8 +71,6 @@ JSCOM.Component.prototype.use = function(sInterfaceName)
 	}
 	
 	
-	// TODO: Throw exception if invalid bindings
-	
 	// Get service providers
 	var aServiceProviders = [];
 	for (var i in aFilterBindings) {
@@ -104,8 +102,11 @@ JSCOM.Component.prototype.use = function(sInterfaceName)
 	
 	if (aServiceProviders.length === 1) {
 		return aServiceProviders[0];
-	} else {
+	} else if (aServiceProviders.length > 1) {
 		return aServiceProviders;
+	} else {
+		// Throw exception if no binding found
+		JSCOM.Error.throwError(JSCOM.Error.NoBindingFound, sInterfaceName, this.id);
 	}
 };
 

@@ -63,6 +63,10 @@ JSCOM.Error = {
 		code: "NoShortNameFound",
 		desc: "No short name found for interface {0} in composite {1}"			
 	},
+	NoBindingFound: {
+		code: "NoBindingFound",
+		desc: "No entity found to provide interface {0} for the acquiring component {1}"
+	},
 };
 
 
