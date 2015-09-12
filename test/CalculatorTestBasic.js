@@ -12,12 +12,27 @@ jscomRt.addComponentRepo(JSCOM.URI_FILE, 'example/BasicCalculator');
 // Get component repository...
 var componentRepo = jscomRt.getComponentRepo();
 
-describe("Componnet Repository Configuration", function() { 
+describe("Component Repository Configuration", function() { 
 	it("Configuration Setter", function() { 
 		should(componentRepo).have.property('protocol', JSCOM.URI_FILE);
 		should(componentRepo).have.property('baseUri', 'example/BasicCalculator');
 	}); 
 });
+
+var aRootRepoFiles = jscomRt.listRepoComponents("/");
+var aCalcRepoFiles = jscomRt.listRepoComponents("/Calc");
+
+describe("Component Repository Exploration", function() { 
+	it("Explore repo root path", function() { 
+		should(aRootRepoFiles).containEql("Calc");
+	}); 
+	it("Explore repo root path", function() { 
+		should(aCalcRepoFiles).containEql("Adder.js");
+	}); 
+});
+
+
+
 
 // Creating a composite of example calculator components...
 var calcComposite = jscomRt.createRootComposite("MyComposite");

@@ -376,7 +376,13 @@ JSCOM.JSCOMRuntime.prototype.getComponentRepo = function()
 	return this._componentRepo;
 };
 
-
+/**
+ * @param sRepoPath {string}  Repository path. Use "/" as the root path to start component repository exploration.
+ */
+JSCOM.JSCOMRuntime.prototype.listRepoComponents = function(sRepoPath)
+{
+	return JSCOM.Loader.listRepo(this._componentRepo, sRepoPath);
+};
 
 
 /***********************

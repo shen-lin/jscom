@@ -178,6 +178,30 @@ JSCOM.Loader.loadRawContentFromHttp = function(uri)
 	throw new Error("Not Implemented");
 };
 
+JSCOM.Loader.listRepo = function(componentRepo, sPath)
+{
+	var protocol = componentRepo.protocol;
+	
+	if (protocol === JSCOM.URI_FILE)
+	{
+		return JSCOM.Loader.listRepoFromFile(componentRepo, sPath);
+	}	
+	else if (protocol === JSCOM.URI_HTTP)
+	{
+		return JSCOM.Loader.listRepoFromHttp(componentRepo, sPath);
+	}
+};
+
+JSCOM.Loader.listRepoFromFile = function(componentRepo, sPath)
+{
+	var sRepoPath = componentRepo.baseUri + sPath;
+	return JSCOM.fs.readdirSync(sRepoPath);
+}
+
+JSCOM.Loader.listRepoFromHttp = function(componentRepo, sPath)
+{
+	throw new Error("Not Implemented");
+}
 
 JSCOM.Loader.isBuildInType = function(className)
 {

@@ -3,17 +3,18 @@ var should = require('should');
 
 // Loading JSCOM runtime...
 var jscom = require('../dist/jscom.js');
-var jscomRt = jscom.getJSCOMRuntime();
-var JSCOM = jscom.getJSCOMGlobal();
+var JSCOM = jscom.getJSCOM();
+var jscomRt = JSCOM.getJSCOMRuntime();
 
 // Configure component repository to be working dir
-// jscomRt.addComponentRepo(JSCOM.URI_FILE, 'example/RestCompPoC');
+jscomRt.addComponentRepo(JSCOM.URI_FILE, 'example/RestCompPoC');
 
 // Get component repository...
 var componentRepo = jscomRt.getComponentRepo();
 
 // Creating a composite of example calculator components...
-var restComposite = jscomRt.createComposite("RestComposite");
+var rootComposite = jscomRt.createRootComposite("ComplexTestComposite");
+var restComposite = rootComposite.createComposite("RestComposite");
 
 // Loading example component instances...
 var restService = restComposite.createComponent("JSCOM.components.rest.RestServer", "MyRestServer");
