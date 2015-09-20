@@ -1,10 +1,8 @@
-Calc.CalcAdaptor = function() 
-{
-	JSCOM.Adaptor.call(this);
-};
+JSCOM.Loader.declare({
+	component: "Calc.CalcAdaptor",
+	extend: "JSCOM.Adaptor"
+});
 
-Calc.CalcAdaptor.prototype = new JSCOM.Adaptor();
-Calc.CalcAdaptor.prototype.constructor = Calc.CalcAdaptor;
 
 
 Calc.CalcAdaptor.prototype.returnDefaultValue = function()
@@ -33,11 +31,19 @@ Calc.CalcAdaptor.prototype.isInteger = function()
 	var adaptorArg = arguments[0];
 	var args = adaptorArg.args;
 	
-	for (var i in args) {
+	var callback = args[args.length - 1];
+	var error;
+	
+	for (var i = 0; i < args.length - 1; i++) {
 		var arg = args[i];
 		if (!this._isInteger(arg)) {
-			throw new Error("Arg " + i + " is not an integer: " + arg);
+			error = new Error("Arg " + i + " is not an integer: " + arg);
+			break;
 		}
+	}
+	
+	if (error) {
+		setImmediate(callback, error, null);
 	}
 };
 

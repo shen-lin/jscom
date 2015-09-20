@@ -24,6 +24,9 @@ JSCOM.Adaptor.Type.INTRODUCE = "Introduce";
 JSCOM.Adaptor.prototype.applyAdaptor = function(sAdaptorFn, oAdaptorType, targetFnItem) 
 {	
 	var adaptorFn = this[sAdaptorFn];
+	if (!adaptorFn) {
+		JSCOM.Error.throwError(JSCOM.Error.IncompleteAdaptor, [this.id, sAdaptorFn]);
+	}
 	
 	if (oAdaptorType === JSCOM.Adaptor.Type.BEFORE) 
 	{

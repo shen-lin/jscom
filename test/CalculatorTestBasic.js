@@ -197,10 +197,6 @@ describe("[Meta Interface] Get Interfaces", function() {
 
 
 
-
-
-
-
 // Invoking example system and printing output...
 describe("Invoke MyComposite Exposed interfaces", function() { 
 	it("Invoke exposed IAdder: 5 + 5", function(done) { 

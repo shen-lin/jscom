@@ -17,11 +17,9 @@ Calc.CalculationDispatcher.prototype.dispatch = function(callback)
 		var a = Math.round(Math.random() * 100);
 		var b = Math.round(Math.random() * 100);
 		var oServiceProvider = this.use("Calc.ICalculator");
-		JSCOM.LOGGER.info("Perform " + a + "+" + b);
 		oServiceProvider.add(a, b, function(error, response) {
 			var result = response;
 			var logMsg = JSCOM.String.format("Result is: {0}", result);
-			JSCOM.LOGGER.info(logMsg);
 		});
 	}
 };

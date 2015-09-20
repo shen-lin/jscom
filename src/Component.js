@@ -29,9 +29,10 @@ JSCOM.Component = function ()
 /***********************
  * @property parent {string} Parent component class
  * @static
+ * @see Property value initialized in JSCOM.Loader
  ***********************/
  
- 
+  
 /***********************
  * Get the parent component class extends this component class
  * @method getParent
@@ -164,16 +165,16 @@ JSCOM.Component.prototype.getAcquisitor = function(sInterfaceName)
 	return null;
 };
 
+
 /***********************
- * @example Calc.Calculator.interfaces = ["Calc.ICalculator"];
- * @property interfaces
+ * @method getInterfaces Get all the interfaces provided by this component, 
+ * including those inherited from this component's ancestry components.
  * @static
  ***********************/ 
-JSCOM.Component.prototype.getInterfaces = function()
+JSCOM.Component.getInterfaces = function(sComponentName)
 {
 	var aComponentInterfaces = [];
-	
-	var sParentName = this.getParent();
+	var sParentName = eval(sComponentName + ".parent");
 	
 	while(sParentName) {
 		var aParentInterfaces = eval(sParentName + ".interfaces");
@@ -183,11 +184,25 @@ JSCOM.Component.prototype.getInterfaces = function()
 		sParentName = eval(sParentName + ".parent");
 	}
 	
-	if (this.constructor.interfaces) {
-		aComponentInterfaces = aComponentInterfaces.concat(this.constructor.interfaces);
+	var iComponentInterfaces = eval(sComponentName + ".interfaces");
+	if (iComponentInterfaces) {
+		aComponentInterfaces = aComponentInterfaces.concat(iComponentInterfaces);
 	}
 	
-	return aComponentInterfaces;
+	return aComponentInterfaces;	
+}
+
+
+
+/***********************
+ * @example Calc.Calculator.interfaces = ["Calc.ICalculator"];
+ * @property interfaces
+ * @static
+ ***********************/ 
+JSCOM.Component.prototype.getInterfaces = function()
+{
+	var sComponentName = this.className;
+	return JSCOM.Component.getInterfaces(sComponentName);
 };
 
 /***********************

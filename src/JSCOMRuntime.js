@@ -12,7 +12,10 @@ JSCOM.JSCOMRuntime = function () {
 	this._componentSet = {};     // loaded component instances
 	this._connectivity = {};          // runtime composite and component hierarchical graph 
 	this._componentClassNameSet = [];   // loaded component class types
-	this._interfaceDefSet = {};       // loaded interface definitions, accessed in Composite.js
+	// Loaded interface definitions. 
+	// Key is full interface name with namespace in string format. 
+	// Value is an instance of JSCOM.Interface object
+	this._interfaceDefSet = {};       
 	
 	/* Adaptor metadata */
 	this._adaptorSet = {}; // loaded adaptors
@@ -171,12 +174,14 @@ JSCOM.JSCOMRuntime.prototype.createAdaptor = function(className, id)
 	'*' Match zero or more characters 
 	'**' Match zero or more directories 
 	'?' Match a single character
+ * @return {array} Functions that have been affected by the advices.	
  */
 JSCOM.JSCOMRuntime.prototype.applyAdaptor = function(sId, oAdvices, oScope)
 {
 	var functions = this._findMatchingFunctions(oScope);
-	this._applyAdaptorToComponents(functions, oAdvices);
+	this._applyAdaptorToComponents(sId, functions, oAdvices);
 	this._storeAdaptorMetadata(sId, functions, oAdvices);
+	return functions;
 };
 
 
@@ -194,8 +199,8 @@ JSCOM.JSCOMRuntime.prototype._storeAdaptorMetadata = function(sId, functions, oA
 	}	
 };
 
-JSCOM.JSCOMRuntime.prototype._applyAdaptorToComponents = function(functions, oAdvices) 
-{
+JSCOM.JSCOMRuntime.prototype._applyAdaptorToComponents = function(sId, functions, oAdvices) 
+{	
 	for (var i in functions) {
 		var targetFnItem = functions[i];
 		// restore backup function
@@ -239,12 +244,13 @@ JSCOM.JSCOMRuntime.prototype._findMatchingFunctionsForClass = function(scope, cl
 	var fnList = [];
 	// load interfaces exposed by this component
 	var oComponentClass = eval(className);
-	var interfaceSet = oComponentClass.interfaces;
+	var interfaceSet = JSCOM.Component.getInterfaces(className);
 	
 	for (var i in interfaceSet) {
 		var interfaceName = interfaceSet[i];
-		var interfaceDef = this._interfaceDefSet[interfaceName];
-		for (var fnName in interfaceDef) {
+		var oInterface = this._interfaceDefSet[interfaceName];
+		var oInterfaceDef = oInterface.oInterfaceDef;
+		for (var fnName in oInterfaceDef) {
 			var classFnPath = className + "@" + fnName;
 			var isMatchingFn = this._isMatchingFunction(scope, classFnPath);
 			if (isMatchingFn) {
@@ -291,8 +297,7 @@ JSCOM.JSCOMRuntime.prototype._isNewAdaptorInstance = function(id)
 	var adaptorInstance = this._adaptorSet[id];
 	if (adaptorInstance)
 	{
-		var errorMsg = JSCOM.String.format("Adaptor instance already exists: ID={0}", id);
-		throw new Error(errorMsg);
+		JSCOM.Error.throwError(JSCOM.Error.AdaptorAlreadyExist, id);
 	}
 };
 
@@ -356,8 +361,6 @@ JSCOM.JSCOMRuntime.prototype.getComponent = function(id)
  ***********************/
 JSCOM.JSCOMRuntime.prototype.addComponentRepo = function(protocol, baseUri)
 {
-	// JSCOM.LOGGER.debug(arguments.callee.name);
-	
 	this._componentRepo = {
 		protocol: protocol,
 		baseUri: baseUri

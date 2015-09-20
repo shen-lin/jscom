@@ -7,6 +7,14 @@
  */
 
 JSCOM.Error = {
+	IncompleteAdaptor: {
+		code: "IncompleteAdaptor",
+		desc: "Adaptor instance {0} does not contain advice function {1}"	
+	},
+	AdaptorAlreadyExist: {
+		code: "AdaptorAlreadyExist",
+		desc: "Adaptor instance already exists: ID={0}"		
+	},
 	CompositeAlreadyExist: {
 		code: "CompositeAlreadyExist",
 		desc: "Composite {0} already exists"

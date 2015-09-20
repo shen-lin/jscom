@@ -175,6 +175,9 @@ JSCOM.Composite.prototype._backupInterfaceMethods = function(compInstance)
 		for (var fnName in oInterfaceDef) {
 			var backupFnName = JSCOM.String.format(JSCOM.FN_BAK, fnName);
 			compInstance.constructor.prototype[backupFnName] = compInstance.constructor.prototype[fnName];
+			// JSCOM.LOGGER.info(backupFnName);
+			// JSCOM.LOGGER.info(compInstance.constructor.prototype[fnName].toString());
+			// JSCOM.LOGGER.info(compInstance.constructor.prototype[backupFnName].toString());
 		}
 	}
 };
