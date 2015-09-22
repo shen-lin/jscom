@@ -12,9 +12,10 @@ Calc.Calculator.acquisitors = [
 Calc.Calculator.prototype.subtract = function(a, b, callback)
 {
 	var oServiceProvider = this.use("Calc.ISubtract");
+	var that = this;
 	oServiceProvider.subtract(a, b, function(error, response){
 		var sub = response;
-		setImmediate(callback, null, sub);
+		that.execCallback(callback, null, sub);
 	});
 };
 
@@ -22,12 +23,13 @@ Calc.Calculator.prototype.log = function(operator, a, b, output, callback)
 {
 	var logMsg = JSCOM.String.format("[{0}] {1} {2} {3} = {4}", "Calculator", a, operator, b, output);
 	var aServiceProviders = this.use("Calc.ILog");
+	var that = this;
 	
 	for (var i in aServiceProviders) {
 		var oServiceProvider = aServiceProviders[i];
 		oServiceProvider.log(logMsg, function(error, response){
 			var msgFromLogger = response;
-			setImmediate(callback, null, msgFromLogger);
+			that.execCallback(callback, null, msgFromLogger);
 		});
 	}
 }

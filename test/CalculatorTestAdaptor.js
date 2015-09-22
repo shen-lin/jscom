@@ -44,12 +44,15 @@ describe("Invalid adaptor creation with duplicate ID", function() {
 /*******************************************************
  * Test applying adaptor functions to components
  *******************************************************/
-var sOriginalAddFn;
-var sCurrentAddFn;
-var oEmptyAdaptorError;
-var calcComposite;
+
+
 
 describe("Test Adaptors", function() { 
+	var sOriginalAddFn;
+	var sCurrentAddFn;
+	var oEmptyAdaptorError;
+	var calcComposite;
+
 	before(function(){
 		// Creating a composite of example calculator components...
 		calcComposite = jscomRt.createRootComposite("TestAdaptorComposite");
@@ -105,8 +108,7 @@ describe("Test Adaptors", function() {
 	
 	
 	
-	describe("Initialize Adaptors", function() { 
-		
+	describe("Initialize Adaptors", function() {
 		before(function () { 
 			var scope = {
 				include: ["Calc.C*@add"],
@@ -128,32 +130,34 @@ describe("Test Adaptors", function() {
 			should(index).be.above(0);
 		});
 		
-		it("No error with adding two integers", function() {
+		it("No error with adding two integers", function(done) {
 			calcComposite.ICalc.add(5, 3, function(error, response){
 				should(response).equal(8);
 				done();
 			});
 		}); 
 
-		it("Non-integer input caught by adaptor function: CalcAdaptor.isInteger", function() {
-			calcComposite.ICalc.add(5, 'abc', function(error, response){
-				should(response).match(/is not an integer/);
+		it("Non-integer input caught by adaptor function: CalcAdaptor.isInteger", function(done) {
+			calcComposite.ICalc.add(5, 'abc', function(error, response) {
+				should(error).match(/is not an integer/);
+				should(response).equal(null);
 				done();
 			});
 		}); 
 		
-		it("Output > 100 caught by adaptor function: CalcAdaptor.isWithinRange", function() { 
-			var caughtOutOfRangeErrorInInterceptedAddFn = function() {
-				var output = iCalcIEP.add(5, 100);
-			};
-			(caughtOutOfRangeErrorInInterceptedAddFn).should.throw(/Result is greater than 100:/);
+		it("Output > 100 caught by adaptor function: CalcAdaptor.isWithinRange", function(done) { 
+			calcComposite.ICalc.add(5, 100, function(error, response) {
+				should(error).match(/Result is greater than 100/);
+				should(response).equal(null);
+				done();
+			});
 		}); 
 	});
 	
-	/*
-	describe("Modified Adaptor", function() { 
-		var sUpdatedAddFn;
 	
+	describe("Modified Adaptor", function() { 
+		var sModifiedAddFn;
+		
 		before(function () { 
 			var scope = {
 				include: ["Calc.C*@add"],
@@ -162,41 +166,39 @@ describe("Test Adaptors", function() {
 			var oAdvices = [
 				{id: "MyAdaptor", fn: "isInteger", type: JSCOM.Adaptor.Type.BEFORE},
 				{id: "MyAdaptor", fn: "isWithinRange", type: JSCOM.Adaptor.Type.AFTER},
-				{id: "MyAdaptor", fn: "returnDefaultValue", type: JSCOM.Adaptor.Type.AFTER_THROW},
+				{id: "MyAdaptor", fn: "returnIncrementedValue", type: JSCOM.Adaptor.Type.AFTER},
 			];
 			jscomRt.applyAdaptor("MyInjection2", oAdvices, scope);
-			
-			sCurrentAddFn = iCalcIEP.add.toString();
-			sUpdatedAddFn = JSCOM.Adaptor.prototype.applyAdaptorAfterThrow.toString();
+			sModifiedAddFn = Calc.Calculator.prototype.add.toString();
 		});
 		
 		it("Test add function after modifying adaptors", function() { 
-			var index = sCurrentAddFn.indexOf("thisAdaptorAfterThrow");
+			var index = sModifiedAddFn.indexOf("thisAdaptorAfter");
 			should(index).be.above(0);
 		}); 
 		
-		it("No error with adding two integers: 5+3=8", function() { 
-			var addTwoInt = iCalcIEP.add(5,3);
-			should(addTwoInt).equal(8);
+		it("No error with adding two integers: 5+3=8", function(done) {
+			calcComposite.ICalc.add(5, 3, function(error, response) {
+				should(response).equal(8);
+				done();
+			});
+		});
+		
+		it("Invalid input handled: Return default value 50 for 5+'abc'", function(done) { 
+			calcComposite.ICalc.add(5, "abc", function(error, response) {
+				should(response).equal(50);
+				done();
+			});
 		}); 
 		
-		it("No error with adding two integers: 5+3=8", function() { 
-			var addTwoInt = iCalcIEP.add(5,3);
-			should(addTwoInt).equal(8);
-		}); 
-		
-		it("Invalid input handled: Return default value 50 for 5+'abc'", function() { 
-			var addTwoInt = iCalcIEP.add(5,'abc');
-			should(addTwoInt).equal(50);
-		}); 
-		
-		it("Out of range output handled: Return default value 50 for 5+100", function() { 
-			var addTwoInt = iCalcIEP.add(5, 100);
-			should(addTwoInt).equal(50);
-		}); 
-
+		it("Out of range output handled: Return default value 50 for 5+100", function(done) { 
+			calcComposite.ICalc.add(5, 100, function(error, response) {
+				should(response).equal(50);
+				done();
+			});
+		});
 	});
-	*/
+	
 	
 	
 	/*******************************************************
@@ -229,6 +231,20 @@ describe("Test Adaptors", function() {
 		}); 
 	});	
 	*/
+	
+	
+	/*******************************************************
+	 * Remove adaptors
+	 *******************************************************/	
+	after(function () { 
+		var scope = {
+			include: ["Calc.C*@add"],
+			exclude: ["**@sub*"],
+		};
+		var oAdvices = [];
+		jscomRt.applyAdaptor("MyInjection3", oAdvices, scope);
+	}); 
+
 });
 
 

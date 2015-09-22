@@ -5,22 +5,27 @@ JSCOM.Loader.declare({
 
 
 
-Calc.CalcAdaptor.prototype.returnDefaultValue = function()
+Calc.CalcAdaptor.prototype.returnIncrementedValue = function(context, callback, error, response)
 {
-	return 50;
+	var incrementedValue;
+	
+	if (response > 100) {
+		incrementedValue = response + 50;
+	}
+	
+	setImmediate(callback.bind(context), error, incrementedValue);
 };
 
 
-Calc.CalcAdaptor.prototype.isWithinRange = function()
-{
-	var adaptorArg = arguments[0];
-	var args = adaptorArg.args;
-	var returnVal = adaptorArg.returnVal;
-	if (returnVal > 100) {
-		throw new Error("Result is greater than 100: " + returnVal);
+Calc.CalcAdaptor.prototype.isWithinRange = function(context, callback, error, response)
+{	
+	JSCOM.LOGGER.info(callback);
+	if (response > 100) {
+		var oError = new Error("Result is greater than 100: " + response);
+		setImmediate(callback.bind(context), oError, null);
 	}
 	else {
-		return returnVal;
+		setImmediate(callback.bind(context), error, response);
 	}
 };
 
@@ -37,13 +42,8 @@ Calc.CalcAdaptor.prototype.isInteger = function()
 	for (var i = 0; i < args.length - 1; i++) {
 		var arg = args[i];
 		if (!this._isInteger(arg)) {
-			error = new Error("Arg " + i + " is not an integer: " + arg);
-			break;
+			throw new Error("Arg " + i + " is not an integer: " + arg);
 		}
-	}
-	
-	if (error) {
-		setImmediate(callback, error, null);
 	}
 };
 

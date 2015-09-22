@@ -263,3 +263,23 @@ JSCOM.Component.prototype.getServiceConsumers = function()
 	var sProviderId = this.id;
 	return JSCOM._jscomRt._getBoundEntities(JSCOM._jscomRt._committedBindings, "target", sProviderId);
 }
+
+
+/**
+ * This function is to trigger asynchronous type of callback on completion of
+ * a function exposed by this component's interface.
+ */
+JSCOM.Component.prototype.execCallback = function(callback, error, response)
+{
+	if (typeof callback === "function") {
+		setImmediate(callback.bind(this), error, response);	
+	}
+	// Original callback is replaced by a type AFTER adaptor.
+	else {
+		var originalCallbackFn = callback.originalCallbackFn;
+		var adaptorFn = callback.adaptorFn;
+		var adaptorRef = callback.adaptorRef;
+		var componentRef = this;
+		adaptorFn.apply(adaptorRef, [componentRef, originalCallbackFn, error, response]);
+	}
+}

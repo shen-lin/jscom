@@ -21,5 +21,5 @@ Calc.FileLogger.prototype.log = function(record, callback)
 	JSCOM.fs.writeFile(filepath, fileContent);
 	
 	var returnMsg = "Log sent to file";
-	setImmediate(callback, null, returnMsg);
+	this.execCallback(callback, null, returnMsg);
 };

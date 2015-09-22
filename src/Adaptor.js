@@ -68,14 +68,23 @@ JSCOM.Adaptor.prototype.applyAdaptorBefore = function(adaptorFn, targetFnItem)
 			args: arguments,
 			returnVal: null
 		}];
-		var augmentedInputs = adaptorFn.apply(thisAdaptorBefore, adaptorArguments);
-		if (!augmentedInputs) {
-			return originalFn.apply(thisComponent, arguments);
+		// Require callback function always presented in the last index of arguments
+		var originalCallbackFn = arguments[arguments.length - 1];
+		var augmentedInputs;
+		try {
+			augmentedInputs	= adaptorFn.apply(thisAdaptorBefore, adaptorArguments);
+			if (!augmentedInputs) {
+				originalFn.apply(thisComponent, arguments);
+			}
+			else {
+				originalFn.apply(thisComponent, augmentedInputs);
+			}
 		}
-		else {
-			return originalFn.apply(thisComponent, augmentedInputs);
+		catch(error) {
+			thisComponent.execCallback(originalCallbackFn, error, null);
 		}
-	}
+	};
+	
 	classObj.prototype[fnName] = newFn;
 };
 
@@ -93,23 +102,22 @@ JSCOM.Adaptor.prototype.applyAdaptorAfter = function(adaptorFn, targetFnItem)
 	var newFn = function() {
 		var thisComponent = this;
 		var returnVal, exception;
-		try {
-			returnVal = originalFn.apply(thisComponent, arguments);
-		} catch(error) {
-			exception = error;
-		}
 		
-		var adaptorArguments = [{
-			args: arguments,
-			returnVal: returnVal
-		}];
-
-		if (exception) {
-			adaptorFn.apply(thisAdaptorAfter, adaptorArguments);
-			throw exception;
-		} else {
-			return adaptorFn.apply(thisAdaptorAfter, adaptorArguments);
+		// Call adaptor function after executing the original function
+		// Doing so by passing adaptor function as the callback function to original function.
+		var originalCallbackFn = arguments[arguments.length - 1];
+		var lastArg = {
+			originalCallbackFn: originalCallbackFn,
+			adaptorFn: adaptorFn,
+			adaptorRef: thisAdaptorAfter
+		};
+		
+		var args = []
+		for (var i = 0; i < arguments.length - 1; i++) {
+			args.push(arguments[i]);
 		}
+		args[arguments.length - 1] = lastArg;
+		originalFn.apply(thisComponent, args);
 	}
 	classObj.prototype[fnName] = newFn;
 };

@@ -9,12 +9,13 @@ Calc.ParentCalculator.acquisitors = [
 ];
 
 Calc.ParentCalculator.prototype.add = function(a, b, callback)
-{
+{	
 	var oServiceProvider = this.use("Calc.IAdd");
+	var that = this;
 	
 	oServiceProvider.add(a, b, function(error, response){
 		var sum = response;
-		setImmediate(callback, null, sum);
+		that.execCallback(callback, null, sum);
 	});
 };
 
