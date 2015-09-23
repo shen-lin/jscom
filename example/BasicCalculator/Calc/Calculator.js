@@ -15,7 +15,7 @@ Calc.Calculator.prototype.subtract = function(a, b, callback)
 	var that = this;
 	oServiceProvider.subtract(a, b, function(error, response){
 		var sub = response;
-		that.execCallback(callback, null, sub);
+		JSCOM.execCallback(that, callback, null, sub);
 	});
 };
 
@@ -29,7 +29,7 @@ Calc.Calculator.prototype.log = function(operator, a, b, output, callback)
 		var oServiceProvider = aServiceProviders[i];
 		oServiceProvider.log(logMsg, function(error, response){
 			var msgFromLogger = response;
-			that.execCallback(callback, null, msgFromLogger);
+			JSCOM.execCallback(that, callback, null, msgFromLogger);
 		});
 	}
 }

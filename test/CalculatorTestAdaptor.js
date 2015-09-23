@@ -197,6 +197,13 @@ describe("Test Adaptors", function() {
 				done();
 			});
 		});
+		
+		it("Output > 50 and within range: Return incremented sum: 5 + 50 + 1 = 56", function(done) { 
+			calcComposite.ICalc.add(5, 50, function(error, response) {
+				should(response).equal(56);
+				done();
+			});
+		});
 	});
 	
 	

@@ -36,18 +36,6 @@ JSCOM.Adaptor.prototype.applyAdaptor = function(sAdaptorFn, oAdaptorType, target
 	{
 		return this.applyAdaptorAfter(adaptorFn, targetFnItem);
 	}
-	else if (oAdaptorType === JSCOM.Adaptor.Type.AFTER_RETURN) 
-	{
-		return this.applyAdaptorAfterReturn(adaptorFn, targetFnItem);
-	}
-	else if (oAdaptorType === JSCOM.Adaptor.Type.AFTER_THROW) 
-	{
-		return this.applyAdaptorAfterThrow(adaptorFn, targetFnItem);
-	}
-	else if (oAdaptorType === JSCOM.Adaptor.Type.AROUND) 
-	{
-		return this.applyAdaptorAround(adaptorFn, targetFnItem);
-	}
 	else if (oAdaptorType === JSCOM.Adaptor.Type.INTRODUCE) 
 	{
 		return this.applyAdaptorIntroduce(adaptorFn, targetFnItem);
@@ -81,7 +69,7 @@ JSCOM.Adaptor.prototype.applyAdaptorBefore = function(adaptorFn, targetFnItem)
 			}
 		}
 		catch(error) {
-			thisComponent.execCallback(originalCallbackFn, error, null);
+			JSCOM.execCallback(thisComponent, originalCallbackFn, error, null);
 		}
 	};
 	
@@ -122,80 +110,7 @@ JSCOM.Adaptor.prototype.applyAdaptorAfter = function(adaptorFn, targetFnItem)
 	classObj.prototype[fnName] = newFn;
 };
 
-/**
- * Execution depends on the success of the original function. If the original function
- * throws exception. The crosscutting function is not executed.
- */
-JSCOM.Adaptor.prototype.applyAdaptorAfterReturn = function(adaptorFn, targetFnItem) 
-{
-	var classObj = targetFnItem.classObj;
-	var className = targetFnItem.className;
-	var fnName = targetFnItem.fnName;
-	var thisAdaptorAfterReturn = this;
-	var originalFn = classObj.prototype[fnName];
-	var newFn = function() {
-		var thisComponent = this;
-		var returnVal = originalFn.apply(thisComponent, arguments);
-		var adaptorArguments = {
-			args: arguments,
-			returnVal: returnVal
-		};
-		var adaptorOutput = adaptorFn.apply(thisAdaptorAfterReturn, adaptorArguments);
-		return adaptorOutput;
-	}
-	classObj.prototype[fnName] = newFn;	
-};
 
-/**
- * Only executed when an exception is thrown. The adaptor functions acts as exception handling process.
- */
-JSCOM.Adaptor.prototype.applyAdaptorAfterThrow = function(adaptorFn, targetFnItem) 
-{
-	var classObj = targetFnItem.classObj;
-	var className = targetFnItem.className;
-	var fnName = targetFnItem.fnName;
-	var thisAdaptorAfterThrow = this;
-	var originalFn = classObj.prototype[fnName];
-	var newFn = function() {
-		var thisComponent = this;
-		var returnVal, exception;
-		try {
-			returnVal = originalFn.apply(thisComponent, arguments);
-		} catch(error) {
-			exception = error;
-		}
-		
-		var adaptorArguments = [{
-			args: arguments,
-			returnVal: returnVal
-		}];
-
-		if (exception) {
-			return adaptorFn.apply(thisAdaptorAfterThrow, adaptorArguments);
-		} else {
-			return returnVal;
-		}
-	}
-	classObj.prototype[fnName] = newFn;
-};
-
-JSCOM.Adaptor.prototype.applyAdaptorAround = function(adaptorFn, targetFnItem) 
-{
-	var classObj = targetFnItem.classObj;
-	var className = targetFnItem.className;
-	var fnName = targetFnItem.fnName;
-	var thisAdaptorAround = this;
-	var originalFn = classObj.prototype[fnName];
-	var newFn = function() {
-		var thisComponent = this;
-		var adaptorArguments = {
-			args: arguments,
-			originFn: originalFn
-		};
-		return adaptorFn.apply(thisAdaptorAround, adaptorArguments);
-	}
-	classObj.prototype[fnName] = newFn;	
-};
 
 JSCOM.Adaptor.prototype.applyAdaptorIntroduce = function(adaptorFn, targetFnItem) 
 {

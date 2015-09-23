@@ -326,7 +326,6 @@ JSCOM.JSCOMRuntime.prototype._initAdaptorInstance = function(className, id)
 	var adaptorInstance = eval(newAdaptorStmt);
 	adaptorInstance.id = id;
 	this._adaptorSet[id] = adaptorInstance;
-	JSCOM.LOGGER.info("Adaptor Instance ID: " + id);
 	// return initialized adaptor instance
 	return adaptorInstance;
 };

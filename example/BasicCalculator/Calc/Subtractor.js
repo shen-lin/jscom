@@ -9,5 +9,5 @@ Calc.Subtractor.interfaces = ["Calc.ISubtract"];
 Calc.Subtractor.prototype.subtract = function(a, b, callback)
 {
 	var result = a - b;
-	this.execCallback(callback, null, result);
+	JSCOM.execCallback(this, callback, null, result);
 };

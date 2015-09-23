@@ -269,17 +269,17 @@ JSCOM.Component.prototype.getServiceConsumers = function()
  * This function is to trigger asynchronous type of callback on completion of
  * a function exposed by this component's interface.
  */
-JSCOM.Component.prototype.execCallback = function(callback, error, response)
+JSCOM.execCallback = function(context, callback, error, response)
 {
 	if (typeof callback === "function") {
-		setImmediate(callback.bind(this), error, response);	
+		setImmediate(callback.bind(context), error, response);	
 	}
 	// Original callback is replaced by a type AFTER adaptor.
 	else {
 		var originalCallbackFn = callback.originalCallbackFn;
 		var adaptorFn = callback.adaptorFn;
 		var adaptorRef = callback.adaptorRef;
-		var componentRef = this;
+		var componentRef = context;
 		adaptorFn.apply(adaptorRef, [componentRef, originalCallbackFn, error, response]);
 	}
 }

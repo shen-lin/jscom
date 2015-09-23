@@ -9,5 +9,5 @@ Calc.Adder.interfaces = ["Calc.IAdd"];
 Calc.Adder.prototype.add = function(a, b, callback)
 {
 	var result = a + b;
-	this.execCallback(callback, null, result);
+	JSCOM.execCallback(this, callback, null, result);
 };

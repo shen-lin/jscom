@@ -15,7 +15,7 @@ Calc.ParentCalculator.prototype.add = function(a, b, callback)
 	
 	oServiceProvider.add(a, b, function(error, response){
 		var sum = response;
-		that.execCallback(callback, null, sum);
+		JSCOM.execCallback(that, callback, null, sum);
 	});
 };
 

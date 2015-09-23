@@ -7,25 +7,27 @@ JSCOM.Loader.declare({
 
 Calc.CalcAdaptor.prototype.returnIncrementedValue = function(context, callback, error, response)
 {
-	var incrementedValue;
-	
-	if (response > 100) {
-		incrementedValue = response + 50;
+	if (error) {
+		JSCOM.execCallback(context, callback, error, 50);
 	}
-	
-	setImmediate(callback.bind(context), error, incrementedValue);
+	else {
+		var incrementedValue = response;
+		if (response > 50) {
+			incrementedValue = response + 1;
+		}
+		JSCOM.execCallback(context, callback, error, incrementedValue);	
+	}
 };
 
 
 Calc.CalcAdaptor.prototype.isWithinRange = function(context, callback, error, response)
 {	
-	JSCOM.LOGGER.info(callback);
 	if (response > 100) {
 		var oError = new Error("Result is greater than 100: " + response);
-		setImmediate(callback.bind(context), oError, null);
+		JSCOM.execCallback(context, callback, oError, null);
 	}
 	else {
-		setImmediate(callback.bind(context), error, response);
+		JSCOM.execCallback(context, callback, error, response);
 	}
 };
 
