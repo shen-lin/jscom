@@ -1,3 +1,5 @@
+var CalculatorTestTransactional = {};
+
 // Load should.js
 var should = require('should');
 
@@ -10,66 +12,74 @@ var jscomRt = JSCOM.getJSCOMRuntime();
 jscomRt.addComponentRepo(JSCOM.URI_FILE, 'example/BasicCalculator');
 
 // Create a composite for each component
-var myComposite = jscomRt.createRootComposite("TestTransactionComposite");
+CalculatorTestTransactional.myComposite = jscomRt.createRootComposite("TestTransactionComposite");
 
 // Create components in the nested composites
-var calculator = myComposite.createComponent("Calc.Calculator", "TestTransactionCalculator");
-var adder = myComposite.createComponent("Calc.Adder", "TestTransactionAdder");
-var subtractor = myComposite.createComponent("Calc.Subtractor", "TestTransactionSubtractor");
+CalculatorTestTransactional.calculator = CalculatorTestTransactional.myComposite.createComponent("Calc.Calculator", "TestTransactionCalculator");
+CalculatorTestTransactional.adder = CalculatorTestTransactional.myComposite.createComponent("Calc.Adder", "TestTransactionAdder");
+CalculatorTestTransactional.subtractor = CalculatorTestTransactional.myComposite.createComponent("Calc.Subtractor", "TestTransactionSubtractor");
 
 
 // Test unsuccessful binding
 try
 {
 	jscomRt.initTransaction();
-	myComposite.exposeInterface("Calc.IAdd", "IAdd");
-	myComposite.exposeInterface("Calc.ISubtract", "ISub");
-	myComposite.bind(calculator, iAdderIEP, "Calc.IAdd");
-	myComposite.bind(calculator, iSubtractorIEP, "Calc.IBad");
+	CalculatorTestTransactional.myComposite.exposeInterface("Calc.IAdd", "IAdd");
+	CalculatorTestTransactional.myComposite.exposeInterface("Calc.ISubtract", "ISub");
+	CalculatorTestTransactional.myComposite.bind("TestTransactionCalculator", "TestTransactionAdder", "Calc.IAdd");
+	CalculatorTestTransactional.myComposite.bind("TestTransactionCalculator", "TestTransactionSubtractor", "Calc.IBad");
 	jscomRt.commit();
 }
 catch (error)
 {
+	JSCOM.LOGGER.info(error);
 	jscomRt.rollback();
 }
 
+CalculatorTestTransactional.calculatorAcquisitors = CalculatorTestTransactional.calculator.getAcquisitors();
+CalculatorTestTransactional.calculatorServiceProviders = CalculatorTestTransactional.calculator.getServiceProviders();
 
-var calculator = jscomRt.getComponent("MyCalculator");
-var calculatorAcquisitors = calculator.getAcquisitorSet();
-var noAdderConnect = (calculatorAcquisitors['Calc.IAdd'].ref === null);
-var noSubtractorConnect = (calculatorAcquisitors['Calc.ISubtract'].ref === null);
-
-var myCompositeChildren = jscomRt.getChildrenList("MyComposite");
+CalculatorTestTransactional.noAdderConnect = CalculatorTestTransactional.calculatorServiceProviders.length === 0;
+CalculatorTestTransactional.noSubtractorConnect = CalculatorTestTransactional.calculatorServiceProviders.length === 0;
+CalculatorTestTransactional.compositeChildren = jscomRt.getChildEntityList("TestTransactionComposite");
 
 
 describe("[Meta Interface] Rollback Transaction", function() { 
-	it("MyCalculator's IAdd Acquisitor", function() { 
-		should(calculatorAcquisitors).have.property('Calc.IAdd');
+	it("Calculator has IAdd Acquisitor", function() { 
+		var obj = {
+			name: "Calc.IAdd",
+			type: JSCOM.ACQUISITOR_SINGLE,
+		};
+		should(CalculatorTestTransactional.calculatorAcquisitors).containEql(obj);
 	}); 
 
-	it("No connect to MyAdder", function() { 
-		should(noAdderConnect).equal(true);
+	it("No connect to Adder", function() { 
+		should(CalculatorTestTransactional.noAdderConnect).equal(true);
 	}); 
 
-	it("MyCalculator's ISubtract Acquisitor", function() { 
-		should(calculatorAcquisitors).have.property('Calc.ISubtract');
+	it("Calculator has ISubtract Acquisitor", function() { 
+		var obj = {
+			name: "Calc.ISubtract",
+			type: JSCOM.ACQUISITOR_SINGLE,
+		};
+		should(CalculatorTestTransactional.calculatorAcquisitors).containEql(obj);
 	}); 
 
-	it("No connect to MySubtractor", function() { 
-		should(noSubtractorConnect).equal(true);
+	it("No connect to Subtractor", function() { 
+		should(CalculatorTestTransactional.noSubtractorConnect).equal(true);
 	}); 
 });
 
 
 
 // Test successful binding
+
 try
 {
 	jscomRt.initTransaction();
-	var iAdderIEP = myComposite.exposeInterface("Calc.IAdd");
-	var iSubtractorIEP = myComposite.exposeInterface("Calc.ISubtract");
-	myComposite.bind(calculator, iAdderIEP, "Calc.IAdd");
-	myComposite.bind(calculator, iSubtractorIEP, "Calc.ISubtract");
+	CalculatorTestTransactional.myComposite.exposeInterface("Calc.ICalculator");
+	CalculatorTestTransactional.myComposite.bind("TestTransactionCalculator", "TestTransactionAdder", "Calc.IAdd");
+	CalculatorTestTransactional.myComposite.bind("TestTransactionCalculator", "TestTransactionSubtractor", "Calc.ISubtract");
 	jscomRt.commit();
 }
 catch (error)
@@ -77,38 +87,50 @@ catch (error)
 	jscomRt.rollback();
 }
 
-var calculator = jscomRt.getComponent("MyCalculator");
-var calculatorAcquisitors = calculator.getAcquisitorSet();
+CalculatorTestTransactional.calculatorAcquisitors = CalculatorTestTransactional.calculator.getAcquisitors();
+CalculatorTestTransactional.calculatorServiceProviders = CalculatorTestTransactional.calculator.getServiceProviders();
+
+
 
 describe("[Meta Interface] Committed Component Graph", function() { 
-	it("MyCalculator's IAdd Acquisitor", function() { 
-		should(calculatorAcquisitors).have.property('Calc.IAdd');
+	it("Calculator has IAdd Acquisitor", function() { 
+		var obj = {
+			name: "Calc.IAdd",
+			type: JSCOM.ACQUISITOR_SINGLE,
+		};
+		should(CalculatorTestTransactional.calculatorAcquisitors).containEql(obj);
 	}); 
 
-	it("Connects to MyAdder", function() { 
-		should(calculatorAcquisitors['Calc.IAdd'].ref.id).equal('MyAdder');
+	it("Connects to Adder", function() { 
+		should(CalculatorTestTransactional.noAdderConnect).equal(true);
 	}); 
 
-	it("MyCalculator's ISubtract Acquisitor", function() { 
-		should(calculatorAcquisitors).have.property('Calc.ISubtract');
+	it("Calculator has ISubtract Acquisitor", function() { 
+		var obj = {
+			name: "Calc.ISubtract",
+			type: JSCOM.ACQUISITOR_SINGLE,
+		};
+		should(CalculatorTestTransactional.calculatorAcquisitors).containEql(obj);
 	}); 
 
-	it("Connects to MySubtractor", function() { 
-		should(calculatorAcquisitors['Calc.ISubtract'].ref.id).equal('MySubtractor');
+	it("Connects to Subtractor", function() { 
+		should(CalculatorTestTransactional.noSubtractorConnect).equal(true);
 	}); 
 });
 
 
-var iCalcIEP = myComposite.exposeInterface("Calc.ICalculator");
-var addOutput = iCalcIEP.add(10, 50);
-var subOutput = iCalcIEP.subtract(10, 50);
-
-describe("Validate Calculation", function() { 
+describe("Validate Calculation After Transactional Binding", function(done) { 
 	it("10 + 50", function() { 
-		should(addOutput).equal(60);	
+		CalculatorTestTransactional.myComposite.IAdd.add(10, 50, function(error, response){
+			should(response).equal(60);
+			done();
+		});
 	});
 
 	it("10 - 50", function() { 
-		should(subOutput).equal(-40);	
+		CalculatorTestTransactional.myComposite.ISub.subtract(10, 50, function(error, response){
+			should(response).equal(-40);
+			done();
+		});
 	});
 });

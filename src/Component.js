@@ -244,7 +244,7 @@ JSCOM.Component.prototype.getCustomMetadata = function()
  ***********************/
 
 /**
- * Get all the entities that have bound interfaces to this composite
+ * Get all the entities that have bound interfaces to this component
  * @method getServiceProviders
  * @return 
  */  
