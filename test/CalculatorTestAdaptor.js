@@ -164,6 +164,7 @@ describe("Test Adaptors", function() {
 				exclude: ["**@sub*"],
 			};
 			var oAdvices = [
+				{id: "MyAdaptor", fn: "newAdd", type: JSCOM.Adaptor.Type.INTRODUCE},
 				{id: "MyAdaptor", fn: "isInteger", type: JSCOM.Adaptor.Type.BEFORE},
 				{id: "MyAdaptor", fn: "isWithinRange", type: JSCOM.Adaptor.Type.AFTER},
 				{id: "MyAdaptor", fn: "returnIncrementedValue", type: JSCOM.Adaptor.Type.AFTER},
@@ -177,9 +178,9 @@ describe("Test Adaptors", function() {
 			should(index).be.above(0);
 		}); 
 		
-		it("No error with adding two integers: 5+3=8", function(done) {
+		it("Adding two integers. 2nd argument is subtracted by 1 by the newAdd adaptor: 5+3=7", function(done) {
 			calcComposite.ICalc.add(5, 3, function(error, response) {
-				should(response).equal(8);
+				should(response).equal(7);
 				done();
 			});
 		});
@@ -198,38 +199,32 @@ describe("Test Adaptors", function() {
 			});
 		});
 		
-		it("Output > 50 and within range: Return incremented sum: 5 + 50 + 1 = 56", function(done) { 
+		it("Output > 50 and within range: Return incremented sum: 5 + (50 + (-1)) + (1) = 55", function(done) { 
 			calcComposite.ICalc.add(5, 50, function(error, response) {
-				should(response).equal(56);
+				should(response).equal(55);
 				done();
 			});
 		});
 	});
 	
 	
-	
-	/*******************************************************
-	 * Test applying adaptor functions to components
-	 *******************************************************/
-	/*
-	var calculatorCompInstance;
-	var oInterfaceAdaptorAdvices;
-
 	describe("Test component's adaptor metadata interface", function() { 
-
+		var calculatorCompInstance;
+		var oInterfaceAdaptorAdvices;
+	
 		before(function () { 
 			// Access JSCOM runtime metadata API to retrieve component.
-			calculatorCompInstance = jscomRt.getComponent("MyCalculator");
+			calculatorCompInstance = jscomRt.getComponent("TestAdaptorCalculator");
 			oInterfaceAdaptorAdvices = calculatorCompInstance.getAdaptorAdvices("Calc.ICalculator");
 		});
 		
 		it("Has advices on the add() method", function() {
 			var oAdvice = oInterfaceAdaptorAdvices["add"];
-			JSCOM.LOGGER.debug(oAdvice);
-			should(oAdvice.length).equal(3);
-			should(oAdvice[0].fn).equal("isInteger");
-			should(oAdvice[1].fn).equal("isWithinRange");
-			should(oAdvice[2].fn).equal("returnDefaultValue");
+			should(oAdvice.length).equal(4);
+			should(oAdvice[0].fn).equal("newAdd");
+			should(oAdvice[1].fn).equal("isInteger");
+			should(oAdvice[2].fn).equal("isWithinRange");
+			should(oAdvice[3].fn).equal("returnIncrementedValue");
 		}); 
 		
 		it("Has no advices on the subtract() method", function() { 
@@ -237,7 +232,6 @@ describe("Test Adaptors", function() {
 			should(oAdvice).equal(undefined);
 		}); 
 	});	
-	*/
 	
 	
 	/*******************************************************

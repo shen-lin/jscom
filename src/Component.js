@@ -215,8 +215,9 @@ JSCOM.Component.prototype.getInterfaces = function()
 JSCOM.Component.prototype.getAdaptorAdvices = function(interfaceName)
 {
 	var oInterfaceAdvices = {};
-	var interfaceDef = JSCOM._jscomRt._interfaceDefSet[interfaceName];
-	for (var fnName in interfaceDef) {
+	var oInterface = JSCOM._jscomRt._interfaceDefSet[interfaceName];
+	var oInterfaceDef = oInterface.oInterfaceDef;
+	for (var fnName in oInterfaceDef) {
 		var classFnName = JSCOM.String.format("{0}{1}{2}", this.className, JSCOM.FN_SEPARATOR, fnName);
 		var sInjectionId = JSCOM._jscomRt._componentInjectionMetadata[classFnName];
 		var oAdvices = JSCOM._jscomRt._injectionInfo[sInjectionId];

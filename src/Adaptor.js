@@ -54,7 +54,8 @@ JSCOM.Adaptor.prototype.applyAdaptorBefore = function(adaptorFn, targetFnItem)
 		var thisComponent = this;
 		var adaptorArguments = [{
 			args: arguments,
-			returnVal: null
+			returnVal: null,
+			context: thisComponent
 		}];
 		// Require callback function always presented in the last index of arguments
 		var originalCallbackFn = arguments[arguments.length - 1];
@@ -100,7 +101,7 @@ JSCOM.Adaptor.prototype.applyAdaptorAfter = function(adaptorFn, targetFnItem)
 			adaptorRef: thisAdaptorAfter
 		};
 		
-		var args = []
+		var args = [];
 		for (var i = 0; i < arguments.length - 1; i++) {
 			args.push(arguments[i]);
 		}
@@ -121,10 +122,12 @@ JSCOM.Adaptor.prototype.applyAdaptorIntroduce = function(adaptorFn, targetFnItem
 	var originalFn = classObj.prototype[fnName];
 	var newFn = function() {
 		var thisComponent = this;
-		var adaptorArguments = {
-			args: arguments
-		};
-		return adaptorFn.apply(thisAdaptorIntroduce, adaptorArguments);
+		var adaptorArguments = [{
+			args: arguments,
+			returnVal: null,
+			context: thisComponent
+		}];
+		adaptorFn.apply(thisAdaptorIntroduce, adaptorArguments);
 	}
 	classObj.prototype[fnName] = newFn;		
 };

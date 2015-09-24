@@ -33,9 +33,8 @@ Calc.CalcAdaptor.prototype.isWithinRange = function(context, callback, error, re
 
 
 
-Calc.CalcAdaptor.prototype.isInteger = function()
+Calc.CalcAdaptor.prototype.isInteger = function(adaptorArg)
 {
-	var adaptorArg = arguments[0];
 	var args = adaptorArg.args;
 	
 	var callback = args[args.length - 1];
@@ -47,6 +46,22 @@ Calc.CalcAdaptor.prototype.isInteger = function()
 			throw new Error("Arg " + i + " is not an integer: " + arg);
 		}
 	}
+};
+
+
+Calc.CalcAdaptor.prototype.newAdd = function(adaptorArg)
+{
+	var componentContext = adaptorArg.context;
+	var args = adaptorArg.args; // original arguments
+	var a = args[0];
+	var b = args[1] - 1;
+	var callback = args[2];
+	
+	var oServiceProvider = componentContext.use("Calc.IAdd");
+	oServiceProvider.add(a, b, function(error, response)
+	{
+		JSCOM.execCallback(componentContext, callback, null, response);
+	});
 };
 
 Calc.CalcAdaptor.prototype._isInteger = function(value)
