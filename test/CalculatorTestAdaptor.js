@@ -139,7 +139,7 @@ describe("Test Adaptors", function() {
 
 		it("Non-integer input caught by adaptor function: CalcAdaptor.isInteger", function(done) {
 			calcComposite.ICalc.add(5, 'abc', function(error, response) {
-				should(error).match(/is not an integer/);
+				should(error).match(/Arg 1 is not an integer/);
 				should(response).equal(null);
 				done();
 			});

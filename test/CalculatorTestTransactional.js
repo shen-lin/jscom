@@ -21,6 +21,7 @@ CalculatorTestTransactional.subtractor = CalculatorTestTransactional.myComposite
 
 
 // Test unsuccessful binding
+CalculatorTestTransactional.commitError; 
 try
 {
 	jscomRt.initTransaction();
@@ -32,19 +33,23 @@ try
 }
 catch (error)
 {
-	JSCOM.LOGGER.info(error);
+	CalculatorTestTransactional.commitError = error;
 	jscomRt.rollback();
 }
 
+CalculatorTestTransactional.calculator = jscomRt.getComponent("TestTransactionCalculator");
 CalculatorTestTransactional.calculatorAcquisitors = CalculatorTestTransactional.calculator.getAcquisitors();
 CalculatorTestTransactional.calculatorServiceProviders = CalculatorTestTransactional.calculator.getServiceProviders();
-
 CalculatorTestTransactional.noAdderConnect = CalculatorTestTransactional.calculatorServiceProviders.length === 0;
 CalculatorTestTransactional.noSubtractorConnect = CalculatorTestTransactional.calculatorServiceProviders.length === 0;
 CalculatorTestTransactional.compositeChildren = jscomRt.getChildEntityList("TestTransactionComposite");
 
 
 describe("[Meta Interface] Rollback Transaction", function() { 
+	it("Expected binding error reported", function() {
+		should(CalculatorTestTransactional.commitError.toString()).match(/BindingFailureAcquisitor/);
+	}); 	
+
 	it("Calculator has IAdd Acquisitor", function() { 
 		var obj = {
 			name: "Calc.IAdd",
@@ -73,7 +78,7 @@ describe("[Meta Interface] Rollback Transaction", function() {
 
 
 // Test successful binding
-
+CalculatorTestTransactional.noCommitError;
 try
 {
 	jscomRt.initTransaction();
@@ -84,25 +89,31 @@ try
 }
 catch (error)
 {
+	CalculatorTestTransactional.noCommitError = error;
 	jscomRt.rollback();
 }
 
-CalculatorTestTransactional.calculatorAcquisitors = CalculatorTestTransactional.calculator.getAcquisitors();
-CalculatorTestTransactional.calculatorServiceProviders = CalculatorTestTransactional.calculator.getServiceProviders();
-
-
+CalculatorTestTransactional.successCalculator = jscomRt.getComponent("TestTransactionCalculator");
+CalculatorTestTransactional.successCalculatorAcquisitors = CalculatorTestTransactional.successCalculator.getAcquisitors();
+CalculatorTestTransactional.successCalculatorServiceProviders = CalculatorTestTransactional.successCalculator.getServiceProviders();
+CalculatorTestTransactional.successAdderConnect = CalculatorTestTransactional.successCalculatorServiceProviders.length === 0;
+CalculatorTestTransactional.successSubtractorConnect = CalculatorTestTransactional.successCalculatorServiceProviders.length === 0;
 
 describe("[Meta Interface] Committed Component Graph", function() { 
+	it("No error during transactional binding", function() {
+		should(CalculatorTestTransactional.noCommitError).equal(undefined);
+	}); 
+	
 	it("Calculator has IAdd Acquisitor", function() { 
 		var obj = {
 			name: "Calc.IAdd",
 			type: JSCOM.ACQUISITOR_SINGLE,
 		};
-		should(CalculatorTestTransactional.calculatorAcquisitors).containEql(obj);
+		should(CalculatorTestTransactional.successCalculatorAcquisitors).containEql(obj);
 	}); 
 
 	it("Connects to Adder", function() { 
-		should(CalculatorTestTransactional.noAdderConnect).equal(true);
+		should(CalculatorTestTransactional.successAdderConnect).equal(true);
 	}); 
 
 	it("Calculator has ISubtract Acquisitor", function() { 
@@ -110,11 +121,11 @@ describe("[Meta Interface] Committed Component Graph", function() {
 			name: "Calc.ISubtract",
 			type: JSCOM.ACQUISITOR_SINGLE,
 		};
-		should(CalculatorTestTransactional.calculatorAcquisitors).containEql(obj);
+		should(CalculatorTestTransactional.successCalculatorAcquisitors).containEql(obj);
 	}); 
 
 	it("Connects to Subtractor", function() { 
-		should(CalculatorTestTransactional.noSubtractorConnect).equal(true);
+		should(CalculatorTestTransactional.successSubtractorConnect).equal(true);
 	}); 
 });
 

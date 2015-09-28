@@ -416,6 +416,7 @@ JSCOM.JSCOMRuntime.prototype.commit = function()
 	{
 		this._startTrans = false;
 		this._removeUncommittedBindings();
+		// TODO: move uncommitted bindings to committed bindings set
 	}
 	else {
 		JSCOM.Error.throwError(JSCOM.Error.NotTransactionStarted);
@@ -478,7 +479,7 @@ JSCOM.JSCOMRuntime.prototype._recordBinding = function(commitType, acquisitorTyp
 {
 	if (this._startTrans) 
 	{
-		this._recordUncommittedBindings(commitType, acquisitorType, 
+		this._recordUncommittedBinding(commitType, acquisitorType, 
 			sourceCompId, targetCompId, interfaceName);
 	}
 	else 
@@ -545,6 +546,10 @@ JSCOM.JSCOMRuntime.prototype._removeUncommittedBindings = function()
  */ 
 JSCOM.JSCOMRuntime.prototype._getBoundEntities = function(aBindings, sSearchProperty, sSearchValue)
 {
+	if (sSearchValue === "TestTransactionCalculator") {
+		JSCOM.LOGGER.info(aBindings);
+	}
+	
 	var aBoundEntities = [];
 	for (var i in aBindings) {
 		var record = aBindings[i];
