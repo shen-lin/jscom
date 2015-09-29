@@ -415,8 +415,8 @@ JSCOM.JSCOMRuntime.prototype.commit = function()
 	if (this._startTrans)
 	{
 		this._startTrans = false;
+		this._commitBindings();
 		this._removeUncommittedBindings();
-		// TODO: move uncommitted bindings to committed bindings set
 	}
 	else {
 		JSCOM.Error.throwError(JSCOM.Error.NotTransactionStarted);
@@ -430,6 +430,7 @@ JSCOM.JSCOMRuntime.prototype.rollback = function()
 	if (this._startTrans)
 	{
 		this._revertUncommittedBindings();
+		this._removeUncommittedBindings();
 		this._startTrans = false;
 	} 
 	else {
@@ -535,7 +536,19 @@ JSCOM.JSCOMRuntime.prototype._removeUncommittedBindings = function()
 	this._uncommittedBindings = [];
 };
 
+JSCOM.JSCOMRuntime.prototype._commitBindings = function()
+{
+	for (var i in this._uncommittedBindings) {
+		var oUncommittedBidningUnit = this._uncommittedBindings[i];
+		var commitType = oUncommittedBidningUnit.commitType;
+		var acquisitorType = oUncommittedBidningUnit.acquisitorType;
+		var sourceCompId = oUncommittedBidningUnit.sourceCompId;
+		var targetCompId = oUncommittedBidningUnit.targetCompId;
+		var interfaceName = oUncommittedBidningUnit.interfaceName;
 
+		this._recordBinding(commitType, acquisitorType, sourceCompId, targetCompId, interfaceName);
+	}
+};
 
 /**
  * Filter the input bindings that contain the matching property and value.
@@ -546,10 +559,6 @@ JSCOM.JSCOMRuntime.prototype._removeUncommittedBindings = function()
  */ 
 JSCOM.JSCOMRuntime.prototype._getBoundEntities = function(aBindings, sSearchProperty, sSearchValue)
 {
-	if (sSearchValue === "TestTransactionCalculator") {
-		JSCOM.LOGGER.info(aBindings);
-	}
-	
 	var aBoundEntities = [];
 	for (var i in aBindings) {
 		var record = aBindings[i];

@@ -96,8 +96,6 @@ catch (error)
 CalculatorTestTransactional.successCalculator = jscomRt.getComponent("TestTransactionCalculator");
 CalculatorTestTransactional.successCalculatorAcquisitors = CalculatorTestTransactional.successCalculator.getAcquisitors();
 CalculatorTestTransactional.successCalculatorServiceProviders = CalculatorTestTransactional.successCalculator.getServiceProviders();
-CalculatorTestTransactional.successAdderConnect = CalculatorTestTransactional.successCalculatorServiceProviders.length === 0;
-CalculatorTestTransactional.successSubtractorConnect = CalculatorTestTransactional.successCalculatorServiceProviders.length === 0;
 
 describe("[Meta Interface] Committed Component Graph", function() { 
 	it("No error during transactional binding", function() {
@@ -112,8 +110,14 @@ describe("[Meta Interface] Committed Component Graph", function() {
 		should(CalculatorTestTransactional.successCalculatorAcquisitors).containEql(obj);
 	}); 
 
-	it("Connects to Adder", function() { 
-		should(CalculatorTestTransactional.successAdderConnect).equal(true);
+	it("Connects to Adder", function() {
+		var obj = {
+			source: "TestTransactionCalculator",
+			target: "TestTransactionAdder",
+			interface: "Calc.IAdd",
+			type: JSCOM.ACQUISITOR_SINGLE
+		};
+		should(CalculatorTestTransactional.successCalculatorServiceProviders).containEql(obj);
 	}); 
 
 	it("Calculator has ISubtract Acquisitor", function() { 
@@ -124,8 +128,14 @@ describe("[Meta Interface] Committed Component Graph", function() {
 		should(CalculatorTestTransactional.successCalculatorAcquisitors).containEql(obj);
 	}); 
 
-	it("Connects to Subtractor", function() { 
-		should(CalculatorTestTransactional.successSubtractorConnect).equal(true);
+	it("Connects to Subtractor", function() {
+		var obj = {
+			source: "TestTransactionCalculator",
+			target: "TestTransactionSubtractor",
+			interface: "Calc.ISubtract",
+			type: JSCOM.ACQUISITOR_SINGLE
+		};
+		should(CalculatorTestTransactional.successCalculatorServiceProviders).containEql(obj);
 	}); 
 });
 

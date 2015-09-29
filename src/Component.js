@@ -250,8 +250,8 @@ JSCOM.Component.prototype.getCustomMetadata = function()
  */  
 JSCOM.Component.prototype.getServiceProviders = function()
 {
-	var sCompositeId = this.id;
-	return JSCOM._jscomRt._getBoundEntities(JSCOM._jscomRt._committedBindings, "source", sCompositeId);
+	var sComponentId = this.id;
+	return JSCOM._jscomRt._getBoundEntities(JSCOM._jscomRt._committedBindings, "source", sComponentId);
 }
 
 /**
