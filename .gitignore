@@ -48,4 +48,5 @@ Temporary Items
 /dist
 /coverage
 /doc
+/_testbak
 *.log
