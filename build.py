@@ -6,7 +6,7 @@ from subprocess import check_call
 # Args parsing
 parser = argparse.ArgumentParser()
 parser.add_argument('-debug', action='store_true', help='Optional argument to activate NodeJS debug mode')
-parser.add_argument('-docgen', action='store_true', help='Optional argument to activate NodeJS debug mode')
+parser.add_argument('-docgen', action='store_true', help='Optional argument to generate API document')
 args = parser.parse_args()
 
 print('Start building JSCOM...')
