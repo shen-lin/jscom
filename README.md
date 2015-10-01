@@ -12,7 +12,7 @@ Development Setup
 --------------------
 	* Environment prerequisite: 
 		Install Python, Java, and NodeJS. Require NodeJS 0.11 and above.
-		Setup the Path environment variables.
+		Setup the Path environment variables for Python, Java, and NodeJS.
 		
 	* Required nodejs modules:
 		cd jscom
@@ -22,10 +22,6 @@ Development Setup
 		log4js:   npm install log4js
 		smartdoc: npm install smartdoc
 		unirest:  npm install unirest
-		
-	* Create folders
-		jscom/logs
-		jscom/dist
 		
 	* Build project
 		cd jscom

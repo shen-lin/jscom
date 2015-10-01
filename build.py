@@ -2,6 +2,7 @@ import os, sys, argparse
 from subprocess import call
 from subprocess import check_call
 
+
 # Args parsing
 parser = argparse.ArgumentParser()
 parser.add_argument('-debug', action='store_true', help='Optional argument to activate NodeJS debug mode')
@@ -13,6 +14,15 @@ print('Start building JSCOM...')
 jscomDir = os.getcwd()
 jscompilerDir = jscomDir + "/jscompiler"
 os.chdir(jscompilerDir)
+
+# Create logs and dist dir
+distDir = jscomDir + "/dist"
+if not os.path.isdir(distDir):
+   os.makedirs(distDir)
+logsDir = jscomDir + "/logs"
+if not os.path.isdir(logsDir):
+   os.makedirs(logsDir)
+
 # Dist JSCOM
 call(["python", "build.py", "--include", "includes", "--warningoff", "--minify", "--output", "../dist/jscom.min.js"])
 call(["python", "build.py", "--include", "includes", "--warningoff", "--output", "../dist/jscom.js"]);
