@@ -170,6 +170,7 @@ JSCOM.Component.prototype.getAcquisitor = function(sInterfaceName)
  * @method getInterfaces Get all the interfaces provided by this component, 
  * including those inherited from this component's ancestry components.
  * @static
+ * @return {array} Interface names of the component. Each item in the array has type {string}.
  ***********************/ 
 JSCOM.Component.getInterfaces = function(sComponentName)
 {
