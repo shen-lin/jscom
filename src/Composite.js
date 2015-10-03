@@ -107,47 +107,23 @@ JSCOM.Composite.prototype.createComponent = function(className, id)
 	if (isNewComponent) {
 		var componentRepo = JSCOM._jscomRt.getComponentRepo();
 		JSCOM.Loader.loadEntity(componentRepo, className);
+
 		// store loaded component paths
 		JSCOM._jscomRt._componentClassNameSet.push(className);
 		// load the interface definition exposed by this component type
-		this._initComponentInterfaceSet(className);
+		JSCOM.Loader._initComponentInterfaceSet(className);
 		// check the interface methods are implemented in the component
-		this._checkInterfaceMethods(className, id);
+		JSCOM.Loader._checkInterfaceMethods(className);
 		// backup interface methods to recover from AoP modification
-		this._backupInterfaceMethods(className);
+		JSCOM.Loader._backupInterfaceMethods(className);
 	}
 
 	// instantiate component instance
 	var compInstance = this._initComponentInstance(className, id);
-
 	return compInstance;
 };
 
 
-JSCOM.Composite.prototype._checkInterfaceMethods = function(sClassName, sComponentId)
-{
-	var aInterfaces = JSCOM.Component.getInterfaces(sClassName);
-	var oPrototype = eval(sClassName + ".prototype");
-
-	for (var i in aInterfaces) {
-		var sInterfaceName = aInterfaces[i];
-		var oInterface = JSCOM._jscomRt._interfaceDefSet[sInterfaceName];
-		var oInterfaceDef = oInterface.oInterfaceDef;
-		this._checkInterfaceMethod(sClassName, oInterfaceDef, oPrototype, sComponentId);
-	}
-};
-
-JSCOM.Composite.prototype._checkInterfaceMethod = 
-	function(sClassName, oInterfaceDef, oPrototype, sComponentId)
-{
-	var sInterfaceName = oInterfaceDef.sInterfaceName;
-	for (var sFnName in oInterfaceDef) {
-		if (!oPrototype[sFnName]) {
-			JSCOM.Error.throwError(JSCOM.Error.FunctionNotImplemented, 
-				[sInterfaceName, sFnName, sComponentId]);
-		}
-	}
-};
 
 /**
  * Initializes a component instance.
@@ -175,21 +151,7 @@ JSCOM.Composite.prototype._initComponentInstance = function(className, id)
 	return compInstance;
 };
 
-JSCOM.Composite.prototype._backupInterfaceMethods = function(sClassName)
-{	
-	var oPrototype = eval(sClassName + ".prototype");
-	var aInterfaces = JSCOM.Component.getInterfaces(sClassName);
-	for (var i in aInterfaces)
-	{
-		var sInterfaceName = aInterfaces[i];
-		var oInterface = JSCOM._jscomRt._interfaceDefSet[sInterfaceName];
-		var oInterfaceDef = oInterface.oInterfaceDef;
-		for (var fnName in oInterfaceDef) {
-			var backupFnName = JSCOM.String.format(JSCOM.FN_BAK, fnName);
-			oPrototype[backupFnName] = oPrototype[fnName];
-		}
-	}
-};
+
 
 JSCOM.Composite.prototype._isNewComponentClassType = function(className)
 {
@@ -220,29 +182,7 @@ JSCOM.Composite.prototype._isNewComponentInstance = function(id)
 
 
 
-JSCOM.Composite.prototype._initComponentInterfaceSet = function(sClassName)
-{
-	var aInterfaces = JSCOM.Component.getInterfaces(sClassName);
-	for (var i in aInterfaces)
-	{
-		var sInterfaceName = aInterfaces[i];
-		this._loadRawInterface(sInterfaceName);
-	}
-};
 
-
-
-JSCOM.Composite.prototype._loadRawInterface = function(sInterfaceName)
-{
-	// Skip interfaces that already added
-	if (JSCOM._jscomRt._interfaceDefSet[sInterfaceName]) return;
-	
-	var componentRepo = JSCOM._jscomRt.getComponentRepo();
-	var interfaceRawContent = JSCOM.Loader.loadRawContent(componentRepo, sInterfaceName);
-	var oInterfaceDef = JSON.parse(interfaceRawContent);
-	var oInterface = new JSCOM.Interface(sInterfaceName, oInterfaceDef);
-	JSCOM._jscomRt._interfaceDefSet[sInterfaceName] = oInterface;
-};
 
 
 

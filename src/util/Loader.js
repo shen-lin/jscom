@@ -40,7 +40,70 @@ JSCOM.Loader.declare = function(oDeclaration)
 	eval(sStmt_4);
 }; 
 
+JSCOM.Loader._initComponentInterfaceSet = function(sClassName)
+{
+	var aInterfaces = JSCOM.Component.getInterfaces(sClassName);
+	for (var i in aInterfaces)
+	{
+		var sInterfaceName = aInterfaces[i];
+		this._loadRawInterface(sInterfaceName);
+	}
+};
 
+
+JSCOM.Loader._loadRawInterface = function(sInterfaceName)
+{
+	// Skip interfaces that already added
+	if (JSCOM._jscomRt._interfaceDefSet[sInterfaceName]) return;
+	
+	var componentRepo = JSCOM._jscomRt.getComponentRepo();
+	var interfaceRawContent = JSCOM.Loader.loadRawContent(componentRepo, sInterfaceName);
+	var oInterfaceDef = JSON.parse(interfaceRawContent);
+	var oInterface = new JSCOM.Interface(sInterfaceName, oInterfaceDef);
+	JSCOM._jscomRt._interfaceDefSet[sInterfaceName] = oInterface;
+};
+
+
+JSCOM.Loader._checkInterfaceMethods = function(sClassName)
+{
+	var aInterfaces = JSCOM.Component.getInterfaces(sClassName);
+	var oPrototype = eval(sClassName + ".prototype");
+
+	for (var i in aInterfaces) {
+		var sInterfaceName = aInterfaces[i];
+		var oInterface = JSCOM._jscomRt._interfaceDefSet[sInterfaceName];
+		var oInterfaceDef = oInterface.oInterfaceDef;
+		this._checkInterfaceMethod(sClassName, oInterfaceDef, oPrototype);
+	}
+};
+
+JSCOM.Loader._checkInterfaceMethod = function(sClassName, oInterfaceDef, oPrototype)
+{
+	var sInterfaceName = oInterfaceDef.sInterfaceName;
+	for (var sFnName in oInterfaceDef) {
+		if (!oPrototype[sFnName]) {
+			JSCOM.Error.throwError(JSCOM.Error.FunctionNotImplemented, 
+				[sInterfaceName, sFnName, sClassName]);
+		}
+	}
+};
+
+
+JSCOM.Loader._backupInterfaceMethods = function(sClassName)
+{	
+	var oPrototype = eval(sClassName + ".prototype");
+	var aInterfaces = JSCOM.Component.getInterfaces(sClassName);
+	for (var i in aInterfaces)
+	{
+		var sInterfaceName = aInterfaces[i];
+		var oInterface = JSCOM._jscomRt._interfaceDefSet[sInterfaceName];
+		var oInterfaceDef = oInterface.oInterfaceDef;
+		for (var fnName in oInterfaceDef) {
+			var backupFnName = JSCOM.String.format(JSCOM.FN_BAK, fnName);
+			oPrototype[backupFnName] = oPrototype[fnName];
+		}
+	}
+};
 
 
 /**
