@@ -5,8 +5,8 @@ JSCOM.Loader.declare({
 
 
 Calc.Calculator.acquisitors = [
-	{name: "Calc.ISubtract", type: JSCOM.ACQUISITOR_SINGLE}, 
-	{name: "Calc.ILog", type: JSCOM.ACQUISITOR_MULTIPLE}
+	new JSCOM.Acquisitor("Calc.ISubtract", JSCOM.ACQUISITOR_SINGLE), 
+	new JSCOM.Acquisitor("Calc.ILog", JSCOM.ACQUISITOR_MULTIPLE)
 ];
 
 Calc.Calculator.prototype.subtract = function(a, b, callback)

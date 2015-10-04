@@ -50,24 +50,36 @@ describe("[Meta Interface] Rollback Transaction", function() {
 		should(CalculatorTestTransactional.commitError.toString()).match(/BindingFailureAcquisitor/);
 	}); 	
 
-	it("Calculator has IAdd Acquisitor", function() { 
-		var obj = {
-			name: "Calc.IAdd",
-			type: JSCOM.ACQUISITOR_SINGLE,
-		};
-		should(CalculatorTestTransactional.calculatorAcquisitors).containEql(obj);
+	it("Calculator has IAdd Acquisitor", function() {
+		var bHasAcquisitor = false;
+		for (var i in CalculatorTestTransactional.calculatorAcquisitors) {
+			var oAcquisitor = CalculatorTestTransactional.calculatorAcquisitors[i];
+			if (oAcquisitor.name === "Calc.IAdd" && 
+				oAcquisitor.type === JSCOM.ACQUISITOR_SINGLE) 
+			{
+				bHasAcquisitor = true;
+				break;
+			}	
+		}
+		should(bHasAcquisitor).equal(true);		
 	}); 
 
 	it("No connect to Adder", function() { 
 		should(CalculatorTestTransactional.noAdderConnect).equal(true);
 	}); 
 
-	it("Calculator has ISubtract Acquisitor", function() { 
-		var obj = {
-			name: "Calc.ISubtract",
-			type: JSCOM.ACQUISITOR_SINGLE,
-		};
-		should(CalculatorTestTransactional.calculatorAcquisitors).containEql(obj);
+	it("Calculator has ISubtract Acquisitor", function() {
+		var bHasAcquisitor = false;
+		for (var i in CalculatorTestTransactional.calculatorAcquisitors) {
+			var oAcquisitor = CalculatorTestTransactional.calculatorAcquisitors[i];
+			if (oAcquisitor.name === "Calc.ISubtract" && 
+				oAcquisitor.type === JSCOM.ACQUISITOR_SINGLE) 
+			{
+				bHasAcquisitor = true;
+				break;
+			}	
+		}
+		should(bHasAcquisitor).equal(true);			
 	}); 
 
 	it("No connect to Subtractor", function() { 
@@ -103,11 +115,17 @@ describe("[Meta Interface] Committed Component Graph", function() {
 	}); 
 	
 	it("Calculator has IAdd Acquisitor", function() { 
-		var obj = {
-			name: "Calc.IAdd",
-			type: JSCOM.ACQUISITOR_SINGLE,
-		};
-		should(CalculatorTestTransactional.successCalculatorAcquisitors).containEql(obj);
+ 		var bHasAcquisitor = false;
+		for (var i in CalculatorTestTransactional.successCalculatorAcquisitors) {
+			var oAcquisitor = CalculatorTestTransactional.successCalculatorAcquisitors[i];
+			if (oAcquisitor.name === "Calc.IAdd" && 
+				oAcquisitor.type === JSCOM.ACQUISITOR_SINGLE) 
+			{
+				bHasAcquisitor = true;
+				break;
+			}	
+		}
+		should(bHasAcquisitor).equal(true);
 	}); 
 
 	it("Connects to Adder", function() {
@@ -120,12 +138,17 @@ describe("[Meta Interface] Committed Component Graph", function() {
 		should(CalculatorTestTransactional.successCalculatorServiceProviders).containEql(obj);
 	}); 
 
-	it("Calculator has ISubtract Acquisitor", function() { 
-		var obj = {
-			name: "Calc.ISubtract",
-			type: JSCOM.ACQUISITOR_SINGLE,
-		};
-		should(CalculatorTestTransactional.successCalculatorAcquisitors).containEql(obj);
+	it("Calculator has ISubtract Acquisitor", function() {
+ 		var bHasAcquisitor = false;
+		for (var i in CalculatorTestTransactional.successCalculatorAcquisitors) {
+			var oAcquisitor = CalculatorTestTransactional.successCalculatorAcquisitors[i];
+			if (oAcquisitor.name === "Calc.ISubtract" && 
+				oAcquisitor.type === JSCOM.ACQUISITOR_SINGLE) 
+			{
+				bHasAcquisitor = true;
+				break;
+			}	
+		}
 	}); 
 
 	it("Connects to Subtractor", function() {

@@ -152,18 +152,30 @@ var oCalculatorProviders = calculator.getServiceProviders();
 
 describe("[Meta Interface] Runtime Component Graph", function() { 
 	it("MyCalculator's IAdd Acquisitor", function() { 
-		var acquisitorIAdd = {
-			name: "Calc.IAdd",
-			type: JSCOM.ACQUISITOR_SINGLE
-		};
-		should(calculatorAcquisitors).containEql(acquisitorIAdd);
+		var bHasAcquisitor = false;
+		for (var i in calculatorAcquisitors) {
+			var oAcquisitor = calculatorAcquisitors[i];
+			if (oAcquisitor.name === "Calc.IAdd" && 
+				oAcquisitor.type === JSCOM.ACQUISITOR_SINGLE) 
+			{
+				bHasAcquisitor = true;
+				break;
+			}	
+		}
+		should(bHasAcquisitor).equal(true);
 	}); 
-	it("MyCalculator's ISubtract Acquisitor", function() { 
-		var acquisitorISubtract = {
-			name: "Calc.ISubtract",
-			type: JSCOM.ACQUISITOR_SINGLE
-		};
-		should(calculatorAcquisitors).containEql(acquisitorISubtract);
+	it("MyCalculator's ISubtract Acquisitor", function() {
+		var bHasAcquisitor = false;
+		for (var i in calculatorAcquisitors) {
+			var oAcquisitor = calculatorAcquisitors[i];
+			if (oAcquisitor.name === "Calc.ISubtract" && 
+				oAcquisitor.type === JSCOM.ACQUISITOR_SINGLE) 
+			{
+				bHasAcquisitor = true;
+				break;
+			}	
+		}
+		should(bHasAcquisitor).equal(true);
 	}); 
 	it("Connects to MyAdder", function() { 
 		var bindingTarget = {

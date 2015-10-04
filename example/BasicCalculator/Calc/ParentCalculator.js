@@ -5,7 +5,7 @@ JSCOM.Loader.declare({
 
 Calc.ParentCalculator.interfaces = ["Calc.ICalculator"];
 Calc.ParentCalculator.acquisitors = [
-	{name: "Calc.IAdd", type: JSCOM.ACQUISITOR_SINGLE}
+	new JSCOM.Acquisitor("Calc.IAdd", JSCOM.ACQUISITOR_SINGLE)
 ];
 
 Calc.ParentCalculator.prototype.add = function(a, b, callback)

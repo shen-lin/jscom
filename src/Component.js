@@ -247,6 +247,7 @@ JSCOM.Component.prototype.getAdaptorAdvices = function(interfaceName)
 };
 
 
+
 /***********************
  * MetaInterface: Metadata
  ***********************/

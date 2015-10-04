@@ -4,7 +4,7 @@ JSCOM.Loader.declare({
 });
 
 Calc.CalculationDispatcher.acquisitors = [
-	{name: "Calc.ICalculator", type: JSCOM.ACQUISITOR_SINGLE}
+	new JSCOM.Acquisitor("Calc.ICalculator", JSCOM.ACQUISITOR_SINGLE)
 ];
 
 // Expose interface ICalculator

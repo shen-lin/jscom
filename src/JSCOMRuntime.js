@@ -588,3 +588,17 @@ JSCOM.JSCOMRuntime.prototype._getBoundEntities = function(aBindings, sSearchProp
 	}
 	return aBoundEntities;
 };
+
+
+
+/***********************
+ * Get interface detail for a give interface name.
+ * @method getInterface
+ * @param {string} sInterfaceName Name of interface
+ * @return {Interface} Interface details.
+ ***********************/ 
+JSCOM.JSCOMRuntime.prototype.getInterface = function(sInterfaceName)
+{
+	var oInterface = this._interfaceDefSet[sInterfaceName];
+	return oInterface;
+};
