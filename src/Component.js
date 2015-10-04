@@ -27,16 +27,17 @@ JSCOM.Component = function ()
 };
 
 /***********************
- * @property parent {string} Parent component class
+ * @property parent {string}
+ * @description Name of the parent component class
  * @static
  * @see Property value initialized in JSCOM.Loader
  ***********************/
  
   
 /***********************
- * Get the parent component class extends this component class
+ * Get the direct parent component class name extended by this component class
  * @method getParent
- * @return {string} Parent component class name
+ * @return {string} Name of the parent component class
  ***********************/ 
 JSCOM.Component.prototype.getParent = function()
 {
@@ -46,7 +47,7 @@ JSCOM.Component.prototype.getParent = function()
 /***********************
  * Get the id of the composite that contains this component instance
  * @method getCompositeId
- * @param {string} The id of the composite that contains this component instance
+ * @return {string} Id of the composite that contains this component instance
  ***********************/
 JSCOM.Component.prototype.getCompositeId = function()
 {
@@ -54,10 +55,16 @@ JSCOM.Component.prototype.getCompositeId = function()
 };
 
 /**
- * 
+ * This method is used in a component implementation. It is called to obtain 
+ * the service providers (i.e. referece to the Components/Composites that 
+ * are bound to this component instance).
+ *
  * @method use
- * @param {string} sInterfaceName Interface type of the acquisitor
- * @return {JSCOM}
+ * @param {string} sInterfaceName Interface name of the acquisitor
+ * @return {array | JSCOM.Component} An array of service providers
+ * are returned if the acquisitor is of type JSCOM.ACQUISITOR_MULTIPLE, and there are
+ * multiple service providers bound to the acquisitor. A component instance is returned
+ * if the acquisitor is of type JSCOM.ACQUISITOR_SINGLE
  */
 JSCOM.Component.prototype.use = function(sInterfaceName)
 {
@@ -114,22 +121,14 @@ JSCOM.Component.prototype.use = function(sInterfaceName)
 
 
 
-/***********************
- * @example 
- * Calc.Calculator.acquisitors = [
- * 		{name: "Calc.IAdd", type: JSCOM.ACQUISITOR_SINGLE}, 
- * 		{name: "Calc.ISubtract", type: JSCOM.ACQUISITOR_SINGLE}
- * ];
- * @property acquisitors
- * @static
- ***********************/
+
  
  
 /***********************
- * Gets a list of acquisitors required by this component class.
+ * Get a list of acquisitors of this component class.
  * @method getAcquisitors
  * @return {array} An array list of acquisitors required by this component class.
- * Each element in the array is a JSON object {name : {string}, type: {JSCOM.ACQUISITOR_SINGLE | JSCOM.ACQUISITOR_MULTIPLE}}  
+ * Each element in the array is of type JSCOM.Acquisitor.
  ***********************/
 JSCOM.Component.prototype.getAcquisitors = function()
 {
@@ -152,6 +151,14 @@ JSCOM.Component.prototype.getAcquisitors = function()
 	return aComponentAcquisitors;
 };
 
+
+
+/***********************
+ * Gets the acquisitor of this component class that match the input interface name.
+ * @method getAcquisitor
+ * @param {string} sInterfaceName Name of the interface type.
+ * @return {Acquisitor} Null value is returned if no matching acquisitor is found.
+ ***********************/
 JSCOM.Component.prototype.getAcquisitor = function(sInterfaceName)
 {
 	var aAcquisitors = this.getAcquisitors();
@@ -167,9 +174,11 @@ JSCOM.Component.prototype.getAcquisitor = function(sInterfaceName)
 
 
 /***********************
- * @method getInterfaces Get all the interfaces provided by this component, 
- * including those inherited from this component's ancestry components.
+ * Get all the interfaces provided by this component, including 
+ * those inherited from this component's ancestry components.
+ * @method getInterfaces
  * @static
+ * @param {string} sComponentName Name of component class
  * @return {array} Interface names of the component. Each item in the array has type {string}.
  ***********************/ 
 JSCOM.Component.getInterfaces = function(sComponentName)
@@ -196,9 +205,9 @@ JSCOM.Component.getInterfaces = function(sComponentName)
 
 
 /***********************
- * @example Calc.Calculator.interfaces = ["Calc.ICalculator"];
- * @property interfaces
- * @static
+ * Get a list of interface names exposed by this component class.
+ * @method getInterfaces
+ * @return {array}
  ***********************/ 
 JSCOM.Component.prototype.getInterfaces = function()
 {
@@ -211,13 +220,23 @@ JSCOM.Component.prototype.getInterfaces = function()
  ***********************/
 
 /**
- * @method getCustomMetadata
+ * Get the adaptor advices that have been applied to the input interface name.
+ * @method getAdaptorAdvices
+ * @param {string} interfaceName Name of interface
+ * @return {map} Key is name of an interface function, type string. 
+
+    Value is the advices applied to the interface function. E.g.
+
+	var aAdvices = [
+		{id: "MyEmptyAdaptor", fn: "isInteger", type: JSCOM.Adaptor.Type.BEFORE},
+		{id: "MyEmptyAdaptor", fn: "isWithinRange", type: JSCOM.Adaptor.Type.AFTER},
+	];
  */
 JSCOM.Component.prototype.getAdaptorAdvices = function(interfaceName)
 {
 	var oInterfaceAdvices = {};
 	var oInterface = JSCOM._jscomRt._interfaceDefSet[interfaceName];
-	var oInterfaceDef = oInterface.oInterfaceDef;
+	var oInterfaceDef = oInterface.definition;
 	for (var fnName in oInterfaceDef) {
 		var classFnName = JSCOM.String.format("{0}{1}{2}", this.className, JSCOM.FN_SEPARATOR, fnName);
 		var sInjectionId = JSCOM._jscomRt._componentInjectionMetadata[classFnName];
@@ -233,7 +252,9 @@ JSCOM.Component.prototype.getAdaptorAdvices = function(interfaceName)
  ***********************/
 
 /**
+ * Get custom data associated with this component instance.
  * @method getCustomMetadata
+ * @return {map} Key is of type string. Value is of type object.
  */
 JSCOM.Component.prototype.getCustomMetadata = function()
 {
@@ -245,9 +266,19 @@ JSCOM.Component.prototype.getCustomMetadata = function()
  ***********************/
 
 /**
- * Get all the entities that have bound interfaces to this component
+ * Get all the entities that are bound to the acquisitors of this component instance.
  * @method getServiceProviders
- * @return 
+ * @return {array} A list of service providers bound to this component instance.
+ 	Each item in the array is a binding information with type JSON object E.g.
+	component instance "MyAdder" provides interface "Calc.IAdd" to component 
+	instance "MyCalculator". So "MyAdder" is service provider of "MyCalculator".
+
+	var oServiceProvider = {
+		source: "MyCalculator",
+		target: "MyAdder",
+		interface: "Calc.IAdd",
+		type: JSCOM.ACQUISITOR_SINGLE
+	}
  */  
 JSCOM.Component.prototype.getServiceProviders = function()
 {
@@ -256,32 +287,22 @@ JSCOM.Component.prototype.getServiceProviders = function()
 }
 
 /**
- * Get all the entities that have bound acquisitors to this composite
+ * Get all the entities that have bound to the interfaces of this component instance.
  * @method getServiceConsumers
- * @return 
+ * @return {array} A list of service consumers bound to this component instance.
+	Each item in the array is a binding information with type JSON object E.g. 
+	component instance "MyAdder" provides interface "Calc.IAdd" to component 
+	instance "MyCalculator". So "MyCalculator" is service consumer of "MyAdder".
+
+	var oServiceConsumer = {
+		source: "MyCalculator",
+		target: "MyAdder",
+		interface: "Calc.IAdd",
+		type: JSCOM.ACQUISITOR_SINGLE
+	}
  */  
 JSCOM.Component.prototype.getServiceConsumers = function()
 {
 	var sProviderId = this.id;
 	return JSCOM._jscomRt._getBoundEntities(JSCOM._jscomRt._committedBindings, "target", sProviderId);
-}
-
-
-/**
- * This function is to trigger asynchronous type of callback on completion of
- * a function exposed by this component's interface.
- */
-JSCOM.execCallback = function(context, callback, error, response)
-{
-	if (typeof callback === "function") {
-		setImmediate(callback.bind(context), error, response);	
-	}
-	// Original callback is replaced by a type AFTER adaptor.
-	else {
-		var originalCallbackFn = callback.originalCallbackFn;
-		var adaptorFn = callback.adaptorFn;
-		var adaptorRef = callback.adaptorRef;
-		var componentRef = context;
-		adaptorFn.apply(adaptorRef, [componentRef, originalCallbackFn, error, response]);
-	}
 }

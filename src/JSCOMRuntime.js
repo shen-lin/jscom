@@ -1,5 +1,7 @@
 /**
- * 
+ * JSCOM runtime environment. It provides reflective API functions to querying
+ * the component framework within the JSCOM runtime environment. A JSCOM runtime
+ * instance should be obtained by calling JSCOM.getJSCOMRuntime().
  * @module core
  * @class JSCOMRuntime
  */
@@ -33,6 +35,15 @@ JSCOM.JSCOMRuntime = function () {
  * Get Entity API
  ***********************/
 
+/**
+ * Get an existing entity resides in the JSCOM runtime environment.
+ * @method getEntity
+ * @param {string} sId Id of the entity
+ * @param {string} sType Type of the entity
+ * @return {Component | Composite} Component instance or composite instance.
+
+ 	Null value is returned if no entity found.
+ */ 
 JSCOM.JSCOMRuntime.prototype.getEntity = function(sId, sType)
 {
 	if (sType === JSCOM.COMPONENT) {
@@ -44,7 +55,14 @@ JSCOM.JSCOMRuntime.prototype.getEntity = function(sId, sType)
 	return null;
 };
 
+/**
+ * Get an existing entity resides in the JSCOM runtime environment.
+ * @method getEntityById
+ * @param {string} sId Id of the entity
+ * @return {Component | Composite} Component instance or composite instance.
 
+ 	Null value is returned if no entity found.
+ */ 
 JSCOM.JSCOMRuntime.prototype.getEntityById = function(sId)
 {
 	var oEntity = this.getComponent(sId);
@@ -65,6 +83,7 @@ JSCOM.JSCOMRuntime.prototype.getEntityById = function(sId)
  * Creates a root composite instance within JSCOM runtime.
  * @method createRootComposite
  * @param  {string} sId Id of the composite instance to be created
+ * @return {Composite} Instance of the created root composite.
  */ 
 JSCOM.JSCOMRuntime.prototype.createRootComposite = function(sId)
 {
@@ -76,10 +95,10 @@ JSCOM.JSCOMRuntime.prototype.createRootComposite = function(sId)
 
 
 /**
- * Gets a root composite instance by Id.
+ * Get a root composite instance by Id.
  * @method getRootComposite
  * @param  {string} sId Composite Id used to query
- * @return {JSCOM.Composite} Composite instance
+ * @return {Composite} Root composite instance
  */ 
 JSCOM.JSCOMRuntime.prototype.getRootComposite = function(sId)
 {
@@ -87,7 +106,7 @@ JSCOM.JSCOMRuntime.prototype.getRootComposite = function(sId)
 };
 
 /**
- * Gets all the root composites with JSCOM runtime.
+ * Get all the root composites with JSCOM runtime.
  * @method getRootCompositeSet
  * @return {map} The set of root composites as a map. Key is composite id.
  */ 
@@ -102,10 +121,10 @@ JSCOM.JSCOMRuntime.prototype.getRootCompositeSet = function()
  
 
 /**
- * Gets a composite instance by Id, including root-level composites.
+ * Get a composite instance by Id, including root-level composites.
  * @method getComposite
- * @param  {string} sId Composite Id used to query
- * @return {JSCOM.Composite} Composite instance
+ * @param  {string} sId Composite Id
+ * @return {Composite} Composite instance
  */ 
 JSCOM.JSCOMRuntime.prototype.getComposite = function(sId)
 {
@@ -127,7 +146,8 @@ JSCOM.JSCOMRuntime.prototype.getComposite = function(sId)
  
 /**
  * @method createAdaptor
- * @param 
+ * @param {string} className
+ * @param {string} id
  */  
 JSCOM.JSCOMRuntime.prototype.createAdaptor = function(className, id) 
 {
@@ -249,7 +269,7 @@ JSCOM.JSCOMRuntime.prototype._findMatchingFunctionsForClass = function(scope, cl
 	for (var i in interfaceSet) {
 		var interfaceName = interfaceSet[i];
 		var oInterface = this._interfaceDefSet[interfaceName];
-		var oInterfaceDef = oInterface.oInterfaceDef;
+		var oInterfaceDef = oInterface.definition;
 		for (var fnName in oInterfaceDef) {
 			var classFnPath = className + "@" + fnName;
 			var isMatchingFn = this._isMatchingFunction(scope, classFnPath);

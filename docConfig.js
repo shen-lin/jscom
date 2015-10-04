@@ -24,5 +24,4 @@ module.exports = {
         paths : [],
         autoComplete : true
     },
-
 };

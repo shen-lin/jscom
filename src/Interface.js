@@ -5,8 +5,18 @@
  * @constructor
  */
 
-JSCOM.Interface = function(sInterfaceName, oInterfaceDef)
+/**
+ * An interface defines a service provided by a component class. 
+ * 
+ * @class Interface
+ * @constructor
+ * @param {string} name Name of interface
+ * @param {object} definition Interface definition
+ * @module core
+ */ 
+
+JSCOM.Interface = function(name, definition)
 {
-	this.sInterfaceName = sInterfaceName;
-	this.oInterfaceDef = oInterfaceDef;
+	this.name = name;
+	this.definition = definition;
 };

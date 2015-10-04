@@ -72,14 +72,13 @@ JSCOM.Loader._checkInterfaceMethods = function(sClassName)
 	for (var i in aInterfaces) {
 		var sInterfaceName = aInterfaces[i];
 		var oInterface = JSCOM._jscomRt._interfaceDefSet[sInterfaceName];
-		var oInterfaceDef = oInterface.oInterfaceDef;
-		this._checkInterfaceMethod(sClassName, oInterfaceDef, oPrototype);
+		var oInterfaceDef = oInterface.definition;
+		this._checkInterfaceMethod(sClassName, sInterfaceName, oInterfaceDef, oPrototype);
 	}
 };
 
-JSCOM.Loader._checkInterfaceMethod = function(sClassName, oInterfaceDef, oPrototype)
+JSCOM.Loader._checkInterfaceMethod = function(sClassName, sInterfaceName, oInterfaceDef, oPrototype)
 {
-	var sInterfaceName = oInterfaceDef.sInterfaceName;
 	for (var sFnName in oInterfaceDef) {
 		if (!oPrototype[sFnName]) {
 			JSCOM.Error.throwError(JSCOM.Error.FunctionNotImplemented, 
@@ -97,7 +96,7 @@ JSCOM.Loader._backupInterfaceMethods = function(sClassName)
 	{
 		var sInterfaceName = aInterfaces[i];
 		var oInterface = JSCOM._jscomRt._interfaceDefSet[sInterfaceName];
-		var oInterfaceDef = oInterface.oInterfaceDef;
+		var oInterfaceDef = oInterface.definition;
 		for (var fnName in oInterfaceDef) {
 			var backupFnName = JSCOM.String.format(JSCOM.FN_BAK, fnName);
 			oPrototype[backupFnName] = oPrototype[fnName];

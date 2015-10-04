@@ -21,7 +21,7 @@ JSCOM.Loader.require("fs");
  * @constructor
  * @private
  * @param  {string} id Composite ID
- * @pram   {boolean} Indicate the composite is root level or not
+ * @param  {boolean} Indicate the composite is root level or not
  */ 
 JSCOM.Composite = function (id) {
 	this.id = id;
@@ -264,7 +264,7 @@ JSCOM.Composite.prototype.exposeInterface = function(sInterfaceName, sShortName)
 JSCOM.Composite.prototype._createInterfaceFunctions = function(sInterfaceName, oComponent, sShortName)
 {
 	var oInterface = JSCOM._jscomRt._interfaceDefSet[sInterfaceName];
-	var oInterfaceDef = oInterface.oInterfaceDef;
+	var oInterfaceDef = oInterface.definition;
 
 	for (var sFnName in oInterfaceDef) {
 		this._createInterfaceFunction(oComponent, sFnName, sInterfaceName, oInterfaceDef, sShortName);
