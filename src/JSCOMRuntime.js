@@ -145,9 +145,10 @@ JSCOM.JSCOMRuntime.prototype.getComposite = function(sId)
  ***********************/
  
 /**
+ * Create an adaptor instance.
  * @method createAdaptor
- * @param {string} className
- * @param {string} id
+ * @param {string} className Adaptor class name
+ * @param {string} id Adaptor instance id
  */  
 JSCOM.JSCOMRuntime.prototype.createAdaptor = function(className, id) 
 {
@@ -171,6 +172,7 @@ JSCOM.JSCOMRuntime.prototype.createAdaptor = function(className, id)
 
 
 /**
+ * Apply adaptor to functions in component classes.
  *
  * @method applyAdaptor
  * @param sId {string} Id of the injection
@@ -368,6 +370,12 @@ JSCOM.JSCOMRuntime.prototype.getChildEntityList = function(sId)
  * Component Access API
  ***********************/
 
+/**
+ * Get component instance by component id
+ * @method getComponent
+ * @param {string} id Component Id
+ * @return {Component} Component instance
+ */
 JSCOM.JSCOMRuntime.prototype.getComponent = function(id)
 {
 	return this._componentSet[id];
@@ -378,6 +386,19 @@ JSCOM.JSCOMRuntime.prototype.getComponent = function(id)
 /***********************
  * Component Repository Access API
  ***********************/
+
+/**
+ * Create component repository
+ * @method addComponentRepo
+ * @param {string} protocol Protocol type to query component repository
+ * @param {string} baseUri Base URI of the component repository
+ * @return {object} Created component repository config data. E.g.
+
+ 	{
+		protocol: protocol,
+		baseUri: baseUri
+	};
+ */ 
 JSCOM.JSCOMRuntime.prototype.addComponentRepo = function(protocol, baseUri)
 {
 	this._componentRepo = {
@@ -388,18 +409,32 @@ JSCOM.JSCOMRuntime.prototype.addComponentRepo = function(protocol, baseUri)
 	return this._componentRepo;
 };
 
+/**
+ * Remove component repository. Set component repository to null.
+ * @method removeComponentRepo
+ */ 
 JSCOM.JSCOMRuntime.prototype.removeComponentRepo = function()
 {
 	this._componentRepo = null;
 };
 
+/**
+ * Get component repository configuration information.
+ * @method getComponentRepo
+ * @return {object} Component repository config data.
+ */ 
 JSCOM.JSCOMRuntime.prototype.getComponentRepo = function()
 {
 	return this._componentRepo;
 };
 
 /**
- * @param sRepoPath {string}  Repository path. Use "/" as the root path to start component repository exploration.
+ * List the folders and components in the component repository. 
+ * @method listRepoComponents
+ * @param sRepoPath {string} Repository path. Use "/" as the root path to start component
+   	repository exploration.
+ * @return {array} A list of string items. Each item is the name of folders or 
+ 	component names in the repository
  */
 JSCOM.JSCOMRuntime.prototype.listRepoComponents = function(sRepoPath)
 {
@@ -427,8 +462,9 @@ JSCOM.JSCOMRuntime.prototype.initTransaction = function()
 };
 
 /**
- * Commit the bindings and unbindings during the transactional phase.
+ * Commit the bindings and unbindings of a transactional phase.
  * @method commit
+ * @throws JSCOM.Error.NotTransactionStarted
  */ 
 JSCOM.JSCOMRuntime.prototype.commit = function()
 {
@@ -444,7 +480,11 @@ JSCOM.JSCOMRuntime.prototype.commit = function()
 };
 
 
-
+/**
+ * Commit the bindings and unbindings of a transactional phase.
+ * @method rollback
+ * @throws JSCOM.Error.NotTransactionStarted
+ */ 
 JSCOM.JSCOMRuntime.prototype.rollback = function()
 {
 	if (this._startTrans)
