@@ -7,14 +7,13 @@ var JSCOM = jscom.getJSCOM();
 var jscomRt = JSCOM.getJSCOMRuntime();
 
 // Configure component repository to be working dir
-jscomRt.addComponentRepo(JSCOM.URI_FILE, 'example/BasicCalculator');
+jscomRt.addComponentRepo('example/BasicCalculator');
 
 // Get component repository...
 var componentRepo = jscomRt.getComponentRepo();
 
 describe("Component Repository Configuration", function() { 
-	it("Configuration Setter", function() { 
-		should(componentRepo).have.property('protocol', JSCOM.URI_FILE);
+	it("Configuration Setter", function() {
 		should(componentRepo).have.property('baseUri', 'example/BasicCalculator');
 	}); 
 });

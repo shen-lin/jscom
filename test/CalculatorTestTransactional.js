@@ -9,7 +9,7 @@ var JSCOM = jscom.getJSCOM();
 var jscomRt = JSCOM.getJSCOMRuntime();
 
 // Configure component repository to be working dir
-jscomRt.addComponentRepo(JSCOM.URI_FILE, 'example/BasicCalculator');
+jscomRt.addComponentRepo('example/BasicCalculator');
 
 // Create a composite for each component
 CalculatorTestTransactional.myComposite = jscomRt.createRootComposite("TestTransactionComposite");

@@ -390,19 +390,16 @@ JSCOM.JSCOMRuntime.prototype.getComponent = function(id)
 /**
  * Create component repository
  * @method addComponentRepo
- * @param {string} protocol Protocol type to query component repository
  * @param {string} baseUri Base URI of the component repository
  * @return {object} Created component repository config data. E.g.
 
  	{
-		protocol: protocol,
 		baseUri: baseUri
 	};
  */ 
-JSCOM.JSCOMRuntime.prototype.addComponentRepo = function(protocol, baseUri)
+JSCOM.JSCOMRuntime.prototype.addComponentRepo = function(baseUri)
 {
 	this._componentRepo = {
-		protocol: protocol,
 		baseUri: baseUri
 	};
 

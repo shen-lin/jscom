@@ -187,25 +187,15 @@ JSCOM.Loader.loadEntity = function(componentRepo, className)
  */ 
 JSCOM.Loader.loadRawContent = function(componentRepo, packagePath)
 {
-	var protocol = componentRepo.protocol;
 	var uri = JSCOM.Loader.convertPackagePath(componentRepo, packagePath);
 
-	var rawContent = null;
-	if (protocol === JSCOM.URI_FILE)
-	{
-		rawContent = JSCOM.Loader.loadRawContentFromFile(uri);
-	}	
-	else if (protocol === JSCOM.URI_HTTP)
-	{
-		rawContent = JSCOM.Loader.loadRawContentFromHttp(uri);
-	}
+	var rawContent = JSCOM.Loader.loadRawContentFromFile(uri);
 	return rawContent;
 };
 
 
 JSCOM.Loader.convertPackagePath = function(componentRepo, packagePath)
 {
-	var protocol = componentRepo.protocol;
 	var baseUri = componentRepo.baseUri;
 
 	var relativeUri = packagePath.replace(/\./g, JSCOM.URI_SEPARATOR);
@@ -245,23 +235,10 @@ JSCOM.Loader.loadRawContentFromFile = function(uri)
 };
 
 
-JSCOM.Loader.loadRawContentFromHttp = function(uri)
-{
-	throw new Error("Not Implemented");
-};
 
 JSCOM.Loader.listRepo = function(componentRepo, sPath)
 {
-	var protocol = componentRepo.protocol;
-	
-	if (protocol === JSCOM.URI_FILE)
-	{
-		return JSCOM.Loader.listRepoFromFile(componentRepo, sPath);
-	}	
-	else if (protocol === JSCOM.URI_HTTP)
-	{
-		return JSCOM.Loader.listRepoFromHttp(componentRepo, sPath);
-	}
+	return JSCOM.Loader.listRepoFromFile(componentRepo, sPath);
 };
 
 JSCOM.Loader.listRepoFromFile = function(componentRepo, sPath)
@@ -270,10 +247,6 @@ JSCOM.Loader.listRepoFromFile = function(componentRepo, sPath)
 	return JSCOM.fs.readdirSync(sRepoPath);
 }
 
-JSCOM.Loader.listRepoFromHttp = function(componentRepo, sPath)
-{
-	throw new Error("Not Implemented");
-}
 
 JSCOM.Loader.isBuildInType = function(className)
 {

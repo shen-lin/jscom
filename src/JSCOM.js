@@ -55,18 +55,6 @@ JSCOM.ACQUISITOR_MULTIPLE = "ACQUISITOR_MULTIPLE";
  */
 JSCOM.URI_SEPARATOR = "/";
 /**
- * @property {string} URI_FILE
- * @static
- * @description URI type to access component repository is file system.
- */
-JSCOM.URI_FILE = "file";
-/**
- * @property {string} URI_HTTP
- * @static
- * @description URI type to access component repository is http.
- */
-JSCOM.URI_HTTP = "http";
-/**
  * @property {string} ENCODE_UTF8
  * @static
  * @description Encode "utf8"
