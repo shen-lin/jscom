@@ -32,10 +32,11 @@ os.chdir(jscomDir)
 
 # Run mocha test
 os.environ['PATH'] = os.environ['PATH'] + ";" + jscomDir + "/node_modules/.bin"
+os.environ['NODE_PATH'] = jscomDir
 
 if args.debug:
 	call(["mocha", "debug"], shell=True)
 else:
-	call(["istanbul", "cover", "node_modules/mocha/bin/_mocha"], shell=True)
+	call(["istanbul", "cover", "-i", "dist/**", "node_modules/mocha/bin/_mocha"], shell=True)
 	if args.docgen:
 		call(["smartDoc"], shell=True)

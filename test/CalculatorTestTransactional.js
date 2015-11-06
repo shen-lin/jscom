@@ -4,7 +4,7 @@ var CalculatorTestTransactional = {};
 var should = require('should');
 
 // Loading JSCOM runtime...
-var jscom = require('../dist/jscom.js');
+var jscom = require('dist/jscom.js');
 var JSCOM = jscom.getJSCOM();
 var jscomRt = JSCOM.getJSCOMRuntime();
 

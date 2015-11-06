@@ -1,3 +1,6 @@
+var jscom = require('dist/jscom.js');
+var JSCOM = jscom.getJSCOM();
+
 JSCOM.Loader.declare({
 	component: "Calc.ParentCalculator",
 	extend: "JSCOM.Component"

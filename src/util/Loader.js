@@ -162,10 +162,11 @@ JSCOM.Loader.loadEntity = function(componentRepo, className)
 	var isBuildin = JSCOM.Loader.isBuildInType(className);
 	if (isBuildin) return;
 	
+	var uri = JSCOM.Loader.convertPackagePath(componentRepo, className);
+
 	try
 	{	
-		var rawContent = JSCOM.Loader.loadRawContent(componentRepo, className);
-		eval(rawContent);
+		require(uri);
 	}
 	catch (error)
 	{
@@ -187,6 +188,24 @@ JSCOM.Loader.loadEntity = function(componentRepo, className)
 JSCOM.Loader.loadRawContent = function(componentRepo, packagePath)
 {
 	var protocol = componentRepo.protocol;
+	var uri = JSCOM.Loader.convertPackagePath(componentRepo, packagePath);
+
+	var rawContent = null;
+	if (protocol === JSCOM.URI_FILE)
+	{
+		rawContent = JSCOM.Loader.loadRawContentFromFile(uri);
+	}	
+	else if (protocol === JSCOM.URI_HTTP)
+	{
+		rawContent = JSCOM.Loader.loadRawContentFromHttp(uri);
+	}
+	return rawContent;
+};
+
+
+JSCOM.Loader.convertPackagePath = function(componentRepo, packagePath)
+{
+	var protocol = componentRepo.protocol;
 	var baseUri = componentRepo.baseUri;
 
 	var relativeUri = packagePath.replace(/\./g, JSCOM.URI_SEPARATOR);
@@ -204,17 +223,8 @@ JSCOM.Loader.loadRawContent = function(componentRepo, packagePath)
 	else {
 		uri = JSCOM.String.format("{0}/{1}.js", baseUri, relativeUri);
 	}
-	
-	var rawContent = null;
-	if (protocol === JSCOM.URI_FILE)
-	{
-		rawContent = JSCOM.Loader.loadRawContentFromFile(uri);
-	}	
-	else if (protocol === JSCOM.URI_HTTP)
-	{
-		rawContent = JSCOM.Loader.loadRawContentFromHttp(uri);
-	}
-	return rawContent;
+
+	return uri;
 };
 
 
