@@ -8,7 +8,7 @@
 
 JSCOM.JSCOMRuntime = function () {
 	/* Composite and Component metadata */
-	this._componentRepo = null;  // component repository
+	this._componentRepoSet = null;  // component repository
 	this._rootCompositeSet = {};     // root level composites
 	this._compositeSet = {};     // non-root level composites
 	this._componentSet = {};     // loaded component instances
@@ -158,8 +158,10 @@ JSCOM.JSCOMRuntime.prototype.createAdaptor = function(className, id)
 	var isNewAdaptor = this._isNewAdaptorType(className);
 	// load adaptor into runtime
 	if (isNewAdaptor) {
+		var sRootScopeName = JSCOM.Loader.getRootScopeName(className);
 		var componentRepo = this.getComponentRepo();
-		JSCOM.Loader.loadEntity(componentRepo, className);		
+		var uri = componentRepo[sRootScopeName];
+		JSCOM.Loader.loadEntity(uri, className);		
 	}
 	// store loaded adaptors
 	this._adaptorClassNameSet.push(className);
@@ -391,19 +393,19 @@ JSCOM.JSCOMRuntime.prototype.getComponent = function(id)
  * Create component repository
  * @method addComponentRepo
  * @param {string} baseUri Base URI of the component repository
- * @return {object} Created component repository config data. E.g.
-
- 	{
-		baseUri: baseUri
-	};
+ * @param {string} rootScopeName The first-level name on the component's namespace.
+ 	E.g. If components from the repository has pattern "JSCOM.**.MyComponent", 
+ 	rootScopeName should be set to "JSCOM".
+ 	It is used to identify the repository when loading a component.
+ * @return {boolean} If the component repository is added successfully
  */ 
-JSCOM.JSCOMRuntime.prototype.addComponentRepo = function(baseUri)
+JSCOM.JSCOMRuntime.prototype.addComponentRepo = function(baseUri, rootScopeName)
 {
-	this._componentRepo = {
-		baseUri: baseUri
-	};
-
-	return this._componentRepo;
+	if (!this._componentRepoSet) {
+		this._componentRepoSet = {};
+	}
+	this._componentRepoSet[rootScopeName] = baseUri;
+	return true;
 };
 
 /**
@@ -412,30 +414,32 @@ JSCOM.JSCOMRuntime.prototype.addComponentRepo = function(baseUri)
  */ 
 JSCOM.JSCOMRuntime.prototype.removeComponentRepo = function()
 {
-	this._componentRepo = null;
+	this._componentRepoSet = null;
 };
 
 /**
  * Get component repository configuration information.
  * @method getComponentRepo
- * @return {object} Component repository config data.
+ * @return {object} Component repository set as key value pairs.
  */ 
 JSCOM.JSCOMRuntime.prototype.getComponentRepo = function()
 {
-	return this._componentRepo;
+	return this._componentRepoSet;
 };
 
 /**
  * List the folders and components in the component repository. 
  * @method listRepoComponents
+ * @param sRootScopeName {string} Identify the component repository to query.
  * @param sRepoPath {string} Repository path. Use "/" as the root path to start component
    	repository exploration.
  * @return {array} A list of string items. Each item is the name of folders or 
  	component names in the repository
  */
-JSCOM.JSCOMRuntime.prototype.listRepoComponents = function(sRepoPath)
+JSCOM.JSCOMRuntime.prototype.listRepoComponents = function(sRootScopeName, sRepoPath)
 {
-	return JSCOM.Loader.listRepo(this._componentRepo, sRepoPath);
+	var sUri = this._componentRepoSet[sRootScopeName];
+	return JSCOM.Loader.listRepo(sUri, sRepoPath);
 };
 
 

@@ -7,7 +7,7 @@ var JSCOM = jscom.getJSCOM();
 var jscomRt = JSCOM.getJSCOMRuntime();
 
 // Configure component repository to be working dir
-jscomRt.addComponentRepo('example/BasicCalculator');
+jscomRt.addComponentRepo('example/BasicCalculator', 'Calc');
 
 // Get component repository...
 var componentRepo = jscomRt.getComponentRepo();

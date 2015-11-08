@@ -7,19 +7,19 @@ var JSCOM = jscom.getJSCOM();
 var jscomRt = JSCOM.getJSCOMRuntime();
 
 // Configure component repository to be working dir
-jscomRt.addComponentRepo('example/BasicCalculator');
+jscomRt.addComponentRepo('example/BasicCalculator', 'Calc');
 
 // Get component repository...
 var componentRepo = jscomRt.getComponentRepo();
 
 describe("Component Repository Configuration", function() { 
 	it("Configuration Setter", function() {
-		should(componentRepo).have.property('baseUri', 'example/BasicCalculator');
+		should(componentRepo).have.property('Calc', 'example/BasicCalculator');
 	}); 
 });
 
-var aRootRepoFiles = jscomRt.listRepoComponents("/");
-var aCalcRepoFiles = jscomRt.listRepoComponents("/Calc");
+var aRootRepoFiles = jscomRt.listRepoComponents("Calc", "/");
+var aCalcRepoFiles = jscomRt.listRepoComponents("Calc", "/Calc");
 
 describe("Component Repository Exploration", function() { 
 	it("Explore repo root path", function() { 

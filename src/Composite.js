@@ -105,8 +105,10 @@ JSCOM.Composite.prototype.createComponent = function(className, id)
 	var isNewComponent = this._isNewComponentClassType(className);
 	// load component into runtime
 	if (isNewComponent) {
+		var sRootScopeName = JSCOM.Loader.getRootScopeName(className);
 		var componentRepo = JSCOM._jscomRt.getComponentRepo();
-		JSCOM.Loader.loadEntity(componentRepo, className);
+		var uri = componentRepo[sRootScopeName];
+		JSCOM.Loader.loadEntity(uri, className);
 
 		// store loaded component paths
 		JSCOM._jscomRt._componentClassNameSet.push(className);

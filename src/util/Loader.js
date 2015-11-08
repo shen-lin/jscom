@@ -18,10 +18,12 @@ JSCOM.Loader.declare = function(oDeclaration)
 	JSCOM.Loader._declare(sComponentClassName);
 	
 	// Load ancestors
-	var bIsBuildInParent = JSCOM.Loader.isBuildInType(sSuperComponentClassName);
-	if (!bIsBuildInParent) {
+	if (sSuperComponentClassName !== "JSCOM.Component" &&
+		sSuperComponentClassName !== "JSCOM.Adaptor") {
+		var sRootScopeName = JSCOM.Loader.getRootScopeName(sSuperComponentClassName);
 		var sComponentRepo = JSCOM._jscomRt.getComponentRepo();
-		JSCOM.Loader.loadEntity(sComponentRepo, sSuperComponentClassName);
+		var uri = sComponentRepo[sRootScopeName];
+		JSCOM.Loader.loadEntity(uri, sSuperComponentClassName);
 	}
 	
 	// Initialize constructor and inheritance
@@ -55,9 +57,10 @@ JSCOM.Loader._loadRawInterface = function(sInterfaceName)
 {
 	// Skip interfaces that already added
 	if (JSCOM._jscomRt._interfaceDefSet[sInterfaceName]) return;
-	
+	var sRootScopeName = JSCOM.Loader.getRootScopeName(sInterfaceName);
 	var componentRepo = JSCOM._jscomRt.getComponentRepo();
-	var interfaceRawContent = JSCOM.Loader.loadRawContent(componentRepo, sInterfaceName);
+	var uri = componentRepo[sRootScopeName];
+	var interfaceRawContent = JSCOM.Loader.loadRawContent(uri, sInterfaceName);
 	var oInterfaceDef = JSON.parse(interfaceRawContent);
 	var oInterface = new JSCOM.Interface(sInterfaceName, oInterfaceDef);
 	JSCOM._jscomRt._interfaceDefSet[sInterfaceName] = oInterface;
@@ -147,26 +150,33 @@ JSCOM.Loader._declare = function(sClassName)
 	}
 };
 
- 
+
+/**
+ * @param {string} className Component name with full namespace path.
+ * @return {string} Root scope name in the input component name
+ */ 
+JSCOM.Loader.getRootScopeName = function(className)
+{
+	var aPaths = className.split(".");
+	return aPaths[0];
+};
+
+
 /**
  * Load component or adaptor. 
  * <p>@throws JSCOM.EntityLoadingError</p>
  * @private
- * @param  {string} componentRepo description
- * @param  {string} className description
+ * @param  {string} uri Base URI
+ * @param  {string} className Full component name with namespace.
  * @static
  */ 
-JSCOM.Loader.loadEntity = function(componentRepo, className)
-{
-	// skip preloaded build-in entities
-	var isBuildin = JSCOM.Loader.isBuildInType(className);
-	if (isBuildin) return;
-	
-	var uri = JSCOM.Loader.convertPackagePath(componentRepo, className);
+JSCOM.Loader.loadEntity = function(uri, className)
+{	
+	var componentUri = JSCOM.Loader.convertPackagePath(uri, className);
 
 	try
 	{	
-		require(uri);
+		require(componentUri);
 	}
 	catch (error)
 	{
@@ -180,24 +190,21 @@ JSCOM.Loader.loadEntity = function(componentRepo, className)
  * Load raw source code content of the component JS file. 
  * <p>@throws</p>
  * @private
- * @param  {string} componentRepo description
+ * @param  {string} baseUri description
  * @param  {string} packagePath description
  * @return {string} Source code content of the loaded component.
  * @static
  */ 
-JSCOM.Loader.loadRawContent = function(componentRepo, packagePath)
+JSCOM.Loader.loadRawContent = function(baseUri, packagePath)
 {
-	var uri = JSCOM.Loader.convertPackagePath(componentRepo, packagePath);
-
+	var uri = JSCOM.Loader.convertPackagePath(baseUri, packagePath);
 	var rawContent = JSCOM.Loader.loadRawContentFromFile(uri);
 	return rawContent;
 };
 
 
-JSCOM.Loader.convertPackagePath = function(componentRepo, packagePath)
+JSCOM.Loader.convertPackagePath = function(baseUri, packagePath)
 {
-	var baseUri = componentRepo.baseUri;
-
 	var relativeUri = packagePath.replace(/\./g, JSCOM.URI_SEPARATOR);
 	var baseUriLastChar = baseUri.substring(baseUri.length);
 	var uri;
@@ -236,19 +243,13 @@ JSCOM.Loader.loadRawContentFromFile = function(uri)
 
 
 
-JSCOM.Loader.listRepo = function(componentRepo, sPath)
+JSCOM.Loader.listRepo = function(uri, sPath)
 {
-	return JSCOM.Loader.listRepoFromFile(componentRepo, sPath);
+	return JSCOM.Loader.listRepoFromFile(uri, sPath);
 };
 
-JSCOM.Loader.listRepoFromFile = function(componentRepo, sPath)
+JSCOM.Loader.listRepoFromFile = function(uri, sPath)
 {
-	var sRepoPath = componentRepo.baseUri + sPath;
+	var sRepoPath = uri + sPath;
 	return JSCOM.fs.readdirSync(sRepoPath);
 }
-
-
-JSCOM.Loader.isBuildInType = function(className)
-{
-	return JSCOM.String.startWith(className, "JSCOM");	
-};

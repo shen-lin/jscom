@@ -1,4 +1,4 @@
-import os, sys, argparse
+import os, sys, argparse, shutil
 from subprocess import call
 from subprocess import check_call
 
@@ -17,6 +17,8 @@ os.chdir(jscompilerDir)
 
 # Create logs and dist dir
 distDir = jscomDir + "/dist"
+if os.path.isdir(distDir):
+   shutil.rmtree(distDir)
 if not os.path.isdir(distDir):
    os.makedirs(distDir)
 logsDir = jscomDir + "/logs"
@@ -29,6 +31,7 @@ call(["python", "build.py", "--include", "includes", "--warningoff", "--output",
 # Change current working dir to jscom
 os.chdir(jscomDir)
 
+shutil.copytree("src/api", "dist/JSCOM/api");
 
 # Run mocha test
 os.environ['PATH'] = os.environ['PATH'] + ";" + jscomDir + "/node_modules/.bin"
