@@ -244,7 +244,7 @@ JSCOM.Composite.prototype.getAcquisitor = function(sInterfaceName)
 JSCOM.Composite.prototype.exposeInterface = function(sInterfaceName, sShortName)
 {
 	if (this._interfaceMap[sShortName]) {
-		JSCOM.Error.throwError(JSCOM.Error.ExposeInterfaceFailure, sShortName, this.id);
+		JSCOM.Error.throwError(JSCOM.Error.ExposeInterfaceFailure, [sShortName, this.id]);
 	}
 	
 	// Find the component within this composite, and this component has 

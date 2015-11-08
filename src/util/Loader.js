@@ -170,7 +170,7 @@ JSCOM.Loader.loadEntity = function(componentRepo, className)
 	}
 	catch (error)
 	{
-		JSCOM.Error.throwError(JSCOM.Error.EntityLoadingError, [className]);
+		JSCOM.Error.throwError(JSCOM.Error.EntityLoadingError, [className], error);
 	}
 };
 

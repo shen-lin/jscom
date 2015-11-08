@@ -319,7 +319,7 @@ JSCOM.JSCOMRuntime.prototype._isNewAdaptorInstance = function(id)
 	var adaptorInstance = this._adaptorSet[id];
 	if (adaptorInstance)
 	{
-		JSCOM.Error.throwError(JSCOM.Error.AdaptorAlreadyExist, id);
+		JSCOM.Error.throwError(JSCOM.Error.AdaptorAlreadyExist, [id]);
 	}
 };
 

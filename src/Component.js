@@ -101,7 +101,7 @@ JSCOM.Component.prototype.use = function(sInterfaceName)
 			}
 			
 			if (!matchingShortName) {
-				JSCOM.Error.throwError(JSCOM.Error.NoShortNameFound, sInterfaceName, oEntity.id);
+				JSCOM.Error.throwError(JSCOM.Error.NoShortNameFound, [sInterfaceName, oEntity.id]);
 			}
 			
 			aServiceProviders.push(oEntity[matchingShortName]);

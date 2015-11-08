@@ -84,10 +84,11 @@ JSCOM.Error = {
  * @method throwError
  * @param  {object} oError JSCOM.Error property
  * @param  {array} args Optional arguments to be formatted into the error description (0:n).
+ * @param  {error} oSysError Optional original NodeJS error
  * @return {error} Error object
  * @static
  */ 
-JSCOM.Error.throwError = function(oError, args)
+JSCOM.Error.throwError = function(oError, args, oSysError)
 {
 	var formatArgs = [oError.desc];
 	if (args) {
@@ -95,5 +96,11 @@ JSCOM.Error.throwError = function(oError, args)
 	}
 	var sErrorMsg = JSCOM.String.format.apply(JSCOM.String.format, formatArgs);
 	sErrorMsg = oError.code + ": " + sErrorMsg;
+	
+	if (oSysError) {
+		sErrorMsg = sErrorMsg + "\n--- Original Error ---\n";
+		sErrorMsg = sErrorMsg + oSysError.toString();
+	}
+
 	throw new Error(sErrorMsg);
 };
