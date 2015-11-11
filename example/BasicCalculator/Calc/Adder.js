@@ -3,11 +3,10 @@ var JSCOM = jscom.getJSCOM();
 
 JSCOM.Loader.declare({
 	component: "Calc.Adder",
-	extend: "JSCOM.Component"
+	extend: "JSCOM.Component",
+	interfaces: ["Calc.IAdd"]
 });
 
-// Expose interface ICalculator
-Calc.Adder.interfaces = ["Calc.IAdd"];
 
 Calc.Adder.prototype.add = function(a, b, callback)
 {

@@ -3,11 +3,10 @@ var JSCOM = jscom.getJSCOM();
 
 JSCOM.Loader.declare({
 	component: "Calc.Subtractor",
-	extend: "JSCOM.Component"
+	extend: "JSCOM.Component",
+	interfaces: ["Calc.ISubtract"]
 });
 
-// Expose interface ICalculator
-Calc.Subtractor.interfaces = ["Calc.ISubtract"];
 
 Calc.Subtractor.prototype.subtract = function(a, b, callback)
 {

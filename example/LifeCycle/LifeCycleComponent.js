@@ -3,25 +3,22 @@ var JSCOM = jscom.getJSCOM();
 
 JSCOM.Loader.declare({
 	component: "LifeCycle.LifeCycleComponent",
-	extend: "JSCOM.Component"
+	extend: "JSCOM.Component",
+	objects: ["LifeCycle.object.LifeCycleObject"],
+	interfaces: ["JSCOM.api.ILifeCycle"]
 });
-
-LifeCycle.LifeCycleComponent.datatypes = ["LifeCycle.object.List"];
-
-// Expose interface ICalculator
-LifeCycle.LifeCycleComponent.interfaces = ["JSCOM.api.ILifeCycle"];
 
 
 LifeCycle.LifeCycleComponent.prototype.data = null;
 
-LifeCycle.LifeCycleComponent.prototype.onLoad = function()
+LifeCycle.LifeCycleComponent.prototype.onInit = function()
 {
-	this.data = "Data";
+	// this.data = new LifeCycle.object.LifeCycleEntity();
 };
 
-LifeCycle.LifeCycleComponent.prototype.onExit = function()
+LifeCycle.LifeCycleComponent.prototype.onDelete = function()
 {
-
+	this.data = null;
 };
 
 

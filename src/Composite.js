@@ -122,7 +122,7 @@ JSCOM.Composite.prototype.createComponent = function(className, id)
 
 	// instantiate component instance
 	var compInstance = this._initComponentInstance(className, id);
-	// call ILifeCycle hook function onLoad
+	// call ILifeCycle hook function onInit
 	var aInterfaces = compInstance.getInterfaces();
 	var bHasILifeCycle;
 	for (var i in aInterfaces) {
@@ -134,7 +134,7 @@ JSCOM.Composite.prototype.createComponent = function(className, id)
 	}
 
 	if (bHasILifeCycle) {
-		compInstance.onLoad();
+		compInstance.onInit();
 	}
 	return compInstance;
 };

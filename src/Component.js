@@ -26,6 +26,8 @@ JSCOM.Component = function ()
 	this._metadataSet = {};
 };
 
+
+
 /***********************
  * @property parent {string}
  * @description Name of the parent component class

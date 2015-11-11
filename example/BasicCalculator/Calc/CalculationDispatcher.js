@@ -3,15 +3,13 @@ var JSCOM = jscom.getJSCOM();
 
 JSCOM.Loader.declare({
 	component: "Calc.CalculationDispatcher",
-	extend: "JSCOM.Component"
+	extend: "JSCOM.Component",
+	interfaces: ["Calc.IDispatch"],
+	acquisitors: [
+		new JSCOM.Acquisitor("Calc.ICalculator", JSCOM.ACQUISITOR_SINGLE)
+	]
 });
 
-Calc.CalculationDispatcher.acquisitors = [
-	new JSCOM.Acquisitor("Calc.ICalculator", JSCOM.ACQUISITOR_SINGLE)
-];
-
-// Expose interface ICalculator
-Calc.CalculationDispatcher.interfaces = ["Calc.IDispatch"];
 
 Calc.CalculationDispatcher.prototype.dispatch = function(callback)
 {

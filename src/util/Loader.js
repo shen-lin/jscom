@@ -12,11 +12,25 @@ JSCOM.Loader = JSCOM.Loader || {};
  ****************************************/
 JSCOM.Loader.declare = function(oDeclaration)
 {	
+	
+	if (oDeclaration.component) {
+		JSCOM.Loader._declareComponent(oDeclaration);
+	}
+
+	else if (oDeclaration.obj) {
+
+	}
+}; 
+
+
+JSCOM.Loader._declareComponent = function(oDeclaration)
+{	
 	var sComponentClassName = oDeclaration.component;
 	var sSuperComponentClassName = oDeclaration.extend;
 	
+	// Create the scope for the component namespace
 	JSCOM.Loader._declare(sComponentClassName);
-	
+
 	// Load ancestors
 	if (sSuperComponentClassName !== "JSCOM.Component" &&
 		sSuperComponentClassName !== "JSCOM.Adaptor") {
@@ -40,7 +54,14 @@ JSCOM.Loader.declare = function(oDeclaration)
 	eval(sStmt_2);
 	eval(sStmt_3);
 	eval(sStmt_4);
+
+	// Set interfaces, acquisitors, and objects lists.
+	var oCurrentComponentScope = eval(sComponentClassName);
+	oCurrentComponentScope.interfaces = oDeclaration.interfaces;
+	oCurrentComponentScope.acquisitors = oDeclaration.acquisitors;
+	oCurrentComponentScope.objects = oDeclaration.objects;
 }; 
+
 
 JSCOM.Loader._initComponentInterfaceSet = function(sClassName)
 {
@@ -123,7 +144,7 @@ JSCOM.Loader.require = function(libName) {
  ****************************************/
 
 /**
- * Convert package name to URI path. 
+ * Convert package name to JS scopes if the scope doesn't exist yet. 
  * <p>@throws</p>
  * @method declare
  * @param  {string} sClassName Component class name

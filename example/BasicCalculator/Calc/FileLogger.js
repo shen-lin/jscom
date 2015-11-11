@@ -3,13 +3,12 @@ var JSCOM = jscom.getJSCOM();
 
 JSCOM.Loader.declare({
 	component: "Calc.FileLogger",
-	extend: "JSCOM.Component"
+	extend: "JSCOM.Component",
+	interfaces: ["Calc.ILog"]
 });
 
 JSCOM.Loader.require('fs');
 
-// Expose interface ICalculator
-Calc.FileLogger.interfaces = ["Calc.ILog"];
 
 Calc.FileLogger.prototype.log = function(record, callback)
 {

@@ -1,5 +1,5 @@
 {
-    "onLoad" : {
+    "onInit" : {
         "inputs": [
 
         ],
@@ -8,7 +8,7 @@
 
         }
     },
-    "onExit" : {
+    "onDelete" : {
         "inputs": [
 
         ],

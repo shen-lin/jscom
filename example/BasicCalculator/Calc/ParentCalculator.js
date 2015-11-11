@@ -3,13 +3,13 @@ var JSCOM = jscom.getJSCOM();
 
 JSCOM.Loader.declare({
 	component: "Calc.ParentCalculator",
-	extend: "JSCOM.Component"
+	extend: "JSCOM.Component",
+	interfaces: ["Calc.ICalculator"],
+	acquisitors: [
+		new JSCOM.Acquisitor("Calc.IAdd", JSCOM.ACQUISITOR_SINGLE)
+	]
 });
 
-Calc.ParentCalculator.interfaces = ["Calc.ICalculator"];
-Calc.ParentCalculator.acquisitors = [
-	new JSCOM.Acquisitor("Calc.IAdd", JSCOM.ACQUISITOR_SINGLE)
-];
 
 Calc.ParentCalculator.prototype.add = function(a, b, callback)
 {	

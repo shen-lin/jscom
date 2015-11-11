@@ -3,11 +3,10 @@ var JSCOM = jscom.getJSCOM();
 
 JSCOM.Loader.declare({
 	component: "Calc.ConsoleLogger",
-	extend: "JSCOM.Component"
+	extend: "JSCOM.Component",
+	interfaces: ["Calc.ILog"]
 });
 
-// Expose interface ICalculator
-Calc.ConsoleLogger.interfaces = ["Calc.ILog"];
 
 Calc.ConsoleLogger.prototype.log = function(record, callback)
 {

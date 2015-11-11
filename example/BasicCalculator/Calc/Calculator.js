@@ -4,14 +4,14 @@ var JSCOM = jscom.getJSCOM();
 
 JSCOM.Loader.declare({
 	component: "Calc.Calculator",
-	extend: "Calc.ParentCalculator"
+	extend: "Calc.ParentCalculator",
+	acquisitors: [
+		new JSCOM.Acquisitor("Calc.ISubtract", JSCOM.ACQUISITOR_SINGLE), 
+		new JSCOM.Acquisitor("Calc.ILog", JSCOM.ACQUISITOR_MULTIPLE)
+	]
 });
 
 
-Calc.Calculator.acquisitors = [
-	new JSCOM.Acquisitor("Calc.ISubtract", JSCOM.ACQUISITOR_SINGLE), 
-	new JSCOM.Acquisitor("Calc.ILog", JSCOM.ACQUISITOR_MULTIPLE)
-];
 
 Calc.Calculator.prototype.subtract = function(a, b, callback)
 {
