@@ -430,11 +430,29 @@ JSCOM.JSCOMRuntime.prototype._initObjectModel =
 
 	JSCOM.objects[namespace][objectName] = function() {
 		var i = 0;
+		var oObjectModelInstance = this;
+
 		for (var sPropertyName in objectModel.properties) {
 			var oProperty = objectModel.properties[sPropertyName];
 			var sPropertyType = oProperty.type;
-			this[sPropertyName] = arguments[i];
-			i++
+			oObjectModelInstance["_" + sPropertyName] = arguments[i];
+
+			var getter = function() {
+				var sInvokedPropertyName = this;
+		    	return oObjectModelInstance["_" + sInvokedPropertyName]; 
+		    };
+
+			var setter = function(value) { 
+				var sInvokedPropertyName = this;
+			    oObjectModelInstance["_" + sInvokedPropertyName] = value;
+			}
+
+			Object.defineProperty(oObjectModelInstance, sPropertyName, {
+			    get: getter.bind(sPropertyName),
+			    set: setter.bind(sPropertyName)
+			});
+
+			i++;
 		}
 	};
 };
