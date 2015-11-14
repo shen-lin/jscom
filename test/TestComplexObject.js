@@ -36,8 +36,16 @@ TestComplexObject.lifeCycleComponent = TestComplexObject.rootComposite
 
 describe("Exec ILifeCycle function", function() { 
 	it("Exec onInit", function() {
-		var oLCCData = TestComplexObject.lifeCycleComponent.data;
-		should(oLCCData.id).equal(10000);
-		should(oLCCData.name).equal("Necklace");
+		var productData1 = TestComplexObject.lifeCycleComponent.productData1;
+		var productData2 = TestComplexObject.lifeCycleComponent.productData2;
+		var supplier = TestComplexObject.lifeCycleComponent.supplierData;
+		should(productData1.id).equal(10000);
+		should(productData1.name).equal("Necklace");
+		should(productData2.id).equal(10001);
+		should(productData2.name).equal("Ring");
+		should(supplier.id).equal(10000);
+		should(supplier.name).equal("SilverForge");
+		should(supplier.product.id).equal(10000);
+		should(supplier.product.name).equal("Necklace");
 	}); 
 });	
