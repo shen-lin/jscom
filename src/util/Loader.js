@@ -29,7 +29,7 @@ JSCOM.Loader._declareComponent = function(oDeclaration)
 	var sSuperComponentClassName = oDeclaration.extend;
 	
 	// Create the scope for the component namespace
-	JSCOM.Loader._declare(sComponentClassName);
+	JSCOM.Loader.declareScope(sComponentClassName);
 
 	// Load ancestors
 	if (sSuperComponentClassName !== "JSCOM.Component" &&
@@ -150,7 +150,7 @@ JSCOM.Loader.require = function(libName) {
  * @param  {string} sClassName Component class name
  * @static
  */ 
-JSCOM.Loader._declare = function(sClassName)
+JSCOM.Loader.declareScope = function(sClassName)
 {
 	var pathTokens = sClassName.split(".");
 	var incrementPath = "";

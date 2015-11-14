@@ -29,6 +29,9 @@ JSCOM.JSCOMRuntime = function () {
 	this._startTrans = false;
 	this._uncommittedBindings = [];
 	this._committedBindings = []; 
+
+	/* JSCOM object schemas */
+	this._objectSchemas = {};
 };
 
 /***********************
@@ -383,6 +386,58 @@ JSCOM.JSCOMRuntime.prototype.getComponent = function(id)
 	return this._componentSet[id];
 };
 
+
+/***********************
+ * Object Model Access API
+ ***********************/
+ /**
+  * Load object schema and instantiate the objects defined in the schema
+  * @method loadObjectSchema
+  * @param {string} schemaUri Namespace of this schema
+  * @return {boolean} If the component repository is added successfully
+  */ 
+JSCOM.JSCOMRuntime.prototype.loadObjectSchema = function(baseUri, schemaUri)
+{
+	// store the schema
+	var bHasSchema = this._objectSchemas[schemaUri];
+	if (bHasSchema) {
+		return;
+	}
+
+	// load schema file
+	var sSchemaContent = JSCOM.Loader.loadRawContent(baseUri, schemaUri);
+	var oSchema = JSON.parse(sSchemaContent);
+	this._objectSchemas[schemaUri] = oSchema;
+
+	// instantiate objects in the schema
+	for (var sObjectName in oSchema) {
+		var oObjectModel = oSchema[sObjectName];
+		this._initObjectModel(schemaUri, sObjectName, oObjectModel);
+	}
+};
+
+
+JSCOM.JSCOMRuntime.prototype._initObjectModel = 
+	function(namespace, objectName, objectModel)
+{
+	//console.log(namespace);
+	//console.log(objectName);
+	//console.log(objectModel);
+
+	if (!JSCOM.objects[namespace]) {
+		JSCOM.Loader.declareScope("JSCOM.objects." + namespace + "." + objectName);
+	}
+
+	JSCOM.objects[namespace][objectName] = function() {
+		var i = 0;
+		for (var sPropertyName in objectModel.properties) {
+			var oProperty = objectModel.properties[sPropertyName];
+			var sPropertyType = oProperty.type;
+			this[sPropertyName] = arguments[i];
+			i++
+		}
+	};
+};
 
 
 /***********************

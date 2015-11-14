@@ -13,6 +13,13 @@ exports.getJSCOM = function() {
 JSCOM._jscomRt = null;
 
 /**
+ * Object model namespace
+ */
+if (!JSCOM.objects) {
+	JSCOM.objects = {};
+}
+
+/**
  * Obtain the JSCOM runtime environment. A new JSCOM runtime 
  * environment is created if it doesn' exist yet.
  * @method getJSCOMRuntime

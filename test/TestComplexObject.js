@@ -12,6 +12,7 @@ var TestComplexObject = {};
 // Configure component repository
 jscomRt.addComponentRepo('example', 'LifeCycle');
 jscomRt.addComponentRepo('dist', 'JSCOM');
+jscomRt.loadObjectSchema('example', 'Product');
 
 TestComplexObject.componentRepo = jscomRt.getComponentRepo();
 
@@ -36,6 +37,7 @@ TestComplexObject.lifeCycleComponent = TestComplexObject.rootComposite
 describe("Exec ILifeCycle function", function() { 
 	it("Exec onInit", function() {
 		var oLCCData = TestComplexObject.lifeCycleComponent.data;
-		// should(oLCCData).equal("Data");
+		should(oLCCData.id).equal(10000);
+		should(oLCCData.name).equal("Necklace");
 	}); 
 });	
