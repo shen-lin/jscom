@@ -12,7 +12,7 @@ var TestComplexObject = {};
 // Configure component repository
 jscomRt.addComponentRepo('example', 'LifeCycle');
 jscomRt.addComponentRepo('dist', 'JSCOM');
-jscomRt.loadObjectSchema('example', 'Product');
+jscomRt.loadObjectSchema('example', 'ProductSchema');
 
 TestComplexObject.componentRepo = jscomRt.getComponentRepo();
 

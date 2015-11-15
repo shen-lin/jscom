@@ -420,22 +420,19 @@ JSCOM.JSCOMRuntime.prototype.loadObjectSchema = function(baseUri, schemaUri)
 JSCOM.JSCOMRuntime.prototype._initObjectModel = 
 	function(namespace, objectName, objectModel)
 {
-	//console.log(namespace);
-	//console.log(objectName);
-	//console.log(objectModel);
 
 	if (!JSCOM.objects[namespace]) {
 		JSCOM.Loader.declareScope("JSCOM.objects." + namespace + "." + objectName);
 	}
 
-	JSCOM.objects[namespace][objectName] = function() {
+	var objectClassScope = eval("JSCOM.objects." + namespace);
+	objectClassScope[objectName] = function() {
 		var i = 0;
 		var oObjectModelInstance = this;
 
 		for (var sPropertyName in objectModel.properties) {
 			var oProperty = objectModel.properties[sPropertyName];
 			var sPropertyType = oProperty.type;
-			oObjectModelInstance["_" + sPropertyName] = arguments[i];
 
 			var getter = function() {
 				var sInvokedPropertyName = this;
@@ -444,6 +441,12 @@ JSCOM.JSCOMRuntime.prototype._initObjectModel =
 
 			var setter = function(value) { 
 				var sInvokedPropertyName = this;
+				var oInvokedProperty = objectModel.properties[sInvokedPropertyName];
+				var sInvokedPropertyType = oInvokedProperty.type;
+				// validate input value type
+				// ...
+				
+				// set value
 			    oObjectModelInstance["_" + sInvokedPropertyName] = value;
 			}
 
@@ -452,6 +455,7 @@ JSCOM.JSCOMRuntime.prototype._initObjectModel =
 			    set: setter.bind(sPropertyName)
 			});
 
+			oObjectModelInstance[sPropertyName] = arguments[i];
 			i++;
 		}
 	};
