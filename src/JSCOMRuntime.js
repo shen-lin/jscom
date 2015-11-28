@@ -32,6 +32,8 @@ JSCOM.JSCOMRuntime = function () {
 
 	/* JSCOM object schemas */
 	this._objectSchemas = {};
+	/* Metadata of objects. Key is the namespace of object in schema */
+	this._objectMetadata = {};
 };
 
 /***********************
@@ -460,6 +462,20 @@ JSCOM.JSCOMRuntime.prototype._initObjectModel =
 		}
 	};
 };
+
+/**
+ * Get object definition in a given schema
+ * @method getObjectMetadata
+ * @param {string} schemaUri Fullname of the schema.
+ * @return {object} Object definition metadata
+ */ 
+JSCOM.JSCOMRuntime.prototype.getSchemaMetadata = 
+	function(schemaUri)
+{
+	return this._objectSchemas[schemaUri];
+}
+
+
 
 
 /***********************
