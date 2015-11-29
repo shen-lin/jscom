@@ -27,6 +27,35 @@ describe("Add multiple repositories", function() {
 	}); 
 });
 
+
+TestComplexObject.schemaMetadata = jscomRt.getSchemaMetadata("ProductSchema");
+
+describe("Schema Metadata Query", function() { 
+	it("Object type query", function() {
+		should(TestComplexObject.schemaMetadata)
+			.have.property('Product');
+		should(TestComplexObject.schemaMetadata)
+			.have.property('Category');
+		should(TestComplexObject.schemaMetadata)
+			.have.property('ProductDetail');
+		should(TestComplexObject.schemaMetadata)
+			.have.property('Supplier');	
+	}); 
+
+	it("Object relation query", function() {
+		TestComplexObject.relatedObjects = jscomRt.getSchemaObjectRelation("ProductSchema", "Product");
+		
+		should(TestComplexObject.relatedObjects)
+			.have.property('ProductSchema.Category', "collection");
+		should(TestComplexObject.relatedObjects)
+			.have.property('ProductSchema.ProductDetail', "single");	
+		should(TestComplexObject.relatedObjects)
+			.have.property('ProductSchema.Supplier', "single");		
+		should(TestComplexObject.relatedObjects)
+			.not.have.property('ProductSchema.Supplier', "collection");						
+	}); 
+});
+
 // Creating a composite of example calculator components...
 TestComplexObject.rootComposite = jscomRt.createRootComposite("TestComplexObjectComposite");
 

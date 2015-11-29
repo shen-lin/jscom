@@ -30,10 +30,10 @@ JSCOM.JSCOMRuntime = function () {
 	this._uncommittedBindings = [];
 	this._committedBindings = []; 
 
-	/* JSCOM object schemas */
-	this._objectSchemas = {};
 	/* Metadata of objects. Key is the namespace of object in schema */
-	this._objectMetadata = {};
+	this._objectSchemas = {};
+	/* A map of each object and related objects*/ 
+	this._objectRelations = {};
 };
 
 /***********************
@@ -415,10 +415,43 @@ JSCOM.JSCOMRuntime.prototype.loadObjectSchema = function(baseUri, schemaUri)
 	for (var sObjectName in oSchema) {
 		var oObjectModel = oSchema[sObjectName];
 		this._initObjectModel(schemaUri, sObjectName, oObjectModel);
+		this._buildObjectRelations(schemaUri, sObjectName, oObjectModel, oSchema);
 	}
 };
 
+/**
+ * Builds a map from each object type in the schema onto the related
+ * object types.
+ */
+JSCOM.JSCOMRuntime.prototype._buildObjectRelations = 
+	function(namespace, objectName, objectModel, oSchema)
+{
+	var oRelatedObjects = {};
+	var sObjectFullName = namespace + "." + objectName;
+	var oProperties = objectModel.properties;
+	for (var sPropertyName in oProperties) {
+		var oPropertyInfo = oProperties[sPropertyName];
 
+		if (oPropertyInfo.type && oSchema[oPropertyInfo.type]) {
+			var sRelatedObjectFullName = namespace + "." + oPropertyInfo.type;
+			oRelatedObjects[sRelatedObjectFullName] = "single";
+		}
+		else if (oPropertyInfo.type && 
+			oPropertyInfo.type === "collection" && 
+			oPropertyInfo.itemType &&
+			oSchema[oPropertyInfo.itemType]) 
+		{
+			var sRelatedObjectFullName = namespace + "." + oPropertyInfo.itemType;
+			oRelatedObjects[sRelatedObjectFullName] = "collection";
+		}
+	}
+
+	this._objectRelations[sObjectFullName] = oRelatedObjects;
+};	
+
+/**
+ * Creates object class for the object types in the schema.
+ */
 JSCOM.JSCOMRuntime.prototype._initObjectModel = 
 	function(namespace, objectName, objectModel)
 {
@@ -476,6 +509,19 @@ JSCOM.JSCOMRuntime.prototype.getSchemaMetadata =
 }
 
 
+/**
+ * Get all the related objects of the input object.
+ * @method getSchemaObjectRelation
+ * @param {string} schemaUri Fullname of the schema.
+ * @param {string} objectName Object class name.
+ * @return {object} A map of related objects 
+ */ 
+JSCOM.JSCOMRuntime.prototype.getSchemaObjectRelation = 
+	function(schemaUri, objectName)
+{
+	var sObjectFullName = schemaUri + "." + objectName;
+	return this._objectRelations[sObjectFullName];
+}
 
 
 /***********************
