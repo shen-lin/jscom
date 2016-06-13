@@ -58,7 +58,7 @@ JSCOM.Component.prototype.getCompositeId = function()
 
 /**
  * This method is used in a component implementation. It is called to obtain 
- * the service providers (i.e. referece to the Components/Composites that 
+ * the service providers (i.e. reference to the Components/Composites that 
  * are bound to this component instance).
  *
  * @method use

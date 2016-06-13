@@ -58,7 +58,7 @@ JSCOM.ACQUISITOR_MULTIPLE = "ACQUISITOR_MULTIPLE";
 /**
  * @property {string} URI_SEPARATOR
  * @static
- * @description URI Path separator charactor.
+ * @description URI Path separator character.
  */
 JSCOM.URI_SEPARATOR = "/";
 /**
