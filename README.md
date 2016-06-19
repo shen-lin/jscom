@@ -7,8 +7,13 @@ meta-level properties at runtime, and allows this system to be reconfigured on t
 
 License: BSD
 
+New Build command
+--------------------
+npm install
+grunt [--test=on|(off)] [--docon|(off)]  
+
 	
-Development Setup
+Old Development Setup
 --------------------
 	* Environment prerequisite: 
 		Install Python, Java, and NodeJS. Require NodeJS 0.11 and above.
